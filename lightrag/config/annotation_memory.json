@@ -15,13 +15,13 @@
       "parameters": [
         {
           "param_name": "预加电压",
-          "value_text": "用户输入的额定工频耐受电压值",
-          "value_expr": "用户输入的额定工频耐受电压值",
+          "value_text": "40.5kV及以下用户输入的额定电压的1.3倍",
+          "value_expr": "40.5kV及以下用户输入的额定电压的1.3倍",
           "value_source": "user_input",
           "value_type": "user_input",
-          "constraints": "用户输入的额定工频耐受电压值",
+          "constraints": "40.5kV及以下用户输入的额定电压的1.3倍",
           "calc_rule": "",
-          "derive_from_rated": "用户输入的额定工频耐受电压值"
+          "derive_from_rated": "40.5kV及以下用户输入的额定电压的1.3倍"
         },
         {
           "param_name": "额定电压",

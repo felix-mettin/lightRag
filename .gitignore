@@ -5,7 +5,6 @@ __pycache__/
 .eggs/
 *.tgz
 *.tar.gz
-*.ini
 
 # Virtual Environment
 .venv/
