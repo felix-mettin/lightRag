@@ -120,16 +120,16 @@
       "skip": false,
       "note": "",
       "parameters": [
-          {
-            "param_name": "预加电压",
-            "value_text": "40.5kV及以下是用户输入的额定电压的1.3倍",
-            "value_expr": "40.5kV及以下是用户输入的额定电压的1.3倍",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "40.5kV及以下是用户输入的额定电压的1.3倍",
-            "calc_rule": "",
-            "derive_from_rated": "40.5kV及以下是用户输入的额定电压的1.3倍"
-          },
+        {
+          "param_name": "预加电压",
+          "value_text": "40.5kV及以下是用户输入的额定电压的1.3倍",
+          "value_expr": "40.5kV及以下是用户输入的额定电压的1.3倍",
+          "value_source": "user_input",
+          "value_type": "user_input",
+          "constraints": "40.5kV及以下是用户输入的额定电压的1.3倍",
+          "calc_rule": "",
+          "derive_from_rated": "40.5kV及以下是用户输入的额定电压的1.3倍"
+        },
         {
           "param_name": "额定电压",
           "value_text": "额定电压范围I：3.6、7.2、12、24、40.5、72.5、126、252 kV；额定电压范围II：363、550、800、1100 kV。",
@@ -140,16 +140,16 @@
           "calc_rule": "",
           "derive_from_rated": ""
         },
-          {
-            "param_name": "预加时间",
-            "value_text": "60s",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "60s",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
+        {
+          "param_name": "预加时间",
+          "value_text": "60s",
+          "value_expr": "",
+          "value_source": "standard",
+          "value_type": "standard",
+          "constraints": "60s",
+          "calc_rule": "",
+          "derive_from_rated": ""
+        },
         {
           "param_name": "交流电压",
           "value_text": "70.5kV及以上按GB1984-2024表7并按断路器结构确定，40.5kV及以下按照1.1倍额定电压",
@@ -227,16 +227,16 @@
       "skip": false,
       "note": "",
       "parameters": [
-      {
-        "param_name": "试验次数",
-        "value_text": "1次",
-        "value_expr": "",
-        "value_source": "standard",
-        "value_type": "standard",
-        "constraints": "1次",
-        "calc_rule": "",
-        "derive_from_rated": ""
-      },
+        {
+          "param_name": "试验次数",
+          "value_text": "1次",
+          "value_expr": "",
+          "value_source": "standard",
+          "value_type": "standard",
+          "constraints": "1次",
+          "calc_rule": "",
+          "derive_from_rated": ""
+        },
         {
           "param_name": "试验时间",
           "value_text": "1min",
@@ -247,13 +247,13 @@
           "calc_rule": "",
           "derive_from_rated": ""
         },
-      {
-        "param_name": "交流电压",
-        "value_text": "2 kV",
-        "value_expr": "",
-        "value_source": "standard",
-        "value_type": "standard",
-        "constraints": "2 kV",
+        {
+          "param_name": "交流电压",
+          "value_text": "2 kV",
+          "value_expr": "",
+          "value_source": "standard",
+          "value_type": "standard",
+          "constraints": "2 kV",
           "calc_rule": "",
           "derive_from_rated": ""
         }
@@ -274,16 +274,16 @@
       "skip": false,
       "note": "",
       "parameters": [
-      {
-        "param_name": "试验次数",
-        "value_text": "1次",
-        "value_expr": "",
-        "value_source": "standard",
-        "value_type": "standard",
-        "constraints": "1次",
-        "calc_rule": "",
-        "derive_from_rated": ""
-      },
+        {
+          "param_name": "试验次数",
+          "value_text": "1次",
+          "value_expr": "",
+          "value_source": "standard",
+          "value_type": "standard",
+          "constraints": "1次",
+          "calc_rule": "",
+          "derive_from_rated": ""
+        },
         {
           "param_name": "试验时间",
           "value_text": "1min",
@@ -294,13 +294,13 @@
           "calc_rule": "",
           "derive_from_rated": ""
         },
-      {
-        "param_name": "交流电压",
-        "value_text": "2 kV",
-        "value_expr": "",
-        "value_source": "standard",
-        "value_type": "standard",
-        "constraints": "2 kV",
+        {
+          "param_name": "交流电压",
+          "value_text": "2 kV",
+          "value_expr": "",
+          "value_source": "standard",
+          "value_type": "standard",
+          "constraints": "2 kV",
           "calc_rule": "",
           "derive_from_rated": ""
         }
@@ -11932,16 +11932,16 @@
         "skip": false,
         "note": "",
         "parameters": [
-      {
-        "param_name": "预加电压",
-        "value_text": "40.5kV及以下是用户输入的额定电压的1.3倍",
-        "value_expr": "40.5kV及以下是用户输入的额定电压的1.3倍",
-        "value_source": "user_input",
-        "value_type": "user_input",
-        "constraints": "40.5kV及以下是用户输入的额定电压的1.3倍",
-        "calc_rule": "",
-        "derive_from_rated": "40.5kV及以下是用户输入的额定电压的1.3倍"
-      },
+          {
+            "param_name": "预加电压",
+            "value_text": "40.5kV及以下是用户输入的额定电压的1.3倍",
+            "value_expr": "40.5kV及以下是用户输入的额定电压的1.3倍",
+            "value_source": "user_input",
+            "value_type": "user_input",
+            "constraints": "40.5kV及以下是用户输入的额定电压的1.3倍",
+            "calc_rule": "",
+            "derive_from_rated": "40.5kV及以下是用户输入的额定电压的1.3倍"
+          },
           {
             "param_name": "额定电压",
             "value_text": "额定电压范围I：3.6、7.2、12、24、40.5、72.5、126、252 kV；额定电压范围II：363、550、800、1100 kV。",
@@ -11952,16 +11952,16 @@
             "calc_rule": "",
             "derive_from_rated": ""
           },
-      {
-        "param_name": "预加时间",
-        "value_text": "60s",
-        "value_expr": "",
-        "value_source": "standard",
-        "value_type": "standard",
-        "constraints": "60s",
-        "calc_rule": "",
-        "derive_from_rated": ""
-      },
+          {
+            "param_name": "预加时间",
+            "value_text": "60s",
+            "value_expr": "",
+            "value_source": "standard",
+            "value_type": "standard",
+            "constraints": "60s",
+            "calc_rule": "",
+            "derive_from_rated": ""
+          },
           {
             "param_name": "交流电压",
             "value_text": "70.5kV及以上按GB1984-2024表7并按断路器结构确定，40.5kV及以下按照1.1倍额定电压",
@@ -12039,16 +12039,16 @@
         "skip": false,
         "note": "",
         "parameters": [
-      {
-        "param_name": "预加电压",
-        "value_text": "40.5kV及以下是用户输入的额定电压的1.3倍",
-        "value_expr": "40.5kV及以下是用户输入的额定电压的1.3倍",
-        "value_source": "user_input",
-        "value_type": "user_input",
-        "constraints": "40.5kV及以下是用户输入的额定电压的1.3倍",
-        "calc_rule": "",
-        "derive_from_rated": "40.5kV及以下是用户输入的额定电压的1.3倍"
-      },
+          {
+            "param_name": "预加电压",
+            "value_text": "40.5kV及以下是用户输入的额定电压的1.3倍",
+            "value_expr": "40.5kV及以下是用户输入的额定电压的1.3倍",
+            "value_source": "user_input",
+            "value_type": "user_input",
+            "constraints": "40.5kV及以下是用户输入的额定电压的1.3倍",
+            "calc_rule": "",
+            "derive_from_rated": "40.5kV及以下是用户输入的额定电压的1.3倍"
+          },
           {
             "param_name": "额定电压",
             "value_text": "额定电压范围I：3.6、7.2、12、24、40.5、72.5、126、252 kV；额定电压范围II：363、550、800、1100 kV。",
@@ -12059,16 +12059,16 @@
             "calc_rule": "",
             "derive_from_rated": ""
           },
-      {
-        "param_name": "预加时间",
-        "value_text": "60s",
-        "value_expr": "",
-        "value_source": "standard",
-        "value_type": "standard",
-        "constraints": "60s",
-        "calc_rule": "",
-        "derive_from_rated": ""
-      },
+          {
+            "param_name": "预加时间",
+            "value_text": "60s",
+            "value_expr": "",
+            "value_source": "standard",
+            "value_type": "standard",
+            "constraints": "60s",
+            "calc_rule": "",
+            "derive_from_rated": ""
+          },
           {
             "param_name": "交流电压",
             "value_text": "70.5kV及以上按GB1984-2024表7并按断路器结构确定，40.5kV及以下按照1.1倍额定电压",
