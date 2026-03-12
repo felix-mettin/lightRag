@@ -20,7 +20,8 @@ case "$profile" in
 esac
 
 config_src="$repo_root/config/profiles/config.${profile}.ini"
-memory_src="$repo_root/lightrag/config/profiles/annotation_memory.${profile}.json"
+memory_profile="$profile"
+memory_src="$repo_root/lightrag/config/profiles/annotation_memory.${memory_profile}.json"
 config_dst="$repo_root/config.ini"
 memory_dst="$repo_root/lightrag/config/annotation_memory.json"
 env_file="$repo_root/.env"
@@ -50,5 +51,6 @@ mkdir -p "$repo_root/data/rag_storage_${profile}"
 
 echo "Activated profile: $profile"
 echo "Config: $config_dst"
+echo "Memory source profile: $memory_profile"
 echo "Memory: $memory_dst"
 echo "WORKING_DIR: $working_dir"
