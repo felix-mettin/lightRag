@@ -363,13 +363,13 @@
         },
         {
           "param_name": "试验相数",
-          "value_text": "用户录入",
-          "value_expr": "用户录入",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户录入",
+          "value_text": "40.5kV及以下默认三相",
+          "value_expr": "40.5kV及以下默认三相",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "40.5kV及以下默认三相",
           "calc_rule": "",
-          "derive_from_rated": "用户录入"
+          "derive_from_rated": ""
         },
         {
           "param_name": "试验状态",
@@ -460,13 +460,13 @@
         },
         {
           "param_name": "试验相数",
-          "value_text": "用户录入",
-          "value_expr": "用户录入",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户录入",
+          "value_text": "40.5kV及以下默认三相",
+          "value_expr": "40.5kV及以下默认三相",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "40.5kV及以下默认三相",
           "calc_rule": "",
-          "derive_from_rated": "用户录入"
+          "derive_from_rated": ""
         },
         {
           "param_name": "试验状态",
@@ -537,11 +537,11 @@
         },
         {
           "param_name": "最大适用海拔",
-          "value_text": "1000 m / 可选项，一般≥2000m需关注。两种选择：1海拔修正，费用无变化，但需说明按多少海拔修正；2选择人工气候室模拟海拔，另一种计费原则，费用有增加",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "1000 m / 可选项，一般≥2000m需关注。两种选择：1海拔修正，费用无变化，但需说明按多少海拔修正；2选择人工气候室模拟海拔，另一种计费原则，费用有增加",
+          "value_text": "默认1000米",
+          "value_expr": "默认1000米",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "默认1000米",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -577,13 +577,13 @@
         },
         {
           "param_name": "试验相数",
-          "value_text": "用户录入",
-          "value_expr": "用户录入",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户录入",
+          "value_text": "40.5kV及以下默认三相",
+          "value_expr": "40.5kV及以下默认三相",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "40.5kV及以下默认三相",
           "calc_rule": "",
-          "derive_from_rated": "用户录入"
+          "derive_from_rated": ""
         },
         {
           "param_name": "电压极性",
@@ -634,11 +634,11 @@
         },
         {
           "param_name": "最大适用海拔",
-          "value_text": "1000 m / 可选项，一般≥2000m需关注。两种选择：1海拔修正，费用无变化，但需说明按多少海拔修正；2选择人工气候室模拟海拔，另一种计费原则，费用有增加",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "1000 m / 可选项，一般≥2000m需关注。两种选择：1海拔修正，费用无变化，但需说明按多少海拔修正；2选择人工气候室模拟海拔，另一种计费原则，费用有增加",
+          "value_text": "默认1000米",
+          "value_expr": "默认1000米",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "默认1000米",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -674,13 +674,13 @@
         },
         {
           "param_name": "试验相数",
-          "value_text": "用户录入",
-          "value_expr": "用户录入",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户录入",
+          "value_text": "40.5kV及以下默认三相",
+          "value_expr": "40.5kV及以下默认三相",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "40.5kV及以下默认三相",
           "calc_rule": "",
-          "derive_from_rated": "用户录入"
+          "derive_from_rated": ""
         },
         {
           "param_name": "电压极性",
@@ -711,11 +711,11 @@
       "parameters": [
         {
           "param_name": "最大适用海拔",
-          "value_text": "1海拔修正，费用无变化，但需说明按多少海拔修正；2选择人工气候室模拟海拔，另一种计费原则，费用有增加",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "1海拔修正，费用无变化，但需说明按多少海拔修正；2选择人工气候室模拟海拔，另一种计费原则，费用有增加",
+          "value_text": "默认1000米",
+          "value_expr": "默认1000米",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "默认1000米",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -800,11 +800,11 @@
       "parameters": [
         {
           "param_name": "最大适用海拔",
-          "value_text": "1海拔修正，费用无变化，但需说明按多少海拔修正；2选择人工气候室模拟海拔，另一种计费原则，费用有增加",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "1海拔修正，费用无变化，但需说明按多少海拔修正；2选择人工气候室模拟海拔，另一种计费原则，费用有增加",
+          "value_text": "默认1000米",
+          "value_expr": "默认1000米",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "默认1000米",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -1395,13 +1395,13 @@
         },
         {
           "param_name": "试验相数",
-          "value_text": "用户输入三相共箱或分箱情况决定，分箱单相，共箱3相",
-          "value_expr": "用户输入三相共箱或分箱情况决定，分箱单相，共箱3相",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户输入三相共箱或分箱情况决定，分箱单相，共箱3相",
+          "value_text": "40.5kV及以下默认三相",
+          "value_expr": "40.5kV及以下默认三相",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "40.5kV及以下默认三相",
           "calc_rule": "",
-          "derive_from_rated": "用户输入三相共箱或分箱情况决定，分箱单相，共箱3相"
+          "derive_from_rated": ""
         }
       ],
       "remove_parameters": [],
@@ -1462,13 +1462,13 @@
         },
         {
           "param_name": "试验相数",
-          "value_text": "用户输入三相共箱或分箱情况决定，分箱单相，共箱3相",
-          "value_expr": "用户输入三相共箱或分箱情况决定，分箱单相，共箱3相",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户输入三相共箱或分箱情况决定，分箱单相，共箱3相",
+          "value_text": "40.5kV及以下默认三相",
+          "value_expr": "40.5kV及以下默认三相",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "40.5kV及以下默认三相",
           "calc_rule": "",
-          "derive_from_rated": "用户输入三相共箱或分箱情况决定，分箱单相，共箱3相"
+          "derive_from_rated": ""
         }
       ],
       "remove_parameters": [],
@@ -12380,13 +12380,13 @@
           },
           {
             "param_name": "试验相数",
-            "value_text": "用户录入",
-            "value_expr": "用户录入",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户录入",
+            "value_text": "40.5kV及以下默认三相",
+            "value_expr": "40.5kV及以下默认三相",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "40.5kV及以下默认三相",
             "calc_rule": "",
-            "derive_from_rated": "用户录入"
+            "derive_from_rated": ""
           },
           {
             "param_name": "试验状态",
@@ -12477,13 +12477,13 @@
           },
           {
             "param_name": "试验相数",
-            "value_text": "用户录入",
-            "value_expr": "用户录入",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户录入",
+            "value_text": "40.5kV及以下默认三相",
+            "value_expr": "40.5kV及以下默认三相",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "40.5kV及以下默认三相",
             "calc_rule": "",
-            "derive_from_rated": "用户录入"
+            "derive_from_rated": ""
           },
           {
             "param_name": "试验状态",
@@ -12556,11 +12556,11 @@
           },
           {
             "param_name": "最大适用海拔",
-            "value_text": "1000 m / 可选项，一般≥2000m需关注。两种选择：1海拔修正，费用无变化，但需说明按多少海拔修正；2选择人工气候室模拟海拔，另一种计费原则，费用有增加",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "1000 m / 可选项，一般≥2000m需关注。两种选择：1海拔修正，费用无变化，但需说明按多少海拔修正；2选择人工气候室模拟海拔，另一种计费原则，费用有增加",
+            "value_text": "默认1000米",
+            "value_expr": "默认1000米",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "默认1000米",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -12596,13 +12596,13 @@
           },
           {
             "param_name": "试验相数",
-            "value_text": "用户录入",
-            "value_expr": "用户录入",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户录入",
+            "value_text": "40.5kV及以下默认三相",
+            "value_expr": "40.5kV及以下默认三相",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "40.5kV及以下默认三相",
             "calc_rule": "",
-            "derive_from_rated": "用户录入"
+            "derive_from_rated": ""
           },
           {
             "param_name": "电压极性",
@@ -12653,11 +12653,11 @@
           },
           {
             "param_name": "最大适用海拔",
-            "value_text": "1000 m / 可选项，一般≥2000m需关注。两种选择：1海拔修正，费用无变化，但需说明按多少海拔修正；2选择人工气候室模拟海拔，另一种计费原则，费用有增加",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "1000 m / 可选项，一般≥2000m需关注。两种选择：1海拔修正，费用无变化，但需说明按多少海拔修正；2选择人工气候室模拟海拔，另一种计费原则，费用有增加",
+            "value_text": "默认1000米",
+            "value_expr": "默认1000米",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "默认1000米",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -12693,13 +12693,13 @@
           },
           {
             "param_name": "试验相数",
-            "value_text": "用户录入",
-            "value_expr": "用户录入",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户录入",
+            "value_text": "40.5kV及以下默认三相",
+            "value_expr": "40.5kV及以下默认三相",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "40.5kV及以下默认三相",
             "calc_rule": "",
-            "derive_from_rated": "用户录入"
+            "derive_from_rated": ""
           },
           {
             "param_name": "电压极性",
@@ -12732,11 +12732,11 @@
         "parameters": [
           {
             "param_name": "最大适用海拔",
-            "value_text": "1海拔修正，费用无变化，但需说明按多少海拔修正；2选择人工气候室模拟海拔，另一种计费原则，费用有增加",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "1海拔修正，费用无变化，但需说明按多少海拔修正；2选择人工气候室模拟海拔，另一种计费原则，费用有增加",
+            "value_text": "默认1000米",
+            "value_expr": "默认1000米",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "默认1000米",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -12821,11 +12821,11 @@
         "parameters": [
           {
             "param_name": "最大适用海拔",
-            "value_text": "1海拔修正，费用无变化，但需说明按多少海拔修正；2选择人工气候室模拟海拔，另一种计费原则，费用有增加",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "1海拔修正，费用无变化，但需说明按多少海拔修正；2选择人工气候室模拟海拔，另一种计费原则，费用有增加",
+            "value_text": "默认1000米",
+            "value_expr": "默认1000米",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "默认1000米",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -13756,13 +13756,13 @@
           },
           {
             "param_name": "试验相数",
-            "value_text": "用户输入三相共箱或分箱情况决定，分箱单相，共箱3相",
-            "value_expr": "用户输入三相共箱或分箱情况决定，分箱单相，共箱3相",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户输入三相共箱或分箱情况决定，分箱单相，共箱3相",
+            "value_text": "40.5kV及以下默认三相",
+            "value_expr": "40.5kV及以下默认三相",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "40.5kV及以下默认三相",
             "calc_rule": "",
-            "derive_from_rated": "用户输入三相共箱或分箱情况决定，分箱单相，共箱3相"
+            "derive_from_rated": ""
           }
         ],
         "remove_parameters": [],
@@ -13823,13 +13823,13 @@
           },
           {
             "param_name": "试验相数",
-            "value_text": "用户输入三相共箱或分箱情况决定，分箱单相，共箱3相",
-            "value_expr": "用户输入三相共箱或分箱情况决定，分箱单相，共箱3相",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户输入三相共箱或分箱情况决定，分箱单相，共箱3相",
+            "value_text": "40.5kV及以下默认三相",
+            "value_expr": "40.5kV及以下默认三相",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "40.5kV及以下默认三相",
             "calc_rule": "",
-            "derive_from_rated": "用户输入三相共箱或分箱情况决定，分箱单相，共箱3相"
+            "derive_from_rated": ""
           }
         ],
         "remove_parameters": [],

@@ -1108,3 +1108,165 @@
 - The remaining debugging lens for future sessions should be:
   - whether a parameter was misclassified into the wrong `resolution_mode`,
   - not just whether retrieval hit the right graph node.
+
+---
+
+# Session Memory Update
+Timestamp: 2026-03-11 20:14:14 CST
+
+## 1) Annotation memory / config cleanup status
+- `lightrag/config/annotation_memory.json` was previously cleaned and now definitely contains these `add_test_items`:
+  - `T60(预备试验)`
+  - `电寿命试验`
+  - `短时耐受电流试验`
+  - `峰值耐受电流试验`
+- `config.ini` was patched so schema whitelist now includes:
+  - `T60(预备试验)`
+  - `短时耐受电流试验`
+  - `峰值耐受电流试验`
+- `config.ini` was also patched to add missing parameter mappings:
+  - `短时耐受电流`
+  - `峰值电流kA`
+  - `试验工位`
+  - `短路持续时间`
+- `config.ini` `test_item_param_requirements` was updated for:
+  - `T60(预备试验)`
+  - `短时耐受电流试验`
+  - `峰值耐受电流试验`
+
+## 2) Root cause of “new tree still unchanged” was not missing rules
+- User reported newly exported trees still did not include:
+  - `T60(预备试验)`
+  - `电寿命试验`
+  - `短时耐受电流试验`
+  - `峰值耐受电流试验`
+- Investigation found the running Docker container was not using this repo at first.
+- `docker inspect lightrag` showed mounts pointed at:
+  - `/Users/df/workspace/python/LightRAG/...`
+  instead of:
+  - `/Users/df/workspace/python/LightRAG-github/...`
+- Therefore earlier runtime results came from another workspace’s old `annotation_memory.json`, not from the edited file in this repo.
+
+## 3) Docker compose was corrected in current repo
+- `docker-compose.yml` was rewritten to a single-service layout:
+  - service name: `lightrag-2`
+  - port mapping: `${PORT:-9622}:9621`
+- Volume mounts now correctly point to current repo paths, including:
+  - `./lightrag/config/annotation_memory.json:/app/lightrag/config/annotation_memory.json`
+  - `./config.ini:/app/config.ini`
+  - `./lightrag/operate.py:/app/lightrag/operate.py`
+  - `./lightrag/lightrag.py:/app/lightrag/lightrag.py`
+  - `./lightrag/prompt.py:/app/lightrag/prompt.py`
+- This compose file is now the intended runtime entry for this repo.
+
+## 4) Another missing-project cause was found in code path
+- In `lightrag/operate.py`, `add_test_items` are injected first, but then all test items are filtered by `config.ini -> test_items`.
+- This explained why:
+  - `T60(预备试验)`
+  - `短时耐受电流试验`
+  - `峰值耐受电流试验`
+  were still dropped before the `config.ini` patch.
+- Separate issue:
+  - `电寿命试验` was not just missing from schema filtering.
+  - `annotation_memory.json` still had historical `skip=true` overrides under:
+    - `开合性能型式试验 > 开合性能型式试验 > 电寿命试验`
+    - `型式试验 > 开合性能型式试验 > 电寿命试验`
+- These stale skip rules were deleted.
+- `tests_by_name["电寿命试验"]` was reduced to `[]` to stop accidental same-name suppression.
+
+## 5) Current graph storage observations (`data/rag_storage`)
+- `data/rag_storage` currently contains:
+  - `graph_chunk_entity_relation.graphml`
+  - `kv_store_doc_status.json`
+  - `kv_store_full_entities.json`
+  - `kv_store_full_relations.json`
+  - `kv_store_text_chunks.json`
+  - `vdb_chunks.json`
+  - `vdb_relationships.json`
+- Observed timestamps were inconsistent:
+  - `kv_store_full_entities.json` / `kv_store_full_relations.json` updated later
+  - `graph_chunk_entity_relation.graphml` remained older
+- This indicates storage may be in a mixed or partially rebuilt state.
+
+## 6) IEC / DLT tree-view debugging conclusions
+- User switched to IEC mode and turned these config flags off:
+  - `annotation_guardrail_mode = false`
+  - `annotation_guardrail_only_override = false`
+  - `strict_tree_override_match = false`
+  - `override_param_filter_to_template = false`
+- This means graph labels now follow extracted report naming more closely and no longer align with GBT-only assumptions.
+- Existing `electrical_test_tree.html` is tightly coupled to GBT:
+  - hard-coded four Chinese root categories
+  - fixed GBT template tree
+- This is why it cannot serve IEC / DLT graph browsing directly.
+
+## 7) New dynamic tree pages created during this session
+- Created:
+  - `electrical_test_tree_std.html`
+  - `electrical_test_tree_dynamic.html`
+- Goal:
+  - preserve original visual style,
+  - support IEC / DLT by discovering roots dynamically via `/graph/label/search`,
+  - then loading graph data via `/graphs`.
+- First versions failed because they treated any discovered `report:*` label as a tree root.
+- User exports confirmed those pages were loading empty roots only.
+
+## 8) Key graph-structure finding for IEC/DLT runtime
+- Inspection of `data/rag_storage/graph_chunk_entity_relation.graphml` found:
+  - nodes like `report:Short-circuit Performance`, `report:Switching Performance`, `report:Continuous Current Performance`
+    exist,
+    but they do **not** have `INCLUDES_TEST` outgoing edges.
+- Instead, the actual test-bearing root is:
+  - `report:型式试验`
+- Confirmed edges:
+  - `report:型式试验 -> test:短路开断试验(T10)` with `rel=INCLUDES_TEST`
+  - similar for other short-circuit test items
+- Example misleading nodes:
+  - `report:Short-circuit Performance`
+  - `report:Switching Performance`
+  - `report:STL Type Test Certificate ...`
+  are mostly report-semantic nodes and not tree roots.
+
+## 9) Latest dynamic page patch status
+- `electrical_test_tree_dynamic.html` was patched again to improve root discovery:
+  - add fallback probe for `report:型式试验`
+  - for each discovered `report:*` candidate, fetch one-hop graph and keep only candidates with:
+    - `INCLUDES_TEST` edge
+    - source == candidate root
+    - target starts with `test:`
+- Debug output added:
+  - `root_check -> HAS_INCLUDES_TEST`
+  - `root_check -> NO_INCLUDES_TEST`
+- Intended effect:
+  - filter out empty IEC report labels like `Short-circuit Performance`
+  - keep only actual test-bearing report roots
+
+## 10) Important uncertainty at end of session
+- User pasted logs still showing old behavior:
+  - loading empty roots such as `report:Short-circuit Performance`
+  - no `root_check` lines visible
+- Strong likelihood:
+  - browser was still using an older cached HTML,
+  - or user opened an older generated page instead of the latest patched `electrical_test_tree_dynamic.html`.
+- This was not fully re-verified within this session.
+
+## 11) Recommended first step for next session
+- Re-open the latest file:
+  - `electrical_test_tree_dynamic.html`
+- Hard-refresh browser / use incognito
+- Click:
+  1. `发现根`
+  2. confirm debug shows `root_check -> ...`
+  3. then `加载树`
+- If still failing:
+  - inspect actual browser-loaded HTML version,
+  - or add an explicit visible version banner such as `dynamic-v2` to remove cache ambiguity.
+
+## 12) Practical takeaway to preserve
+- For IEC / DLT graph browsing, do **not** assume:
+  - discovered `report:*Performance` labels are tree roots.
+- The graph may still organize test items under a single Chinese root:
+  - `report:型式试验`
+- Therefore any future tree UI must identify roots by structure:
+  - “has `INCLUDES_TEST` outgoing edges”
+  - not merely by report label text.

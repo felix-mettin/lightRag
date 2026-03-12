@@ -24,12 +24,7 @@ services:
       - ./.env:/app/.env
     env_file:
       - .env
-    networks:
-      - lightrag2_network
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
-networks:
-  lightrag2_network:
-    driver: bridge
