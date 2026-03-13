@@ -3,15 +3,27 @@ This module contains all query-related routes for the LightRAG API.
 """
 
 import json
+import os
 from typing import Any, Dict, List, Literal, Optional
+from langfuse import observe, Langfuse
+
 from fastapi import APIRouter, Depends, HTTPException
+from dotenv import load_dotenv
+
 from lightrag.base import QueryParam
 from lightrag.api.utils_api import get_combined_auth_dependency
 from lightrag.utils import logger
 from pydantic import BaseModel, Field, field_validator
 
+load_dotenv()
+
 router = APIRouter(tags=["query"])
 
+langfuse = Langfuse(
+    secret_key=os.getenv("LANGFUSE_SECRET_KEY"),
+    public_key=os.getenv("LANGFUSE_PUBLIC_KEY"),
+    host=os.getenv("LANGFUSE_URL"),
+)
 
 class QueryRequest(BaseModel):
     query: str = Field(
@@ -453,6 +465,7 @@ def create_query_routes(rag, api_key: Optional[str] = None, top_k: int = 60):
             logger.error(f"Error processing query: {str(e)}", exc_info=True)
             raise HTTPException(status_code=500, detail=str(e))
 
+    @observe(name="queryStream")
     @router.post(
         "/query/stream",
         dependencies=[Depends(combined_auth)],
