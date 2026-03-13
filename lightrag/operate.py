@@ -7638,6 +7638,48 @@ async def _build_context_str(
         else "Multiple Paragraphs"
     )
 
+    def _query_has_explicit_fracture_param(query_text: str, family: str) -> bool:
+        text = str(query_text or "").strip()
+        if not text:
+            return False
+        normalized = text.replace("（", "(").replace("）", ")")
+        family_patterns = {
+            "pf": [
+                r"额定(?:短时)?工频耐受电压\s*\(断口\)",
+                r"断口[^，。\n]*工频耐受电压",
+            ],
+            "li": [
+                r"额定雷电冲击耐受电压\s*\(断口\)",
+                r"断口[^，。\n]*雷电冲击耐受电压",
+            ],
+        }
+        return any(
+            re.search(pattern, normalized, flags=re.IGNORECASE)
+            for pattern in family_patterns.get(family, [])
+        )
+
+    fracture_pf_provided = _query_has_explicit_fracture_param(query, "pf")
+    fracture_li_provided = _query_has_explicit_fracture_param(query, "li")
+
+    auto_query_instructions: list[str] = []
+    if not fracture_pf_provided:
+        auto_query_instructions.append(
+            "系统约束：用户未提供额定短时工频耐受电压(断口)或同义断口工频参数，禁止输出`工频耐受电压试验(断口)`与`工频耐受电压试验(相间及对地)`拆分项目；只能输出未拆分的`工频耐受电压试验`。"
+        )
+    if not fracture_li_provided:
+        auto_query_instructions.append(
+            "系统约束：用户未提供额定雷电冲击耐受电压(断口)或同义断口雷电参数，禁止输出`雷电冲击耐受电压试验(断口)`与`雷电冲击耐受电压试验(相间及对地)`拆分项目；只能输出未拆分的`雷电冲击耐受电压试验`。"
+        )
+    if auto_query_instructions:
+        auto_instruction_block = "System-Enforced Query Constraints:\n" + "\n".join(
+            f"- {instruction}" for instruction in auto_query_instructions
+        )
+        user_prompt = (
+            f"{user_prompt}\n\n{auto_instruction_block}"
+            if user_prompt
+            else auto_instruction_block
+        )
+
     async def _build_project_param_context() -> tuple[
         dict[str, list[str]], dict[str, dict[str, dict[str, str]]]
     ]:
@@ -7716,6 +7758,23 @@ async def _build_context_str(
                 params = _get_config_required_params(str(test_name))
                 if params:
                     fallback_map[str(test_name)] = params
+            if fracture_pf_provided and "工频耐受电压试验" in fallback_map:
+                fallback_map["工频耐受电压试验(断口)"] = list(
+                    fallback_map["工频耐受电压试验"]
+                )
+                fallback_map["工频耐受电压试验(相间及对地)"] = list(
+                    fallback_map["工频耐受电压试验"]
+                )
+            if fracture_li_provided and "雷电冲击耐受电压试验" in fallback_map:
+                fallback_map["雷电冲击耐受电压试验(断口)"] = list(
+                    fallback_map["雷电冲击耐受电压试验"]
+                )
+                fallback_map["雷电冲击耐受电压试验(相间及对地)"] = list(
+                    fallback_map["雷电冲击耐受电压试验"]
+                )
+            if "电寿命试验" in fallback_map:
+                for split_name in ("电寿命(单分)", "电寿命(合分)", "电寿命(循环)"):
+                    fallback_map[split_name] = list(fallback_map["电寿命试验"])
             return fallback_map, {}
 
         project_param_map: dict[str, list[str]] = {}
@@ -7806,7 +7865,44 @@ async def _build_context_str(
                 params = _get_config_required_params(str(test_name))
                 if params:
                     fallback_map[str(test_name)] = params
+            if fracture_pf_provided and "工频耐受电压试验" in fallback_map:
+                fallback_map["工频耐受电压试验(断口)"] = list(
+                    fallback_map["工频耐受电压试验"]
+                )
+                fallback_map["工频耐受电压试验(相间及对地)"] = list(
+                    fallback_map["工频耐受电压试验"]
+                )
+            if fracture_li_provided and "雷电冲击耐受电压试验" in fallback_map:
+                fallback_map["雷电冲击耐受电压试验(断口)"] = list(
+                    fallback_map["雷电冲击耐受电压试验"]
+                )
+                fallback_map["雷电冲击耐受电压试验(相间及对地)"] = list(
+                    fallback_map["雷电冲击耐受电压试验"]
+                )
+            if "电寿命试验" in fallback_map:
+                for split_name in ("电寿命(单分)", "电寿命(合分)", "电寿命(循环)"):
+                    fallback_map[split_name] = list(fallback_map["电寿命试验"])
             return fallback_map, {}
+
+        def _inherit_split_param_map(target_name: str, source_name: str) -> None:
+            source_params = project_param_map.get(source_name, [])
+            if not source_params:
+                return
+            project_param_map[target_name] = list(source_params)
+
+        if fracture_pf_provided:
+            _inherit_split_param_map("工频耐受电压试验(断口)", "工频耐受电压试验")
+            _inherit_split_param_map(
+                "工频耐受电压试验(相间及对地)", "工频耐受电压试验"
+            )
+        if fracture_li_provided:
+            _inherit_split_param_map("雷电冲击耐受电压试验(断口)", "雷电冲击耐受电压试验")
+            _inherit_split_param_map(
+                "雷电冲击耐受电压试验(相间及对地)", "雷电冲击耐受电压试验"
+            )
+        if "电寿命试验" in project_param_map:
+            for split_name in ("电寿命(单分)", "电寿命(合分)", "电寿命(循环)"):
+                _inherit_split_param_map(split_name, "电寿命试验")
         return project_param_map, project_param_value_map
 
     project_param_map, project_param_value_map = await _build_project_param_context()
@@ -7987,6 +8083,10 @@ async def _build_context_str(
         final_data["metadata"] = {}
     final_data["metadata"]["project_param_map"] = project_param_map
     final_data["metadata"]["project_param_value_map"] = project_param_value_map
+    final_data["metadata"]["project_split_rules"] = {
+        "pf_fracture_enabled": fracture_pf_provided,
+        "li_fracture_enabled": fracture_li_provided,
+    }
     logger.debug(
         f"[_build_context_str] Final data after conversion: {len(final_data.get('entities', []))} entities, {len(final_data.get('relationships', []))} relationships, {len(final_data.get('chunks', []))} chunks"
     )
