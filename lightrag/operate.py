@@ -6549,6 +6549,8 @@ async def kg_query(
         # Apply higher priority (5) to query relation LLM function
         use_model_func = partial(use_model_func, _priority=5)
 
+    retrieval_query = _build_scope_focused_query(query)
+
     def _extract_calculation_result_value(line: str) -> str | None:
         if "calculation" not in line.lower():
             return None
@@ -6619,7 +6621,7 @@ async def kg_query(
         return "\n".join(corrected_lines)
 
     hl_keywords, ll_keywords = await get_keywords_from_query(
-        query, query_param, global_config, hashing_kv
+        retrieval_query, query_param, global_config, hashing_kv
     )
 
     logger.debug(f"High-level keywords: {hl_keywords}")
@@ -6633,7 +6635,7 @@ async def kg_query(
     if hl_keywords == [] and ll_keywords == []:
         if len(query) < 50:
             logger.warning(f"Forced low_level_keywords to origin query: {query}")
-            ll_keywords = [query]
+            ll_keywords = [retrieval_query]
         else:
             return QueryResult(content=PROMPTS["fail_response"])
 
@@ -6665,7 +6667,7 @@ async def kg_query(
 
     # Build query context (unified interface)
     context_result = await _build_query_context(
-        query,
+        retrieval_query,
         ll_keywords_str,
         hl_keywords_str,
         knowledge_graph_inst,
@@ -6793,12 +6795,13 @@ async def kg_query(
             second_hints = _extract_second_retrieval_hints(response)
             if second_hints:
                 second_query = f"{query} " + " ".join(second_hints)
+                second_retrieval_query = _build_scope_focused_query(second_query)
                 logger.info(
                     "[kg_query] Second retrieval triggered with hints: %s",
                     "; ".join(second_hints),
                 )
                 second_context_result = await _build_query_context(
-                    second_query,
+                    second_retrieval_query,
                     ll_keywords_str,
                     hl_keywords_str,
                     knowledge_graph_inst,
@@ -6892,6 +6895,53 @@ async def get_keywords_from_query(
         query, query_param, global_config, hashing_kv
     )
     return hl_keywords, ll_keywords
+
+
+def _build_scope_focused_query(query: str) -> str:
+    """Reduce noisy cross-domain parameters before retrieval for known test scopes."""
+    text = str(query or "").strip()
+    if not text:
+        return text
+
+    if "绝缘性能型式试验" not in text:
+        return text
+
+    normalized = " ".join(text.split())
+    fragments: list[str] = []
+
+    model_match = re.search(r"型号名称\s*[：:]\s*([^，。；;\n]+)", normalized)
+    if model_match:
+        fragments.append(f"型号名称：{model_match.group(1).strip()}")
+
+    if "绝缘性能型式试验" in normalized:
+        fragments.append("断路器需要进行绝缘性能型式试验")
+
+    insulation_patterns = [
+        r"额定电压\s*[0-9]+(?:\.[0-9]+)?\s*kV",
+        r"额定电流\s*[0-9]+(?:\.[0-9]+)?\s*A",
+        r"额定频率\s*[0-9]+(?:\.[0-9]+)?\s*Hz?",
+        r"额定短时工频耐受电压(?:\(断口\))?\s*[0-9]+(?:\.[0-9]+)?\s*k?V?",
+        r"额定雷电冲击耐受电压(?:\(断口\))?\s*[0-9]+(?:\.[0-9]+)?\s*k?V?",
+        r"最大\(适用\)的海拔\s*[0-9]+(?:\.[0-9]+)?\s*m",
+        r"SF6气体的最低功能压力\(20℃表压\)\s*[0-9]+(?:\.[0-9]+)?\s*MPa",
+        r"SF6气体的额定压力\(20℃表压\)\s*[0-9]+(?:\.[0-9]+)?\s*MPa",
+        r"额定直流电压\s*[0-9]+(?:\.[0-9]+)?\s*k?V?",
+        r"元件中含固封极柱",
+        r"户内[^，。；;\n]*断路器",
+        r"户外[^，。；;\n]*断路器",
+        r"固封式",
+        r"充气断路器",
+        r"充油断路器",
+    ]
+
+    for pattern in insulation_patterns:
+        for match in re.finditer(pattern, normalized, flags=re.IGNORECASE):
+            value = match.group(0).strip("，。；; ")
+            if value and value not in fragments:
+                fragments.append(value)
+
+    # Fall back to original query if trimming would over-prune context.
+    return "，".join(fragments) if len(fragments) >= 3 else text
 
 
 async def extract_keywords_only(
@@ -7707,25 +7757,17 @@ async def _build_context_str(
         else "Multiple Paragraphs"
     )
 
-    def _query_has_explicit_fracture_param(query_text: str, family: str) -> bool:
+    def _extract_named_voltage_kv(query_text: str, labels: list[str]) -> float | None:
         text = str(query_text or "").strip()
         if not text:
-            return False
+            return None
         normalized = text.replace("（", "(").replace("）", ")")
-        family_patterns = {
-            "pf": [
-                r"额定(?:短时)?工频耐受电压\s*\(断口\)",
-                r"断口[^，。\n]*工频耐受电压",
-            ],
-            "li": [
-                r"额定雷电冲击耐受电压\s*\(断口\)",
-                r"断口[^，。\n]*雷电冲击耐受电压",
-            ],
-        }
-        return any(
-            re.search(pattern, normalized, flags=re.IGNORECASE)
-            for pattern in family_patterns.get(family, [])
-        )
+        for label in labels:
+            pattern = rf"{re.escape(label)}\s*([0-9]+(?:\.[0-9]+)?)\s*(?:kV)?"
+            match = re.search(pattern, normalized, flags=re.IGNORECASE)
+            if match:
+                return float(match.group(1))
+        return None
 
     def _extract_model_prefix(query_text: str) -> str | None:
         text = str(query_text or "").strip()
@@ -7741,42 +7783,72 @@ async def _build_context_str(
         match = re.search(r"额定电流\s*([0-9]+)\s*A\b", text, flags=re.IGNORECASE)
         return int(match.group(1)) if match else None
 
+    def _extract_rated_voltage_kv(query_text: str) -> float | None:
+        text = str(query_text or "").strip()
+        if not text:
+            return None
+        match = re.search(
+            r"额定电压\s*([0-9]+(?:\.[0-9]+)?)\s*kV\b", text, flags=re.IGNORECASE
+        )
+        return float(match.group(1)) if match else None
+
     def _query_has_explicit_solid_sealed_pole(query_text: str) -> bool:
         text = str(query_text or "").strip()
         if not text:
             return False
         return bool(re.search(r"元件中含固封极柱", text))
 
-    fracture_pf_provided = _query_has_explicit_fracture_param(query, "pf")
-    fracture_li_provided = _query_has_explicit_fracture_param(query, "li")
+    pf_base_kv = _extract_named_voltage_kv(
+        query, ["额定短时工频耐受电压", "额定工频耐受电压"]
+    )
+    pf_fracture_kv = _extract_named_voltage_kv(
+        query, ["额定短时工频耐受电压(断口)", "额定工频耐受电压(断口)"]
+    )
+    li_base_kv = _extract_named_voltage_kv(query, ["额定雷电冲击耐受电压"])
+    li_fracture_kv = _extract_named_voltage_kv(query, ["额定雷电冲击耐受电压(断口)"])
+
+    fracture_pf_provided = pf_fracture_kv is not None
+    fracture_li_provided = li_fracture_kv is not None
+    fracture_pf_enabled = bool(
+        pf_fracture_kv is not None and pf_base_kv is not None and pf_fracture_kv > pf_base_kv
+    )
+    fracture_li_enabled = bool(
+        li_fracture_kv is not None and li_base_kv is not None and li_fracture_kv > li_base_kv
+    )
     model_prefix = _extract_model_prefix(query)
     rated_current_amp = _extract_rated_current_amp(query)
+    rated_voltage_kv = _extract_rated_voltage_kv(query)
     explicit_solid_sealed_pole = _query_has_explicit_solid_sealed_pole(query)
 
+    pd_allowed_by_voltage = rated_voltage_kv == 40.5
     pd_allowed_by_model = bool(
         model_prefix
         and model_prefix != "VF1"
         and rated_current_amp == 4000
     )
-    pd_allowed = explicit_solid_sealed_pole or pd_allowed_by_model
+    pd_allowed = explicit_solid_sealed_pole or pd_allowed_by_model or pd_allowed_by_voltage
 
     auto_query_instructions: list[str] = []
-    if not fracture_pf_provided:
+    if not fracture_pf_enabled:
         auto_query_instructions.append(
-            "系统约束：用户未提供额定短时工频耐受电压(断口)或同义断口工频参数，禁止输出`工频耐受电压试验(断口)`与`工频耐受电压试验(相间及对地)`拆分项目；只能输出未拆分的`工频耐受电压试验`。"
+            "系统约束：只有当额定短时工频耐受电压(断口)严格大于额定短时工频耐受电压时，才允许输出`工频耐受电压试验(断口)`与`工频耐受电压试验(相间及对地)`拆分项目；否则只能输出未拆分的`工频耐受电压试验`。"
         )
-    if not fracture_li_provided:
+    if not fracture_li_enabled:
         auto_query_instructions.append(
-            "系统约束：用户未提供额定雷电冲击耐受电压(断口)或同义断口雷电参数，禁止输出`雷电冲击耐受电压试验(断口)`与`雷电冲击耐受电压试验(相间及对地)`拆分项目；只能输出未拆分的`雷电冲击耐受电压试验`。"
+            "系统约束：只有当额定雷电冲击耐受电压(断口)严格大于额定雷电冲击耐受电压时，才允许输出`雷电冲击耐受电压试验(断口)`与`雷电冲击耐受电压试验(相间及对地)`拆分项目；否则只能输出未拆分的`雷电冲击耐受电压试验`。"
         )
     if pd_allowed:
         if explicit_solid_sealed_pole:
             auto_query_instructions.append(
-                "系统约束：用户已明确提供`元件中含固封极柱`，允许输出`局部放电试验`。"
+                "系统约束：用户已明确提供`元件中含固封极柱`，必须输出`局部放电试验`。"
+            )
+        elif pd_allowed_by_voltage:
+            auto_query_instructions.append(
+                "系统约束：当额定电压精确等于`40.5kV`时，必须输出`局部放电试验`；其试验次数按无断口局放口径执行为`3次`，不得因为断口工频/雷电参数而改成9次。"
             )
         else:
             auto_query_instructions.append(
-                "系统约束：仅因型号前缀不是`VF1`且额定电流精确等于`4000A`，允许按业务规则输出`局部放电试验`；不得将`3150A`、`2500A`、`2000A`、`1600A`、`1250A`、`630A`或“接近4000A”视为命中。"
+                "系统约束：仅因型号前缀不是`VF1`且额定电流精确等于`4000A`，必须按业务规则输出`局部放电试验`；不得将`3150A`、`2500A`、`2000A`、`1600A`、`1250A`、`630A`或“接近4000A”视为命中。"
             )
     else:
         auto_query_instructions.append(
@@ -7870,14 +7942,14 @@ async def _build_context_str(
                 params = _get_config_required_params(str(test_name))
                 if params:
                     fallback_map[str(test_name)] = params
-            if fracture_pf_provided and "工频耐受电压试验" in fallback_map:
+            if fracture_pf_enabled and "工频耐受电压试验" in fallback_map:
                 fallback_map["工频耐受电压试验(断口)"] = list(
                     fallback_map["工频耐受电压试验"]
                 )
                 fallback_map["工频耐受电压试验(相间及对地)"] = list(
                     fallback_map["工频耐受电压试验"]
                 )
-            if fracture_li_provided and "雷电冲击耐受电压试验" in fallback_map:
+            if fracture_li_enabled and "雷电冲击耐受电压试验" in fallback_map:
                 fallback_map["雷电冲击耐受电压试验(断口)"] = list(
                     fallback_map["雷电冲击耐受电压试验"]
                 )
@@ -7958,10 +8030,11 @@ async def _build_context_str(
                         "resolution_mode": resolution_mode,
                     }
             if params:
-                project_param_map[test_name] = params
+                required_params = _get_config_required_params(test_name)
+                project_param_map[test_name] = required_params or params
                 if param_value_entries:
                     ordered_value_entries: dict[str, dict[str, str]] = {}
-                    for param_name in params:
+                    for param_name in project_param_map[test_name]:
                         if param_name in param_value_entries:
                             ordered_value_entries[param_name] = param_value_entries[param_name]
                     if ordered_value_entries:
@@ -7977,14 +8050,14 @@ async def _build_context_str(
                 params = _get_config_required_params(str(test_name))
                 if params:
                     fallback_map[str(test_name)] = params
-            if fracture_pf_provided and "工频耐受电压试验" in fallback_map:
+            if fracture_pf_enabled and "工频耐受电压试验" in fallback_map:
                 fallback_map["工频耐受电压试验(断口)"] = list(
                     fallback_map["工频耐受电压试验"]
                 )
                 fallback_map["工频耐受电压试验(相间及对地)"] = list(
                     fallback_map["工频耐受电压试验"]
                 )
-            if fracture_li_provided and "雷电冲击耐受电压试验" in fallback_map:
+            if fracture_li_enabled and "雷电冲击耐受电压试验" in fallback_map:
                 fallback_map["雷电冲击耐受电压试验(断口)"] = list(
                     fallback_map["雷电冲击耐受电压试验"]
                 )
@@ -8002,12 +8075,12 @@ async def _build_context_str(
                 return
             project_param_map[target_name] = list(source_params)
 
-        if fracture_pf_provided:
+        if fracture_pf_enabled:
             _inherit_split_param_map("工频耐受电压试验(断口)", "工频耐受电压试验")
             _inherit_split_param_map(
                 "工频耐受电压试验(相间及对地)", "工频耐受电压试验"
             )
-        if fracture_li_provided:
+        if fracture_li_enabled:
             _inherit_split_param_map("雷电冲击耐受电压试验(断口)", "雷电冲击耐受电压试验")
             _inherit_split_param_map(
                 "雷电冲击耐受电压试验(相间及对地)", "雷电冲击耐受电压试验"
@@ -8196,11 +8269,14 @@ async def _build_context_str(
     final_data["metadata"]["project_param_map"] = project_param_map
     final_data["metadata"]["project_param_value_map"] = project_param_value_map
     final_data["metadata"]["project_split_rules"] = {
-        "pf_fracture_enabled": fracture_pf_provided,
-        "li_fracture_enabled": fracture_li_provided,
+        "pf_fracture_enabled": fracture_pf_enabled,
+        "li_fracture_enabled": fracture_li_enabled,
+        "pf_fracture_provided": fracture_pf_provided,
+        "li_fracture_provided": fracture_li_provided,
         "partial_discharge_enabled": pd_allowed,
         "partial_discharge_by_explicit_solid_sealed_pole": explicit_solid_sealed_pole,
         "partial_discharge_by_model_rule": pd_allowed_by_model,
+        "partial_discharge_by_voltage_rule": pd_allowed_by_voltage,
     }
     logger.debug(
         f"[_build_context_str] Final data after conversion: {len(final_data.get('entities', []))} entities, {len(final_data.get('relationships', []))} relationships, {len(final_data.get('chunks', []))} chunks"
