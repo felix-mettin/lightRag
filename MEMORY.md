@@ -1,5 +1,200 @@
 # Conversation Memory (2026-02-06, Updated)
 
+## Conversation Memory (2026-03-15, Updated 21:45 CST)
+
+## Context
+- Workspace now is `/Users/df/Downloads/绝缘问答/LightRAG-github`.
+- Main focus shifted to query-time rule layer and answer stabilization for electrical QA.
+- Core idea has been made explicit:
+  - graph stores candidate facts,
+  - runtime rules decide allow/deny/split/merge/override,
+  - prompt should follow runtime scope instead of re-deciding business logic.
+
+## Major Runtime Architecture Changes Applied
+
+### 1) Query-time rule context was formalized
+- Added four runtime prompt blocks in QA context:
+  - `Domain Rule Decisions`
+  - `Resolved Rule Overrides`
+  - `Allowed Final Test Items`
+  - `Removed Test Items`
+- These are built in `lightrag/operate.py` and injected by `lightrag/prompt.py`.
+- Purpose:
+  - expose backend rule decisions to model,
+  - reduce free-form project selection by the model.
+
+### 2) `UserPrompt.md` priority conflicts were reduced
+- Static whitelist / hard-constraint wording in `UserPrompt.md` was downgraded so it no longer claims to outrank runtime rules.
+- Prompt now states runtime rule outputs are authoritative; static whitelist is only a domain candidate scope.
+
+### 3) `CurrentReportScope` hard filtering added
+- Implemented explicit query-time report-scope filtering in `lightrag/operate.py`:
+  - `_get_report_scope_test_whitelist()`
+  - `_extract_current_report_scopes(...)`
+  - `_filter_project_context_by_report_scope(...)`
+- Applied after runtime decisions, before prompt context build.
+- Behavior:
+  - single report query => only keep that report’s whitelist items,
+  - multi-report query => keep union of requested report scopes.
+- Scope-filtered items are appended into `Removed Test Items`.
+- Metadata now stores:
+  - `current_report_scopes`
+  - `project_param_map_raw`
+  - `project_param_value_map_raw`
+
+### 4) Final-scope bug in `pair_merge` fixed
+- `_build_final_test_item_scope(...)` previously removed both primary and secondary items on merge.
+- This wrongly removed merge target items such as:
+  - `LC1 + CC1 -> CC1`
+  - `LC2 + CC2 -> CC2`
+- Fixed so secondary item is only removed if it is not the final merge target.
+
+## Domain Rule Changes Applied
+
+### 1) Insulation / PF / LI
+- Added stronger handling for:
+  - `pair_merge` visibility in resolved overrides,
+  - PF/LI user-input voltage override,
+  - outdoor PF dry/wet split details,
+  - `试验状态` fallback for `工频耐受电压试验(干)/(湿)`,
+  - `介质性质` hard protection:
+    - only explicit `SF6 / 六氟化硫 / 充气断路器 / 充油断路器` allows `充气/充油`,
+    - otherwise final answer forces `正常`.
+
+### 2) Applicability additions / fixes
+- Added or widened applicability rules in `lightrag/config/domain_rules/insulation.gb.json` for:
+  - `雷电冲击耐受电压试验`
+  - `局部放电试验`
+  - `作为状态检查的工频耐受电压试验`
+  - `BC1/BC2`
+  - `CC1/CC2`
+  - `LC1/LC2`
+  - `OP1/OP2`
+  - `L90/L75`
+  - `T10/T30/T60/T100s`
+- Important clarifications:
+  - `BC1/BC2` now trigger from:
+    - `额定背对背电容器组开断电流`
+    - `背对背电容器组开断电流`
+    - `额定单个电容器组开断电流`
+    - `单个电容器组开断电流`
+  - `CC1/CC2` trigger from cable charging current labels.
+  - `LC1/LC2` trigger from line charging current labels.
+  - `OP1/OP2` now trigger not only on `失步额定值`, but also:
+    - `额定失步开断电流`
+    - `失步开断电流`
+  - `L90/L75` no longer leak from short-circuit scope whitelist alone; they need explicit applicability conditions.
+
+### 3) Merge logic changes
+- `短时耐受电流试验 / 峰值耐受电流试验` merge rule changed multiple times during session.
+- Final currently saved logic is:
+  - merge when `峰值耐受电流 < 2.6 × 短时耐受电流`
+  - separate when `峰值耐受电流 >= 2.6 × 短时耐受电流`
+- This was explicitly changed per user request at the end of the session.
+- Note: this is nonstandard compared with earlier versions; do not "fix back" tomorrow unless user asks.
+
+## Query-time Value Override / Hard Defaulting Added
+
+### 1) Warm-rise domain
+- `连续电流试验` now hard-fills:
+  - `额定电压`
+  - `试验电流A`
+  - `试验部位 = 主回路`
+  - `试验相数 = 三相` (<=40.5kV)
+  - `试验次数 = 1次`
+- `辅助和控制回路温升试验`:
+  - `试验次数 = 1次`
+- `前后回路电阻测量试验`:
+  - `试验次数 = 2次`
+
+### 2) Switching domain
+- `BC1/BC2` now hard-fill:
+  - `试验电流A`
+  - `试验电压 = 额定电压`
+  - `试验类别 = 背对背电容器组 / 单个电容器组` (based on user input label)
+  - `开合容性电流能力的级别 = user C-grade or default C2`
+  - `试验相数 = 三相` (<=40.5kV)
+- `LC1/LC2/CC1/CC2` now hard-fill:
+  - `试验电压 = 额定电压`
+  - `开合容性电流能力的级别 = user C-grade or default C2`
+  - `试验相数 = 三相`
+- `作为状态检查的工频耐受电压试验` hard-fills:
+  - `交流电压 = 0.8 × 额定短时工频耐受电压`
+  - `试验时间 = 1min`
+  - `正常次数 = 1次`
+- `T60(预备试验)` hard-fills:
+  - `试验电压 = 额定电压 / 2`
+  - `试验电流kA = 额定短路开断电流 × 60%`
+  - `试验相数 = 三相`
+
+### 3) Short-circuit domain
+- Added hard-fills for:
+  - `短时耐受电流和峰值耐受电流试验`
+    - `额定电压`
+    - `试验部位 = 主回路`
+    - `试验工位 = 老站`
+    - `短时耐受电流`
+    - `峰值电流kA`
+    - `短路持续时间`
+  - `短路开断试验(T10/T30/T60/T100s)`
+    - `额定电压`
+    - `试验电压 = 额定电压`
+    - `试验电流kA`
+    - `关合电流`
+    - `试验相数 = 三相`
+    - `断路器等级 = S1`
+    - `首开极系数kpp`
+    - `额定频率`
+  - `作为状态检查的T10试验`
+    - `额定电压`
+    - `试验电压 = 50% × 额定电压`
+    - `试验电流kA = 10% × 额定短路开断电流`
+    - `试验相数 = 三相`
+  - `电寿命(单分/合分/循环)`
+    - `试验电压 = 额定电压`
+    - `试验电流kA = 额定短路开断电流`
+    - `关合电流 = 额定短路关合电流`
+    - `试验相数 = 三相`
+
+## Display Suppression / Answer Cleanup Added
+- Moved several suppressions from tail-end markdown cleanup to prompt-context level:
+  - build `display_project_param_map`
+  - build `display_project_param_value_map`
+  - prompt now uses display-filtered maps, not raw maps
+- Current suppressed nonessential params include:
+  - warm-rise noise params,
+  - LC/CC/BC gas-shell-unevenness params,
+  - short-circuit `回路电阻`,
+  - many short-circuit `不均匀系数 / 外壳是否带电 / 失败次数`
+- E-section cleanup strengthened:
+  - hide noisy lines for `缺失项`, `建议补检`, `图谱参数缺失项`, `参数覆盖校验`, `被白名单抑制参数`, etc. when they only add noise.
+
+## Scope / Name-Resolution Bugs Fixed
+- Fixed multiple helper scope errors introduced during rapid edits:
+  - `_extract_named_voltage_kv`
+  - `_preferred_capacitive_current_a`
+  - `_format_current_a`
+  - `_extract_named_current_ka`
+- In each case, local helper versions were added inside `_apply_domain_rule_decisions_to_project_context(...)`.
+
+## Current Known Status At End Of Session
+- Many previously wrong answers now improved:
+  - cross-domain leakage reduced,
+  - `Allowed Final Test Items` and `Domain Rule Decisions` no longer obviously contradict in common cases,
+  - switching and warm-rise domains are much more stable.
+- Short-circuit domain is improved but still not fully finished:
+  - some answers still over-explain with `PROJECT_PARAM_VALUE_MAP` provenance,
+  - some project-specific formulas/defaults may still be missing,
+  - OP/T10/T30/T60/T100s placement and content should be revalidated on live queries tomorrow.
+
+## Tomorrow's Likely Follow-up Focus
+1. Continue tightening short-circuit domain:
+   - eliminate remaining explanation-text outputs,
+   - confirm all T10/T30/T60/T100s/T10-state-check values match expected standard semantics.
+2. Re-check OP1/OP2 answer details after applicability widening.
+3. Re-check whether E-section still leaks nonessential “缺失/补检” narratives in edge cases.
+4. Possibly move more domain-specific display rules from code to config if user wants maintainability.
+
 ## Context
 - User is working in `/Users/df/workspace/python/LightRAG`.
 - Goal: build controlled electrical KG with strict hierarchy:

@@ -5243,12 +5243,12 @@
         },
         {
           "param_name": "试验电流kA",
-          "value_text": "30%用户输入额定短路开断电流",
+          "value_text": "10%用户输入额定短路开断电流",
           "value_expr": "",
           "value_source": "formula",
           "value_type": "formula",
-          "constraints": "30%用户输入额定短路开断电流",
-          "calc_rule": "30%用户输入额定短路开断电流",
+          "constraints": "10%用户输入额定短路开断电流",
+          "calc_rule": "10%用户输入额定短路开断电流",
           "derive_from_rated": ""
         }
       ],
@@ -11506,12 +11506,12 @@
           },
           {
             "param_name": "试验电流kA",
-            "value_text": "30%用户输入额定短路开断电流",
+            "value_text": "10%用户输入额定短路开断电流",
             "value_expr": "",
             "value_source": "formula",
             "value_type": "formula",
-            "constraints": "30%用户输入额定短路开断电流",
-            "calc_rule": "30%用户输入额定短路开断电流",
+            "constraints": "10%用户输入额定短路开断电流",
+            "calc_rule": "10%用户输入额定短路开断电流",
             "derive_from_rated": ""
           }
         ],
