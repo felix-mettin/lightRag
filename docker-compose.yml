@@ -8,7 +8,7 @@ services:
       tags:
         - ghcr.io/hkuds/lightrag:latest
     ports:
-      - "${PORT:-9622}:9621"
+      - "${PORT:-9620}:9621"
     volumes:
       - ./lightrag/prompt.py:/app/lightrag/prompt.py
       - ./lightrag/operate.py:/app/lightrag/operate.py
@@ -28,3 +28,231 @@ services:
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
+
+
+services:
+
+  lightrag_gbt:
+    container_name: lightrag_gbt
+    image: ghcr.io/hkuds/lightrag:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      tags:
+        - ghcr.io/hkuds/lightrag:latest
+    ports:
+      - "9621:9621"
+    volumes:
+      - ./lightrag/prompt.py:/app/lightrag/prompt.py
+      - ./lightrag/config/annotation_memory.json:/app/lightrag/config/annotation_memory.json
+      - ./lightrag/config/profiles:/app/lightrag/config/profiles
+      - ./lightrag/config/domain_rules:/app/lightrag/config/domain_rules
+      - ./lightrag/utils_graph.py:/app/lightrag/utils_graph.py
+      - ./lightrag/lightrag.py:/app/lightrag/lightrag.py
+      - ./lightrag/api/config.py:/app/lightrag/api/config.py
+      - ./lightrag/api/routers/document_routes.py:/app/lightrag/api/routers/document_routes.py
+      - ./lightrag/utils.py:/app/lightrag/utils.py
+      - ./data/gbt/operate.py:/app/lightrag/operate.py
+      - ./data/gbt/data:/app/data
+      - ./data/gbt/config.ini:/app/config.ini
+      - ./data/.env:/app/.env
+    env_file:
+      - ./data/.env
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - lightrag_network
+
+  lightrag_gbt_gy:
+    container_name: lightrag_gbt_gy
+    image: ghcr.io/hkuds/lightrag:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      tags:
+        - ghcr.io/hkuds/lightrag:latest
+    ports:
+      - "9624:9621"
+    volumes:
+      - ./lightrag/prompt.py:/app/lightrag/prompt.py
+      - ./lightrag/config/annotation_memory.json:/app/lightrag/config/annotation_memory.json
+      - ./lightrag/config/profiles:/app/lightrag/config/profiles
+      - ./lightrag/config/domain_rules:/app/lightrag/config/domain_rules
+      - ./lightrag/utils_graph.py:/app/lightrag/utils_graph.py
+      - ./lightrag/lightrag.py:/app/lightrag/lightrag.py
+      - ./lightrag/api/config.py:/app/lightrag/api/config.py
+      - ./lightrag/api/routers/document_routes.py:/app/lightrag/api/routers/document_routes.py
+      - ./lightrag/utils.py:/app/lightrag/utils.py
+      - ./data/gbt_gy/operate.py:/app/lightrag/operate.py
+      - ./data/gbt_gy/data:/app/data
+      - ./data/gbt_gy/config.ini:/app/config.ini
+      - ./data/.env:/app/.env
+    env_file:
+      - ./data/.env
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - lightrag_network
+
+  lightrag_debug_gbt:
+    container_name: lightrag_debug_gbt
+    image: ghcr.io/hkuds/lightrag:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      tags:
+        - ghcr.io/hkuds/lightrag:latest
+    ports:
+      - "9630:9621"
+    volumes:
+      - ./lightrag/prompt.py:/app/lightrag/prompt.py
+      - ./lightrag/config/annotation_memory.json:/app/lightrag/config/annotation_memory.json
+      - ./lightrag/config/profiles:/app/lightrag/config/profiles
+      - ./lightrag/config/domain_rules:/app/lightrag/config/domain_rules
+      - ./lightrag/utils_graph.py:/app/lightrag/utils_graph.py
+      - ./lightrag/lightrag.py:/app/lightrag/lightrag.py
+      - ./lightrag/api/config.py:/app/lightrag/api/config.py
+      - ./lightrag/api/routers/document_routes.py:/app/lightrag/api/routers/document_routes.py
+      - ./lightrag/utils.py:/app/lightrag/utils.py
+      - ./data/debug/operate.py:/app/lightrag/operate.py
+      - ./data/debug/data:/app/data
+      - ./data/debug/config.ini:/app/config.ini
+      - ./data/debug/.env:/app/.env
+    env_file:
+      - ./data/debug/.env
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - lightrag_network
+
+  lightrag_iec:
+    container_name: lightrag_iec
+    image: ghcr.io/hkuds/lightrag:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      tags:
+        - ghcr.io/hkuds/lightrag:latest
+    ports:
+      - "9622:9621"
+    volumes:
+      - ./lightrag/prompt.py:/app/lightrag/prompt.py
+      - ./lightrag/config/annotation_memory.json:/app/lightrag/config/annotation_memory.json
+      - ./lightrag/config/profiles:/app/lightrag/config/profiles
+      - ./lightrag/config/domain_rules:/app/lightrag/config/domain_rules
+      - ./lightrag/utils_graph.py:/app/lightrag/utils_graph.py
+      - ./lightrag/lightrag.py:/app/lightrag/lightrag.py
+      - ./lightrag/api/config.py:/app/lightrag/api/config.py
+      - ./lightrag/api/routers/document_routes.py:/app/lightrag/api/routers/document_routes.py
+      - ./data/iec/operate.py:/app/lightrag/operate.py
+      - ./data/iec/data:/app/data
+      - ./data/iec/config.ini:/app/config.ini
+      - ./data/.env:/app/.env
+    env_file:
+      - ./data/.env
+    networks:
+      - lightrag_network
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  lightrag_iec_gy:
+    container_name: lightrag_iec_gy
+    image: ghcr.io/hkuds/lightrag:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      tags:
+        - ghcr.io/hkuds/lightrag:latest
+    ports:
+      - "9625:9621"
+    volumes:
+      - ./lightrag/prompt.py:/app/lightrag/prompt.py
+      - ./lightrag/config/annotation_memory.json:/app/lightrag/config/annotation_memory.json
+      - ./lightrag/config/profiles:/app/lightrag/config/profiles
+      - ./lightrag/config/domain_rules:/app/lightrag/config/domain_rules
+      - ./lightrag/utils_graph.py:/app/lightrag/utils_graph.py
+      - ./lightrag/lightrag.py:/app/lightrag/lightrag.py
+      - ./lightrag/api/config.py:/app/lightrag/api/config.py
+      - ./lightrag/api/routers/document_routes.py:/app/lightrag/api/routers/document_routes.py
+      - ./data/iec_gy/operate.py:/app/lightrag/operate.py
+      - ./data/iec_gy/data:/app/data
+      - ./data/iec_gy/config.ini:/app/config.ini
+      - ./data/.env:/app/.env
+    env_file:
+      - ./data/.env
+    networks:
+      - lightrag_network
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  lightrag_dlt:
+    container_name: lightrag_dlt
+    image: ghcr.io/hkuds/lightrag:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      tags:
+        - ghcr.io/hkuds/lightrag:latest
+    ports:
+      - "9623:9621"
+    volumes:
+      - ./lightrag/prompt.py:/app/lightrag/prompt.py
+      - ./lightrag/config/annotation_memory.json:/app/lightrag/config/annotation_memory.json
+      - ./lightrag/config/profiles:/app/lightrag/config/profiles
+      - ./lightrag/config/domain_rules:/app/lightrag/config/domain_rules
+      - ./lightrag/utils_graph.py:/app/lightrag/utils_graph.py
+      - ./lightrag/lightrag.py:/app/lightrag/lightrag.py
+      - ./lightrag/api/config.py:/app/lightrag/api/config.py
+      - ./lightrag/api/routers/document_routes.py:/app/lightrag/api/routers/document_routes.py
+      - ./data/dlt/operate.py:/app/lightrag/operate.py
+      - ./data/dlt/data:/app/data
+      - ./data/dlt/config.ini:/app/config.ini
+      - ./data/.env:/app/.env
+    env_file:
+      - ./data/.env
+    networks:
+      - lightrag_network
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+
+  lightrag_dlt_gy:
+    container_name: lightrag_dlt_gy
+    image: ghcr.io/hkuds/lightrag:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      tags:
+        - ghcr.io/hkuds/lightrag:latest
+    ports:
+      - "9626:9621"
+    volumes:
+      - ./lightrag/prompt.py:/app/lightrag/prompt.py
+      - ./lightrag/config/annotation_memory.json:/app/lightrag/config/annotation_memory.json
+      - ./lightrag/config/profiles:/app/lightrag/config/profiles
+      - ./lightrag/config/domain_rules:/app/lightrag/config/domain_rules
+      - ./lightrag/utils_graph.py:/app/lightrag/utils_graph.py
+      - ./lightrag/lightrag.py:/app/lightrag/lightrag.py
+      - ./lightrag/api/config.py:/app/lightrag/api/config.py
+      - ./lightrag/api/routers/document_routes.py:/app/lightrag/api/routers/document_routes.py
+      - ./data/dlt_gy/operate.py:/app/lightrag/operate.py
+      - ./data/dlt_gy/data:/app/data
+      - ./data/dlt_gy/config.ini:/app/config.ini
+      - ./data/.env:/app/.env
+    env_file:
+      - ./data/.env
+    networks:
+      - lightrag_network
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  lightrag_network:
+    name: lightrag_network
