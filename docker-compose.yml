@@ -30,8 +30,6 @@ services:
       - "host.docker.internal:host-gateway"
 
 
-services:
-
   lightrag_gbt:
     container_name: lightrag_gbt
     image: ghcr.io/hkuds/lightrag:latest
