@@ -90,7 +90,7 @@ export type EdgeType = {
   hidden?: boolean
 }
 
-const fetchGraph = async (label: string, maxDepth: number, maxNodes: number) => {
+const fetchGraph = async (label: string, maxDepth: number, maxNodes: number, workspace?: string) => {
   let rawData: any = null;
 
   // Trigger GraphLabels component to check if the label is valid
@@ -101,8 +101,8 @@ const fetchGraph = async (label: string, maxDepth: number, maxNodes: number) => 
   const queryLabel = label || '*';
 
   try {
-    console.log(`Fetching graph label: ${queryLabel}, depth: ${maxDepth}, nodes: ${maxNodes}`);
-    rawData = await queryGraphs(queryLabel, maxDepth, maxNodes);
+    console.log(`Fetching graph label: ${queryLabel}, depth: ${maxDepth}, nodes: ${maxNodes}, workspace: ${workspace}`);
+    rawData = await queryGraphs(queryLabel, maxDepth, maxNodes, workspace);
   } catch (e) {
     useBackendState.getState().setErrorMessage(errorMessage(e), 'Query Graphs Error!');
     return null;
@@ -269,6 +269,7 @@ const useLightrangeGraph = () => {
   const nodeToExpand = useGraphStore.use.nodeToExpand()
   const nodeToPrune = useGraphStore.use.nodeToPrune()
   const graphDataVersion = useGraphStore.use.graphDataVersion()
+  const currentWorkspace = useGraphStore.use.currentWorkspace()
 
 
   // Use ref to track if data has been loaded and initial load
@@ -305,6 +306,21 @@ const useLightrangeGraph = () => {
       initialLoadRef.current = false
     }
   }, [queryLabel, rawGraph, sigmaGraph])
+
+  // Reset fetch flag when workspace changes to trigger data refresh
+  useEffect(() => {
+    const state = useGraphStore.getState()
+    state.setGraphDataFetchAttempted(false)
+    emptyDataHandledRef.current = false
+    // Reset fetch in progress flag to allow new fetch
+    fetchInProgressRef.current = false
+    // Reset queryLabel to '*' to ensure data is fetched for new workspace
+    const currentLabel = useSettingsStore.getState().queryLabel
+    if (!currentLabel || currentLabel === '') {
+      useSettingsStore.getState().setQueryLabel('*')
+    }
+    console.log('Workspace changed, resetting fetch flag for:', currentWorkspace)
+  }, [currentWorkspace])
 
   // Graph data fetching logic
   useEffect(() => {
@@ -346,9 +362,9 @@ const useLightrangeGraph = () => {
       // Declare a variable to store data promise
       let dataPromise: Promise<{ rawGraph: RawGraph | null; is_truncated: boolean | undefined } | null>;
 
-      // 1. If query label is not empty, use fetchGraph
+      // 1. If query label is not empty, use fetchGraph with workspace
       if (currentQueryLabel) {
-        dataPromise = fetchGraph(currentQueryLabel, currentMaxQueryDepth, currentMaxNodes);
+        dataPromise = fetchGraph(currentQueryLabel, currentMaxQueryDepth, currentMaxNodes, currentWorkspace);
       } else {
         // 2. If query label is empty, set data to null
         console.log('Query label is empty, show empty graph')
@@ -403,9 +419,9 @@ const useLightrangeGraph = () => {
           const errorMessage = useBackendState.getState().message;
           const isAuthError = errorMessage && errorMessage.includes('Authentication required');
 
-          // Only clear queryLabel if it's not an auth error and current label is not empty
-          if (!isAuthError && currentQueryLabel) {
-            useSettingsStore.getState().setQueryLabel('');
+          // Keep queryLabel as '*' instead of clearing it to allow workspace switching to work
+          if (!isAuthError && currentQueryLabel && currentQueryLabel !== '*') {
+            useSettingsStore.getState().setQueryLabel('*');
           }
 
           // Only clear last successful query label if it's not an auth error
@@ -425,6 +441,27 @@ const useLightrangeGraph = () => {
           state.setSigmaGraph(newSigmaGraph);
           state.setRawGraph(data);
           state.setGraphIsEmpty(false);
+
+          // If there is a pending edge selection (created via drag), try to find and select it
+          try {
+            const pending = state.pendingEdgeSelection
+            if (pending && pending.sourceName && pending.targetName) {
+              const srcNode = data.nodes.find(n => n.properties?.entity_id === pending.sourceName || (n.labels && n.labels.includes(pending.sourceName)))
+              const tgtNode = data.nodes.find(n => n.properties?.entity_id === pending.targetName || (n.labels && n.labels.includes(pending.targetName)))
+              if (srcNode && tgtNode) {
+                const foundEdge = data.edges.find(e => (e.source === srcNode.id && e.target === tgtNode.id) || (e.source === tgtNode.id && e.target === srcNode.id))
+                if (foundEdge && foundEdge.dynamicId) {
+                  state.setSelectedEdge(foundEdge.dynamicId)
+                  // Ensure properties panel is visible
+                  try { useSettingsStore.setState({ showPropertyPanel: true }) } catch (e) {}
+                }
+              }
+              // clear pending selection
+              state.setPendingEdgeSelection(null)
+            }
+          } catch (e) {
+            console.warn('Error processing pending edge selection', e)
+          }
 
           // Update last successful query label
           state.setLastSuccessfulQueryLabel(currentQueryLabel);
@@ -455,7 +492,7 @@ const useLightrangeGraph = () => {
         state.setLastSuccessfulQueryLabel('') // Clear last successful query label on error
       })
     }
-  }, [queryLabel, maxQueryDepth, maxNodes, isFetching, t, graphDataVersion])
+  }, [queryLabel, maxQueryDepth, maxNodes, isFetching, t, graphDataVersion, currentWorkspace])
 
   // Handle node expansion
   useEffect(() => {
@@ -478,7 +515,7 @@ const useLightrangeGraph = () => {
         }
 
         // Fetch the extended subgraph with depth 2
-        const extendedGraph = await queryGraphs(label, 2, 1000);
+        const extendedGraph = await queryGraphs(label, 2, 1000, currentWorkspace);
 
         if (!extendedGraph || !extendedGraph.nodes || !extendedGraph.edges) {
           console.error('Failed to fetch extended graph');

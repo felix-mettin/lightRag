@@ -659,7 +659,11 @@
             throw new Error(`流式 JSON 解析失败：${trimmed}`);
           }
           if (parsed.response) {
-            answer += parsed.response;
+            if (parsed.event === 'final') {
+              answer = parsed.response;
+            } else {
+              answer += parsed.response;
+            }
             updateMessage(assistantIndex, answer);
           } else if (parsed.error) {
             throw new Error(parsed.error);
@@ -670,7 +674,11 @@
       if (buffer.trim()) {
         const parsed = JSON.parse(buffer.trim());
         if (parsed.response) {
-          answer += parsed.response;
+          if (parsed.event === 'final') {
+            answer = parsed.response;
+          } else {
+            answer += parsed.response;
+          }
           updateMessage(assistantIndex, answer);
         } else if (parsed.error) {
           throw new Error(parsed.error);

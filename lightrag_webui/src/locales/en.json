@@ -37,7 +37,13 @@
     "cancel": "Cancel",
     "save": "Save",
     "saving": "Saving...",
-    "saveFailed": "Save failed"
+    "saveFailed": "Save failed",
+    "create": "Create",
+    "creating": "Creating...",
+    "update": "Update",
+    "updating": "Updating...",
+    "delete": "Delete",
+    "deleting": "Deleting..."
   },
   "documentPanel": {
     "clearDocuments": {
@@ -334,9 +340,11 @@
         "relationships": "Relations(within subgraph)",
         "expandNode": "Expand Node",
         "pruneNode": "Prune Node",
-        "deleteAllNodesError": "Refuse to delete all nodes in the graph",
-        "nodesRemoved": "{{count}} nodes removed, including orphan nodes",
-        "noNewNodes": "No expandable nodes found",
+        "deleteNode": "Delete Node",
+        "deleteConfirm": "Are you sure you want to delete the entity '{{name}}'? This action cannot be undone.",
+        "deleteSuccess": "Entity deleted successfully",
+        "deleteFailed": "Failed to delete entity",
+        "deleteError": "Cannot delete entity: entity name not found",
         "propertyNames": {
           "description": "Description",
           "entity_id": "Name",
@@ -354,7 +362,66 @@
         "type": "Type",
         "source": "Source",
         "target": "Target",
-        "properties": "Properties"
+        "properties": "Properties",
+        "deleteEdge": "Delete Relationship",
+        "deleteConfirm": "Are you sure you want to delete the relationship between '{{source}}' and '{{target}}'? This action cannot be undone.",
+        "deleteSuccess": "Relationship deleted successfully",
+        "deleteFailed": "Failed to delete relationship"
+      }
+    },
+    "editControl": {
+      "title": "Graph Editor",
+      "tooltip": "Create, update, and delete graph elements",
+      "tabs": {
+        "createEntity": "Create Entity",
+        "createRelation": "Create Relation",
+        "updateEntity": "Update Entity",
+        "updateRelation": "Update Relation",
+        "deleteEntity": "Delete Entity",
+        "deleteRelation": "Delete Relation"
+      },
+      "entity": {
+        "name": "Entity Name",
+        "namePlaceholder": "Enter entity name",
+        "type": "Entity Type",
+        "typePlaceholder": "e.g., PERSON, ORGANIZATION",
+        "description": "Description",
+        "descriptionPlaceholder": "Enter entity description"
+      },
+      "relation": {
+        "source": "Source Entity",
+        "sourcePlaceholder": "Enter source entity name",
+        "target": "Target Entity",
+        "targetPlaceholder": "Enter target entity name",
+        "description": "Description",
+        "descriptionPlaceholder": "Enter relationship description",
+        "keywords": "Keywords",
+        "keywordsPlaceholder": "Enter keywords (comma separated)"
+      },
+      "delete": {
+        "warning": "Warning: This action cannot be undone."
+      },
+      "errors": {
+        "entityNameRequired": "Entity name is required",
+        "entityExists": "Entity with this name already exists",
+        "sourceTargetRequired": "Source and target entities are required",
+        "selfRelation": "Cannot create relation between same entity",
+        "sourceEntityNotFound": "Source entity does not exist",
+        "targetEntityNotFound": "Target entity does not exist",
+        "createEntityFailed": "Failed to create entity",
+        "createRelationFailed": "Failed to create relation",
+        "updateEntityFailed": "Failed to update entity",
+        "updateRelationFailed": "Failed to update relation",
+        "deleteEntityFailed": "Failed to delete entity",
+        "deleteRelationFailed": "Failed to delete relation"
+      },
+      "success": {
+        "entityCreated": "Entity created successfully",
+        "relationCreated": "Relation created successfully",
+        "entityUpdated": "Entity updated successfully",
+        "relationUpdated": "Relation updated successfully",
+        "entityDeleted": "Entity deleted successfully",
+        "relationDeleted": "Relation deleted successfully"
       }
     },
     "search": {
@@ -371,7 +438,12 @@
       "refreshCurrentLabelTooltip": "Refresh current page graph data",
       "refreshingTooltip": "Refreshing data..."
     },
-    "emptyGraph": "Empty(Try Reload Again)"
+    "emptyGraph": "Empty(Try Reload Again)",
+    "workspaceSelector": {
+      "selectWorkspace": "Select Workspace",
+      "loadError": "Failed to load workspaces",
+      "switched": "Switched to workspace: {{workspace}}"
+    }
   },
   "retrievePanel": {
     "chatMessage": {

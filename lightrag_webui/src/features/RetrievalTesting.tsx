@@ -258,8 +258,14 @@ export default function RetrievalTesting() {
       }
 
       // Create a function to update the assistant's message
-      const updateAssistantMessage = (chunk: string, isError?: boolean) => {
-        assistantMessage.content += chunk
+      const updateAssistantMessage = (
+        chunk: string,
+        isError?: boolean,
+        mode: 'append' | 'replace' = 'append'
+      ) => {
+        assistantMessage.content = mode === 'replace'
+          ? chunk
+          : assistantMessage.content + chunk
 
         // Start thinking timer on first sight of think tag
         if (assistantMessage.content.includes('<think>') && !thinkingStartTime.current) {
@@ -371,7 +377,9 @@ export default function RetrievalTesting() {
         // Run query
         if (state.querySettings.stream) {
           let errorMessage = ''
-          await queryTextStream(queryParams, updateAssistantMessage, (error) => {
+          await queryTextStream(queryParams, ({ response, mode }) => {
+            updateAssistantMessage(response, undefined, mode)
+          }, (error) => {
             errorMessage += error
           })
           if (errorMessage) {

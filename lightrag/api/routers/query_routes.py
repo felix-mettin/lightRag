@@ -12,6 +12,95 @@ from pydantic import BaseModel, Field, field_validator
 
 router = APIRouter(tags=["query"])
 
+STANDARD_TYPE_KEYWORDS = {
+    "GB": ["国标", "国家标准", "GB/T", "GBT", "GB-T", "GB", "gb/t", "gbt", "gb-t", "gb"],
+    "HB": ["行标", "行业标准", "HB", "hb", "DL/T", "DLT", "DL-T", "DL", "dl/t", "dlt", "dl-t", "dl"],
+    "GJB": ["国际标准", "国际标", "IEC", "ISO", "IEEE", "GJB", "gjb", "iec", "iso", "ieee", "国际"],
+}
+
+
+def _normalize_standard_type(value: str | None) -> str | None:
+    if not value:
+        return None
+    normalized = value.strip().upper()
+    if normalized in {"GB", "HB", "GJB", "OTHERS"}:
+        return "others" if normalized == "OTHERS" else normalized
+
+    lowered = value.strip().lower()
+    for std_type, keywords in STANDARD_TYPE_KEYWORDS.items():
+        if any(keyword.lower() == lowered for keyword in keywords):
+            return std_type
+    return None
+
+
+def detect_standard_types_from_query(query: str) -> list[str]:
+    if not query:
+        return ["GB"]
+
+    query_upper = query.upper()
+    matches: list[tuple[int, str]] = []
+    for std_type, keywords in STANDARD_TYPE_KEYWORDS.items():
+        positions = [query_upper.find(keyword.upper()) for keyword in keywords]
+        positions = [position for position in positions if position >= 0]
+        if positions:
+            matches.append((min(positions), std_type))
+
+    if not matches:
+        return ["GB"]
+
+    matches.sort(key=lambda item: item[0])
+    return [std_type for _, std_type in matches]
+
+
+def detect_standard_type_from_query(query: str) -> str:
+    return detect_standard_types_from_query(query)[0]
+
+
+def _resolve_standard_type(
+    request: "QueryRequest", rag_instances: dict[str, Any]
+) -> str:
+    explicit = _normalize_standard_type(request.standard_type)
+    if explicit and explicit in rag_instances:
+        return explicit
+
+    detected = detect_standard_type_from_query(request.query)
+    if detected in rag_instances:
+        return detected
+
+    if "GB" in rag_instances:
+        return "GB"
+
+    if "others" in rag_instances:
+        return "others"
+
+    return next(iter(rag_instances))
+
+
+def _enrich_references_with_chunk_content(
+    references: list[dict[str, Any]],
+    data: dict[str, Any],
+    include_chunk_content: bool,
+) -> list[dict[str, Any]]:
+    if not include_chunk_content or not references:
+        return references
+
+    chunks = data.get("chunks", [])
+    ref_id_to_content: dict[str, list[str]] = {}
+    for chunk in chunks:
+        ref_id = chunk.get("reference_id", "")
+        content = chunk.get("content", "")
+        if ref_id and content:
+            ref_id_to_content.setdefault(ref_id, []).append(content)
+
+    enriched_references: list[dict[str, Any]] = []
+    for ref in references:
+        ref_copy = ref.copy()
+        ref_id = ref.get("reference_id", "")
+        if ref_id in ref_id_to_content:
+            ref_copy["content"] = ref_id_to_content[ref_id]
+        enriched_references.append(ref_copy)
+    return enriched_references
+
 
 class QueryRequest(BaseModel):
     query: str = Field(
@@ -110,6 +199,11 @@ class QueryRequest(BaseModel):
         description="If True, enables streaming output for real-time responses. Only affects /query/stream endpoint.",
     )
 
+    standard_type: Optional[str] = Field(
+        default=None,
+        description="Filter by a single standard type/workspace. If omitted, it is inferred from query keywords.",
+    )
+
     @field_validator("query", mode="after")
     @classmethod
     def query_strip_after(cls, query: str) -> str:
@@ -134,7 +228,8 @@ class QueryRequest(BaseModel):
         # Use Pydantic's `.model_dump(exclude_none=True)` to remove None values automatically
         # Exclude API-level parameters that don't belong in QueryParam
         request_data = self.model_dump(
-            exclude_none=True, exclude={"query", "include_chunk_content"}
+            exclude_none=True,
+            exclude={"query", "include_chunk_content", "standard_type"},
         )
 
         # Ensure `mode` and `stream` are set explicitly
@@ -190,7 +285,7 @@ class StreamChunkResponse(BaseModel):
     )
 
 
-def create_query_routes(rag, api_key: Optional[str] = None, top_k: int = 60):
+def create_query_routes(rag_instances, api_key: Optional[str] = None, top_k: int = 60):
     combined_auth = get_combined_auth_dependency(api_key)
 
     @router.post(
@@ -402,13 +497,12 @@ def create_query_routes(rag, api_key: Optional[str] = None, top_k: int = 60):
                 - 500: Internal processing error (e.g., LLM service unavailable)
         """
         try:
+            standard_type = _resolve_standard_type(request, rag_instances)
+            rag = rag_instances[standard_type]
             param = request.to_query_params(
                 False
             )  # Ensure stream=False for non-streaming endpoint
-            # Force stream=False for /query endpoint regardless of include_references setting
             param.stream = False
-
-            # Unified approach: always use aquery_llm for both cases
             result = await rag.aquery_llm(request.query, param=param)
 
             # Extract LLM response and references from unified result
@@ -422,27 +516,9 @@ def create_query_routes(rag, api_key: Optional[str] = None, top_k: int = 60):
                 response_content = "No relevant context found for the query."
 
             # Enrich references with chunk content if requested
-            if request.include_references and request.include_chunk_content:
-                chunks = data.get("chunks", [])
-                # Create a mapping from reference_id to chunk content
-                ref_id_to_content = {}
-                for chunk in chunks:
-                    ref_id = chunk.get("reference_id", "")
-                    content = chunk.get("content", "")
-                    if ref_id and content:
-                        # Collect chunk content; join later to avoid quadratic string concatenation
-                        ref_id_to_content.setdefault(ref_id, []).append(content)
-
-                # Add content to references
-                enriched_references = []
-                for ref in references:
-                    ref_copy = ref.copy()
-                    ref_id = ref.get("reference_id", "")
-                    if ref_id in ref_id_to_content:
-                        # Keep content as a list of chunks (one file may have multiple chunks)
-                        ref_copy["content"] = ref_id_to_content[ref_id]
-                    enriched_references.append(ref_copy)
-                references = enriched_references
+            references = _enrich_references_with_chunk_content(
+                references, data, request.include_references and request.include_chunk_content
+            )
 
             # Return response with or without references based on request
             if request.include_references:
@@ -662,11 +738,12 @@ def create_query_routes(rag, api_key: Optional[str] = None, top_k: int = 60):
         try:
             # Use the stream parameter from the request, defaulting to True if not specified
             stream_mode = request.stream if request.stream is not None else True
-            param = request.to_query_params(stream_mode)
 
             from fastapi.responses import StreamingResponse
 
-            # Unified approach: always use aquery_llm for all cases
+            standard_type = _resolve_standard_type(request, rag_instances)
+            rag = rag_instances[standard_type]
+            param = request.to_query_params(stream_mode)
             result = await rag.aquery_llm(request.query, param=param)
 
             async def stream_generator():
@@ -675,28 +752,11 @@ def create_query_routes(rag, api_key: Optional[str] = None, top_k: int = 60):
                 llm_response = result.get("llm_response", {})
 
                 # Enrich references with chunk content if requested
-                if request.include_references and request.include_chunk_content:
-                    data = result.get("data", {})
-                    chunks = data.get("chunks", [])
-                    # Create a mapping from reference_id to chunk content
-                    ref_id_to_content = {}
-                    for chunk in chunks:
-                        ref_id = chunk.get("reference_id", "")
-                        content = chunk.get("content", "")
-                        if ref_id and content:
-                            # Collect chunk content
-                            ref_id_to_content.setdefault(ref_id, []).append(content)
-
-                    # Add content to references
-                    enriched_references = []
-                    for ref in references:
-                        ref_copy = ref.copy()
-                        ref_id = ref.get("reference_id", "")
-                        if ref_id in ref_id_to_content:
-                            # Keep content as a list of chunks (one file may have multiple chunks)
-                            ref_copy["content"] = ref_id_to_content[ref_id]
-                        enriched_references.append(ref_copy)
-                    references = enriched_references
+                references = _enrich_references_with_chunk_content(
+                    references,
+                    result.get("data", {}),
+                    request.include_references and request.include_chunk_content,
+                )
 
                 if llm_response.get("is_streaming"):
                     # Streaming mode: send references first, then stream response chunks
@@ -707,7 +767,11 @@ def create_query_routes(rag, api_key: Optional[str] = None, top_k: int = 60):
                     if response_stream:
                         try:
                             async for chunk in response_stream:
-                                if chunk:  # Only send non-empty content
+                                if isinstance(chunk, dict):
+                                    payload = dict(chunk)
+                                    if payload:
+                                        yield f"{json.dumps(payload)}\n"
+                                elif chunk:  # Only send non-empty content
                                     yield f"{json.dumps({'response': chunk})}\n"
                         except Exception as e:
                             logger.error(f"Streaming error: {str(e)}")
@@ -1139,6 +1203,8 @@ def create_query_routes(rag, api_key: Optional[str] = None, top_k: int = 60):
             as structured data analysis typically requires source attribution.
         """
         try:
+            standard_type = _resolve_standard_type(request, rag_instances)
+            rag = rag_instances[standard_type]
             param = request.to_query_params(False)  # No streaming for data endpoint
             response = await rag.aquery_data(request.query, param=param)
 

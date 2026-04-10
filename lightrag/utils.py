@@ -385,6 +385,55 @@ def setup_logger(
         logger_instance.addFilter(path_filter)
 
 
+def get_file_only_logger(
+    logger_name: str,
+    default_filename: str,
+    level: str = "INFO",
+    env_var: str | None = None,
+):
+    """Set up a dedicated rotating file logger without console output."""
+    logger_instance = logging.getLogger(logger_name)
+    if getattr(logger_instance, "_lightrag_file_only_logger_configured", False):
+        return logger_instance
+
+    logger_instance.setLevel(level)
+    logger_instance.propagate = False
+
+    configured_path = os.getenv(env_var) if env_var else None
+    if configured_path:
+        log_file_path = os.path.abspath(configured_path)
+    else:
+        log_dir = os.getenv("LOG_DIR", os.getcwd())
+        log_file_path = os.path.abspath(os.path.join(log_dir, default_filename))
+
+    os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
+
+    log_max_bytes = get_env_value("LOG_MAX_BYTES", DEFAULT_LOG_MAX_BYTES, int)
+    log_backup_count = get_env_value(
+        "LOG_BACKUP_COUNT", DEFAULT_LOG_BACKUP_COUNT, int
+    )
+    detailed_formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+
+    try:
+        file_handler = logging.handlers.RotatingFileHandler(
+            filename=log_file_path,
+            maxBytes=log_max_bytes,
+            backupCount=log_backup_count,
+            encoding="utf-8",
+        )
+        file_handler.setFormatter(detailed_formatter)
+        file_handler.setLevel(level)
+        logger_instance.addHandler(file_handler)
+        logger_instance._lightrag_file_only_logger_configured = True
+        logger_instance._lightrag_file_only_logger_path = log_file_path
+    except PermissionError as e:
+        logger.warning(f"Could not create log file at {log_file_path}: {str(e)}")
+
+    return logger_instance
+
+
 class UnlimitedSemaphore:
     """A context manager that allows unlimited access."""
 

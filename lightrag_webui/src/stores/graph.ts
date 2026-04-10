@@ -94,6 +94,14 @@ interface GraphState {
 
   typeColorMap: Map<string, string>
 
+  // Workspace management
+  currentWorkspace: string
+  availableWorkspaces: Array<{
+    name: string
+    has_data: boolean
+    label_count: number
+  }>
+
   // Global flags to track data fetching attempts
   graphDataFetchAttempted: boolean
   labelsFetchAttempted: boolean
@@ -117,6 +125,14 @@ interface GraphState {
   // Legend color mapping methods
   setTypeColorMap: (typeColorMap: Map<string, string>) => void
 
+  // Workspace management methods
+  setCurrentWorkspace: (workspace: string) => void
+  setAvailableWorkspaces: (workspaces: Array<{
+    name: string
+    has_data: boolean
+    label_count: number
+  }>) => void
+
   // Search engine methods
   setSearchEngine: (engine: MiniSearch | null) => void
   resetSearchEngine: () => void
@@ -132,6 +148,20 @@ interface GraphState {
   // Node operation state
   nodeToExpand: string | null
   nodeToPrune: string | null
+
+  // Edge creation mode
+  createEdgeMode: boolean
+  setCreateEdgeMode: (enabled: boolean) => void
+
+  // Edge creation drag state
+  edgeStart: string | null
+  setEdgeStart: (nodeId: string | null) => void
+  tempEdgeEnd: { x: number; y: number } | null
+  setTempEdgeEnd: (pos: { x: number; y: number } | null) => void
+
+  // Pending edge selection for newly created edges
+  pendingEdgeSelection: { sourceName: string; targetName: string } | null
+  setPendingEdgeSelection: (sel: { sourceName: string; targetName: string } | null) => void
 
   // Version counter to trigger data refresh
   graphDataVersion: number
@@ -156,6 +186,10 @@ const useGraphStoreBase = create<GraphState>()((set, get) => ({
   // Initialize global flags
   graphDataFetchAttempted: false,
   labelsFetchAttempted: false,
+
+  // Initialize workspace management
+  currentWorkspace: 'GB', // Default workspace
+  availableWorkspaces: [],
 
   rawGraph: null,
   sigmaGraph: null,
@@ -188,6 +222,9 @@ const useGraphStoreBase = create<GraphState>()((set, get) => ({
       focusedNode: null,
       selectedEdge: null,
       focusedEdge: null,
+      // Keep workspace selection and workspace list intact to avoid loss of context on refresh
+      //currentWorkspace: 'GB',
+      //availableWorkspaces: [],
       rawGraph: null,
       sigmaGraph: null,  // to avoid other components from acccessing graph objects
       searchEngine: null,
@@ -212,6 +249,28 @@ const useGraphStoreBase = create<GraphState>()((set, get) => ({
 
   setTypeColorMap: (typeColorMap: Map<string, string>) => set({ typeColorMap }),
 
+  // Workspace management methods
+  setCurrentWorkspace: (workspace: string) => set({ currentWorkspace: workspace }),
+  setAvailableWorkspaces: (workspaces: Array<{
+    name: string
+    has_data: boolean
+    label_count: number
+  }>) => set({ availableWorkspaces: workspaces }),
+
+  // Create-edge interaction mode (when true, dragging from node to node creates a relation)
+  createEdgeMode: false,
+  setCreateEdgeMode: (enabled: boolean) => set({ createEdgeMode: enabled }),
+
+  // Edge creation drag state
+  edgeStart: null,
+  setEdgeStart: (nodeId: string | null) => set({ edgeStart: nodeId }),
+  tempEdgeEnd: null,
+  setTempEdgeEnd: (pos: { x: number; y: number } | null) => set({ tempEdgeEnd: pos }),
+
+  // Pending edge selection to pick and open after graph refresh
+  pendingEdgeSelection: null,
+  setPendingEdgeSelection: (sel: { sourceName: string; targetName: string } | null) => set({ pendingEdgeSelection: sel }),
+
   setSearchEngine: (engine: MiniSearch | null) => set({ searchEngine: engine }),
   resetSearchEngine: () => set({ searchEngine: null }),
 
@@ -229,7 +288,11 @@ const useGraphStoreBase = create<GraphState>()((set, get) => ({
 
   // Version counter implementation
   graphDataVersion: 0,
-  incrementGraphDataVersion: () => set((state) => ({ graphDataVersion: state.graphDataVersion + 1 })),
+  incrementGraphDataVersion: () =>
+    set((state) => ({
+      graphDataVersion: state.graphDataVersion + 1,
+      graphDataFetchAttempted: false,
+    })),
 
   // Methods for updating graph elements and UI state together
   updateNodeAndSelect: async (nodeId: string, entityId: string, propertyName: string, newValue: string) => {

@@ -1165,6 +1165,7 @@ export default function DocumentManager() {
             {isSelectionMode && (
               <DeleteDocumentsDialog
                 selectedDocIds={selectedDocIds}
+                selectedDocs={currentPageDocs.filter(doc => selectedDocIds.includes(doc.id))}
                 onDocumentsDeleted={handleDocumentsDeleted}
               />
             )}
@@ -1200,91 +1201,89 @@ export default function DocumentManager() {
           <CardHeader className="flex-none py-2 px-4">
             <div className="flex justify-between items-center">
               <CardTitle>{t('documentPanel.documentManager.uploadedTitle')}</CardTitle>
-              <div className="flex items-center gap-2">
-                <div className="flex gap-1" dir={i18n.dir()}>
-                  <Button
-                    size="sm"
-                    variant={statusFilter === 'all' ? 'secondary' : 'outline'}
-                    onClick={() => handleStatusFilterChange('all')}
-                    disabled={isRefreshing}
-                    className={cn(
-                      statusFilter === 'all' && 'bg-gray-100 dark:bg-gray-900 font-medium border border-gray-400 dark:border-gray-500 shadow-sm'
-                    )}
-                  >
-                    {t('documentPanel.documentManager.status.all')} ({statusCounts.all || documentCounts.all})
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={statusFilter === 'processed' ? 'secondary' : 'outline'}
-                    onClick={() => handleStatusFilterChange('processed')}
-                    disabled={isRefreshing}
-                    className={cn(
-                      processedCount > 0 ? 'text-green-600' : 'text-gray-500',
-                      statusFilter === 'processed' && 'bg-green-100 dark:bg-green-900/30 font-medium border border-green-400 dark:border-green-600 shadow-sm'
-                    )}
-                  >
-                    {t('documentPanel.documentManager.status.completed')} ({processedCount})
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={statusFilter === 'preprocessed' ? 'secondary' : 'outline'}
-                    onClick={() => handleStatusFilterChange('preprocessed')}
-                    disabled={isRefreshing}
-                    className={cn(
-                      preprocessedCount > 0 ? 'text-purple-600' : 'text-gray-500',
-                      statusFilter === 'preprocessed' && 'bg-purple-100 dark:bg-purple-900/30 font-medium border border-purple-400 dark:border-purple-600 shadow-sm'
-                    )}
-                  >
-                    {t('documentPanel.documentManager.status.preprocessed')} ({preprocessedCount})
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={statusFilter === 'processing' ? 'secondary' : 'outline'}
-                    onClick={() => handleStatusFilterChange('processing')}
-                    disabled={isRefreshing}
-                    className={cn(
-                      processingCount > 0 ? 'text-blue-600' : 'text-gray-500',
-                      statusFilter === 'processing' && 'bg-blue-100 dark:bg-blue-900/30 font-medium border border-blue-400 dark:border-blue-600 shadow-sm'
-                    )}
-                  >
-                    {t('documentPanel.documentManager.status.processing')} ({processingCount})
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={statusFilter === 'pending' ? 'secondary' : 'outline'}
-                    onClick={() => handleStatusFilterChange('pending')}
-                    disabled={isRefreshing}
-                    className={cn(
-                      pendingCount > 0 ? 'text-yellow-600' : 'text-gray-500',
-                      statusFilter === 'pending' && 'bg-yellow-100 dark:bg-yellow-900/30 font-medium border border-yellow-400 dark:border-yellow-600 shadow-sm'
-                    )}
-                  >
-                    {t('documentPanel.documentManager.status.pending')} ({pendingCount})
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={statusFilter === 'failed' ? 'secondary' : 'outline'}
-                    onClick={() => handleStatusFilterChange('failed')}
-                    disabled={isRefreshing}
-                    className={cn(
-                      failedCount > 0 ? 'text-red-600' : 'text-gray-500',
-                      statusFilter === 'failed' && 'bg-red-100 dark:bg-red-900/30 font-medium border border-red-400 dark:border-red-600 shadow-sm'
-                    )}
-                  >
-                    {t('documentPanel.documentManager.status.failed')} ({failedCount})
-                  </Button>
-                </div>
+              <div className="flex gap-1" dir={i18n.dir()}>
                 <Button
-                  variant="ghost"
                   size="sm"
-                  onClick={handleManualRefresh}
+                  variant={statusFilter === 'all' ? 'secondary' : 'outline'}
+                  onClick={() => handleStatusFilterChange('all')}
                   disabled={isRefreshing}
-                  side="bottom"
-                  tooltip={t('documentPanel.documentManager.refreshTooltip')}
+                  className={cn(
+                    statusFilter === 'all' && 'bg-gray-100 dark:bg-gray-900 font-medium border border-gray-400 dark:border-gray-500 shadow-sm'
+                  )}
                 >
-                  <RotateCcwIcon className="h-4 w-4" />
+                  {t('documentPanel.documentManager.status.all')} ({statusCounts.all || documentCounts.all})
+                </Button>
+                <Button
+                  size="sm"
+                  variant={statusFilter === 'processed' ? 'secondary' : 'outline'}
+                  onClick={() => handleStatusFilterChange('processed')}
+                  disabled={isRefreshing}
+                  className={cn(
+                    processedCount > 0 ? 'text-green-600' : 'text-gray-500',
+                    statusFilter === 'processed' && 'bg-green-100 dark:bg-green-900/30 font-medium border border-green-400 dark:border-green-600 shadow-sm'
+                  )}
+                >
+                  {t('documentPanel.documentManager.status.completed')} ({processedCount})
+                </Button>
+                <Button
+                  size="sm"
+                  variant={statusFilter === 'preprocessed' ? 'secondary' : 'outline'}
+                  onClick={() => handleStatusFilterChange('preprocessed')}
+                  disabled={isRefreshing}
+                  className={cn(
+                    preprocessedCount > 0 ? 'text-purple-600' : 'text-gray-500',
+                    statusFilter === 'preprocessed' && 'bg-purple-100 dark:bg-purple-900/30 font-medium border border-purple-400 dark:border-purple-600 shadow-sm'
+                  )}
+                >
+                  {t('documentPanel.documentManager.status.preprocessed')} ({preprocessedCount})
+                </Button>
+                <Button
+                  size="sm"
+                  variant={statusFilter === 'processing' ? 'secondary' : 'outline'}
+                  onClick={() => handleStatusFilterChange('processing')}
+                  disabled={isRefreshing}
+                  className={cn(
+                    processingCount > 0 ? 'text-blue-600' : 'text-gray-500',
+                    statusFilter === 'processing' && 'bg-blue-100 dark:bg-blue-900/30 font-medium border border-blue-400 dark:border-blue-600 shadow-sm'
+                  )}
+                >
+                  {t('documentPanel.documentManager.status.processing')} ({processingCount})
+                </Button>
+                <Button
+                  size="sm"
+                  variant={statusFilter === 'pending' ? 'secondary' : 'outline'}
+                  onClick={() => handleStatusFilterChange('pending')}
+                  disabled={isRefreshing}
+                  className={cn(
+                    pendingCount > 0 ? 'text-yellow-600' : 'text-gray-500',
+                    statusFilter === 'pending' && 'bg-yellow-100 dark:bg-yellow-900/30 font-medium border border-yellow-400 dark:border-yellow-600 shadow-sm'
+                  )}
+                >
+                  {t('documentPanel.documentManager.status.pending')} ({pendingCount})
+                </Button>
+                <Button
+                  size="sm"
+                  variant={statusFilter === 'failed' ? 'secondary' : 'outline'}
+                  onClick={() => handleStatusFilterChange('failed')}
+                  disabled={isRefreshing}
+                  className={cn(
+                    failedCount > 0 ? 'text-red-600' : 'text-gray-500',
+                    statusFilter === 'failed' && 'bg-red-100 dark:bg-red-900/30 font-medium border border-red-400 dark:border-red-600 shadow-sm'
+                  )}
+                >
+                  {t('documentPanel.documentManager.status.failed')} ({failedCount})
                 </Button>
               </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleManualRefresh}
+                disabled={isRefreshing}
+                side="bottom"
+                tooltip={t('documentPanel.documentManager.refreshTooltip')}
+              >
+                <RotateCcwIcon className="h-4 w-4" />
+              </Button>
               <div className="flex items-center gap-2">
                 <label
                   htmlFor="toggle-filename-btn"

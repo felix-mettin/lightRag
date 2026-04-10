@@ -20,10 +20,14 @@ import PropertiesView from '@/components/graph/PropertiesView'
 import SettingsDisplay from '@/components/graph/SettingsDisplay'
 import Legend from '@/components/graph/Legend'
 import LegendButton from '@/components/graph/LegendButton'
+import GraphEditControl from '@/components/graph/GraphEditControl'
+import WorkspaceSelector from '@/components/graph/WorkspaceSelector'
 
 import { useSettingsStore } from '@/stores/settings'
 import { useGraphStore } from '@/stores/graph'
 import { labelColorDarkTheme, labelColorLightTheme } from '@/lib/constants'
+import { createRelation } from '@/api/lightrag'
+import { toast } from 'sonner'
 
 import '@react-sigma/core/lib/style.css'
 import '@react-sigma/graph-search/lib/style.css'
@@ -61,48 +65,175 @@ const createSigmaSettings = (isDarkTheme: boolean): Partial<SigmaSettings> => ({
   // labelFont: 'Lato, sans-serif'
 })
 
+const TempEdgeLine = () => {
+  const sigma = useSigma()
+  const edgeStart = useGraphStore.use.edgeStart()
+  const tempEdgeEnd = useGraphStore.use.tempEdgeEnd()
+  const createEdgeMode = useGraphStore.use.createEdgeMode()
+
+  if (!createEdgeMode || !edgeStart || !tempEdgeEnd) return null
+
+  const graph = sigma.getGraph()
+  const sourcePos = graph.getNodeAttributes(edgeStart)
+  
+  const startViewport = sigma.graphToViewport({ x: sourcePos.x, y: sourcePos.y })
+  const endViewport = sigma.graphToViewport({ x: tempEdgeEnd.x, y: tempEdgeEnd.y })
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none',
+        zIndex: 100
+      }}
+    >
+      <svg width="100%" height="100%">
+        <defs>
+          <marker
+            id="arrowhead"
+            markerWidth="10"
+            markerHeight="7"
+            refX="9"
+            refY="3.5"
+            orient="auto"
+          >
+            <polygon points="0 0, 10 3.5, 0 7" fill="#3b82f6" />
+          </marker>
+        </defs>
+        <line
+          x1={startViewport.x}
+          y1={startViewport.y}
+          x2={endViewport.x}
+          y2={endViewport.y}
+          stroke="#3b82f6"
+          strokeWidth="3"
+          strokeDasharray="8,4"
+          markerEnd="url(#arrowhead)"
+        />
+        <circle
+          cx={startViewport.x}
+          cy={startViewport.y}
+          r="6"
+          fill="#3b82f6"
+        />
+        <circle
+          cx={endViewport.x}
+          cy={endViewport.y}
+          r="6"
+          fill="#3b82f6"
+        />
+      </svg>
+    </div>
+  )
+}
+
 const GraphEvents = () => {
   const registerEvents = useRegisterEvents()
   const sigma = useSigma()
   const [draggedNode, setDraggedNode] = useState<string | null>(null)
+  const createEdgeMode = useGraphStore.use.createEdgeMode()
+  const currentWorkspace = useGraphStore.use.currentWorkspace()
 
   useEffect(() => {
-    // Register the events
     registerEvents({
       downNode: (e) => {
-        setDraggedNode(e.node)
-        sigma.getGraph().setNodeAttribute(e.node, 'highlighted', true)
+        if (createEdgeMode) {
+          useGraphStore.getState().setEdgeStart(e.node)
+          sigma.getGraph().setNodeAttribute(e.node, 'highlighted', true)
+          toast.info('拖拽到目标节点以创建关系', { duration: 2000 })
+          e.preventSigmaDefault()
+        } else {
+          setDraggedNode(e.node)
+          sigma.getGraph().setNodeAttribute(e.node, 'highlighted', true)
+        }
       },
-      // On mouse move, if the drag mode is enabled, we change the position of the draggedNode
       mousemovebody: (e) => {
+        if (createEdgeMode) {
+          const edgeStart = useGraphStore.getState().edgeStart
+          if (edgeStart) {
+            const pos = sigma.viewportToGraph(e)
+            useGraphStore.getState().setTempEdgeEnd(pos)
+          }
+          e.preventSigmaDefault()
+          e.original.preventDefault()
+          e.original.stopPropagation()
+          return
+        }
         if (!draggedNode) return
-        // Get new position of node
         const pos = sigma.viewportToGraph(e)
         sigma.getGraph().setNodeAttribute(draggedNode, 'x', pos.x)
         sigma.getGraph().setNodeAttribute(draggedNode, 'y', pos.y)
-
-        // Prevent sigma to move camera:
         e.preventSigmaDefault()
         e.original.preventDefault()
         e.original.stopPropagation()
       },
-      // On mouse up, we reset the autoscale and the dragging mode
+      upNode: (e) => {
+        if (!createEdgeMode) return
+        const edgeStart = useGraphStore.getState().edgeStart
+        if (!edgeStart) return
+        
+        const targetNode = e.node
+        const sourceNode = edgeStart
+        sigma.getGraph().removeNodeAttribute(edgeStart, 'highlighted')
+        useGraphStore.getState().setEdgeStart(null)
+        useGraphStore.getState().setTempEdgeEnd(null)
+
+        if (targetNode === sourceNode) return
+
+        const rawGraph = useGraphStore.getState().rawGraph
+        const getName = (nodeId: string) => {
+          try {
+            const nodeObj = rawGraph?.getNode(nodeId)
+            if (nodeObj) return nodeObj.properties?.entity_id || (nodeObj.labels && nodeObj.labels[0]) || nodeId
+          } catch (err) {
+          }
+          return nodeId
+        }
+
+        const sourceName = getName(sourceNode)
+        const targetName = getName(targetNode)
+
+        ;(async () => {
+          try {
+            await createRelation(sourceName, targetName, {}, currentWorkspace)
+            toast.success(`关系创建成功: ${sourceName} → ${targetName}`)
+            useGraphStore.getState().setPendingEdgeSelection({ sourceName, targetName })
+            useGraphStore.getState().incrementGraphDataVersion()
+          } catch (err) {
+            console.error('Failed to create relation via drag:', err)
+            toast.error('创建关系失败')
+          }
+        })()
+      },
       mouseup: () => {
         if (draggedNode) {
           setDraggedNode(null)
           sigma.getGraph().removeNodeAttribute(draggedNode, 'highlighted')
         }
+        const edgeStart = useGraphStore.getState().edgeStart
+        if (edgeStart) {
+          sigma.getGraph().removeNodeAttribute(edgeStart, 'highlighted')
+          useGraphStore.getState().setEdgeStart(null)
+          useGraphStore.getState().setTempEdgeEnd(null)
+        }
       },
-      // Disable the autoscale at the first down interaction
       mousedown: (e) => {
-        // Only set custom BBox if it's a drag operation (mouse button is pressed)
-        const mouseEvent = e.original as MouseEvent;
+        if (createEdgeMode) {
+          e.preventSigmaDefault()
+          e.original.preventDefault()
+          return
+        }
+        const mouseEvent = e.original as MouseEvent
         if (mouseEvent.buttons !== 0 && !sigma.getCustomBBox()) {
           sigma.setCustomBBox(sigma.getBBox())
         }
       }
     })
-  }, [registerEvents, sigma, draggedNode])
+  }, [registerEvents, sigma, draggedNode, createEdgeMode])
 
   return null
 }
@@ -111,6 +242,7 @@ const GraphViewer = () => {
   const [isThemeSwitching, setIsThemeSwitching] = useState(false)
   const sigmaRef = useRef<any>(null)
   const prevTheme = useRef<string>('')
+  const currentWorkspace = useGraphStore.use.currentWorkspace()
 
   const selectedNode = useGraphStore.use.selectedNode()
   const focusedNode = useGraphStore.use.focusedNode()
@@ -202,10 +334,12 @@ const GraphViewer = () => {
         <GraphControl />
 
         {enableNodeDrag && <GraphEvents />}
+        <TempEdgeLine />
 
         <FocusOnNode node={autoFocusedNode} move={moveToSelectedNode} />
 
         <div className="absolute top-2 left-2 flex items-start gap-2">
+          <WorkspaceSelector />
           <GraphLabels />
           {showNodeSearchBar && !isThemeSwitching && (
             <GraphSearch
@@ -220,6 +354,7 @@ const GraphViewer = () => {
           <LayoutsControl />
           <ZoomControl />
           <FullScreenControl />
+          <GraphEditControl />
           <LegendButton />
           <Settings />
           {/* <ThemeToggle /> */}

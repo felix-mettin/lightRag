@@ -567,6 +567,18 @@ class LightRAG:
                 "standard_name": section.get("standard_name", "").strip(),
                 "report_types": _parse_list(section.get("report_types", "")),
                 "report_aliases": _parse_map(section.get("report_aliases", "")),
+                "report_scope_fallback_high_level_keywords": _parse_map_list(
+                    section.get("report_scope_fallback_high_level_keywords", "")
+                ),
+                "report_scope_fallback_low_level_keywords": _parse_map_list(
+                    section.get("report_scope_fallback_low_level_keywords", "")
+                ),
+                "report_scope_multi_fallback_high_level_keywords": _parse_map_list(
+                    section.get("report_scope_multi_fallback_high_level_keywords", "")
+                ),
+                "report_scope_multi_fallback_low_level_keywords": _parse_map_list(
+                    section.get("report_scope_multi_fallback_low_level_keywords", "")
+                ),
                 "test_items": _parse_list(section.get("test_items", "")),
                 "test_aliases": _parse_map(section.get("test_aliases", "")),
                 "param_map": _parse_map(section.get("param_map", "")),

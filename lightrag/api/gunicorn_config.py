@@ -13,9 +13,16 @@ from lightrag.constants import (
 # Get log directory path from environment variable
 log_dir = os.getenv("LOG_DIR", os.getcwd())
 log_file_path = os.path.abspath(os.path.join(log_dir, DEFAULT_LOG_FILENAME))
+electrical_debug_log_path = os.path.abspath(
+    os.getenv(
+        "LIGHTRAG_ELECTRICAL_DEBUG_LOG",
+        os.path.join(log_dir, "lightrag_electrical_debug.log"),
+    )
+)
 
 # Ensure log directory exists
 os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
+os.makedirs(os.path.dirname(electrical_debug_log_path), exist_ok=True)
 
 # Get log file max size and backup count from environment variables
 log_max_bytes = get_env_value("LOG_MAX_BYTES", DEFAULT_LOG_MAX_BYTES, int)
@@ -60,6 +67,14 @@ logconfig_dict = {
             "backupCount": log_backup_count,
             "encoding": "utf8",
         },
+        "electrical_file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "formatter": "standard",
+            "filename": electrical_debug_log_path,
+            "maxBytes": log_max_bytes,
+            "backupCount": log_backup_count,
+            "encoding": "utf8",
+        },
     },
     "filters": {
         "path_filter": {
@@ -69,6 +84,11 @@ logconfig_dict = {
     "loggers": {
         "lightrag": {
             "handlers": ["console", "file"],
+            "level": loglevel.upper() if loglevel else "INFO",
+            "propagate": False,
+        },
+        "lightrag.electrical_debug": {
+            "handlers": ["electrical_file"],
             "level": loglevel.upper() if loglevel else "INFO",
             "propagate": False,
         },
@@ -153,6 +173,8 @@ def post_fork(server, worker):
     # Set up lightrag submodule loggers
     for name in logging.root.manager.loggerDict:
         if name.startswith("lightrag."):
+            if name == "lightrag.electrical_debug":
+                continue
             setup_logger(name, log_level, add_filter=True, log_file_path=log_file_path)
 
     # Disable uvicorn.error logger

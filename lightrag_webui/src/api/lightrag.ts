@@ -138,10 +138,22 @@ export type QueryRequest = {
   user_prompt?: string
   /** Enable reranking for retrieved text chunks. If True but no rerank model is configured, a warning will be issued. Default is True. */
   enable_rerank?: boolean
+  /** Optional standard type filter: GB, HB, GJB, others. If not provided, auto-detects from query. */
+  standard_type?: string
+  /** Explicit standard list for multi-standard fusion retrieval. */
+  standard_types?: string[]
+  /** Explicit test domain list for multi-domain fusion retrieval. */
+  test_domains?: string[]
 }
 
 export type QueryResponse = {
   response: string
+}
+
+export type QueryStreamChunk = {
+  response: string
+  mode: 'append' | 'replace'
+  event?: string
 }
 
 export type EntityUpdateResponse = {
@@ -160,6 +172,7 @@ export type EntityUpdateResponse = {
 }
 
 export type DocActionResponse = {
+  [x: string]: any
   status: 'success' | 'partial_success' | 'failure' | 'duplicated'
   message: string
   track_id?: string
@@ -216,6 +229,7 @@ export type DocumentsRequest = {
   page_size: number
   sort_field: 'created_at' | 'updated_at' | 'id' | 'file_path'
   sort_direction: 'asc' | 'desc'
+  standard_type?: string | null
 }
 
 export type PaginationInfo = {
@@ -453,9 +467,18 @@ axiosInstance.interceptors.response.use(
 export const queryGraphs = async (
   label: string,
   maxDepth: number,
-  maxNodes: number
+  maxNodes: number,
+  workspace?: string
 ): Promise<LightragGraphType> => {
-  const response = await axiosInstance.get(`/graphs?label=${encodeURIComponent(label)}&max_depth=${maxDepth}&max_nodes=${maxNodes}`)
+  const params = new URLSearchParams({
+    label: encodeURIComponent(label),
+    max_depth: maxDepth.toString(),
+    max_nodes: maxNodes.toString()
+  })
+  if (workspace) {
+    params.append('standard_type', encodeURIComponent(workspace))
+  }
+  const response = await axiosInstance.get(`/graphs?${params.toString()}`)
   return response.data
 }
 
@@ -464,13 +487,39 @@ export const getGraphLabels = async (): Promise<string[]> => {
   return response.data
 }
 
+export const getGraphLabelsForWorkspace = async (workspace: string): Promise<string[]> => {
+  const response = await axiosInstance.get(`/graph/label/list?standard_type=${encodeURIComponent(workspace)}`)
+  return response.data
+}
+
+export const getWorkspaces = async (): Promise<{
+  workspaces: Record<string, {
+    name: string
+    has_data: boolean
+    label_count: number
+  }>
+}> => {
+  const response = await axiosInstance.get('/graph/workspaces')
+  return response.data
+}
+
 export const getPopularLabels = async (limit: number = popularLabelsDefaultLimit): Promise<string[]> => {
   const response = await axiosInstance.get(`/graph/label/popular?limit=${limit}`)
   return response.data
 }
 
+export const getPopularLabelsForWorkspace = async (workspace: string, limit: number = popularLabelsDefaultLimit): Promise<string[]> => {
+  const response = await axiosInstance.get(`/graph/label/popular?limit=${limit}&standard_type=${encodeURIComponent(workspace)}`)
+  return response.data
+}
+
 export const searchLabels = async (query: string, limit: number = searchLabelsDefaultLimit): Promise<string[]> => {
   const response = await axiosInstance.get(`/graph/label/search?q=${encodeURIComponent(query)}&limit=${limit}`)
+  return response.data
+}
+
+export const searchLabelsForWorkspace = async (workspace: string, query: string, limit: number = searchLabelsDefaultLimit): Promise<string[]> => {
+  const response = await axiosInstance.get(`/graph/label/search?q=${encodeURIComponent(query)}&limit=${limit}&standard_type=${encodeURIComponent(workspace)}`)
   return response.data
 }
 
@@ -515,9 +564,36 @@ export const queryText = async (request: QueryRequest): Promise<QueryResponse> =
 
 export const queryTextStream = async (
   request: QueryRequest,
-  onChunk: (chunk: string) => void,
+  onChunk: (chunk: QueryStreamChunk) => void,
   onError?: (error: string) => void
 ) => {
+  if (request.stream === false) {
+    try {
+      const response = await queryText({ ...request, stream: false })
+      if (response.response) {
+        onChunk({
+          response: response.response,
+          mode: 'replace'
+        })
+      }
+    } catch (error) {
+      onError?.(errorMessage(error))
+    }
+    return
+  }
+
+  const emitChunk = (payload: Record<string, unknown>) => {
+    if (typeof payload.response !== 'string' || !payload.response) {
+      return
+    }
+
+    onChunk({
+      response: payload.response,
+      mode: payload.event === 'final' ? 'replace' : 'append',
+      event: typeof payload.event === 'string' ? payload.event : undefined,
+    })
+  }
+
   const apiKey = useSettingsStore.getState().apiKey;
   const token = localStorage.getItem('LIGHTRAG-API-TOKEN');
   const headers: HeadersInit = {
@@ -588,7 +664,7 @@ export const queryTextStream = async (
                   try {
                     const parsed = JSON.parse(line);
                     if (parsed.response) {
-                      onChunk(parsed.response);
+                      emitChunk(parsed);
                     } else if (parsed.error) {
                       onError?.(parsed.error);
                     }
@@ -605,7 +681,7 @@ export const queryTextStream = async (
               try {
                 const parsed = JSON.parse(buffer);
                 if (parsed.response) {
-                  onChunk(parsed.response);
+                  emitChunk(parsed);
                 } else if (parsed.error) {
                   onError?.(parsed.error);
                 }
@@ -671,7 +747,7 @@ export const queryTextStream = async (
           try {
             const parsed = JSON.parse(line);
             if (parsed.response) {
-              onChunk(parsed.response);
+              emitChunk(parsed);
             } else if (parsed.error && onError) {
               onError(parsed.error);
             }
@@ -688,7 +764,7 @@ export const queryTextStream = async (
       try {
         const parsed = JSON.parse(buffer);
         if (parsed.response) {
-          onChunk(parsed.response);
+          emitChunk(parsed);
         } else if (parsed.error && onError) {
           onError(parsed.error);
         }
@@ -791,10 +867,14 @@ export const insertTexts = async (texts: string[]): Promise<DocActionResponse> =
 
 export const uploadDocument = async (
   file: File,
-  onUploadProgress?: (percentCompleted: number) => void
+  onUploadProgress?: (percentCompleted: number) => void,
+  standardType?: string
 ): Promise<DocActionResponse> => {
   const formData = new FormData()
   formData.append('file', file)
+  if (standardType) {
+    formData.append('standard_type', standardType)
+  }
 
   const response = await axiosInstance.post('/documents/upload', formData, {
     headers: {
@@ -814,13 +894,14 @@ export const uploadDocument = async (
 
 export const batchUploadDocuments = async (
   files: File[],
-  onUploadProgress?: (fileName: string, percentCompleted: number) => void
+  onUploadProgress?: (fileName: string, percentCompleted: number) => void,
+  standardType?: string
 ): Promise<DocActionResponse[]> => {
   return await Promise.all(
     files.map(async (file) => {
       return await uploadDocument(file, (percentCompleted) => {
         onUploadProgress?.(file.name, percentCompleted)
-      })
+      }, standardType)
     })
   )
 }
@@ -841,10 +922,20 @@ export const clearCache = async (): Promise<{
 export const deleteDocuments = async (
   docIds: string[],
   deleteFile: boolean = false,
-  deleteLLMCache: boolean = false
+  deleteLLMCache: boolean = false,
+  standardType?: string
 ): Promise<DeleteDocResponse> => {
+  const data: Record<string, any> = {
+    doc_ids: docIds,
+    delete_file: deleteFile,
+    delete_llm_cache: deleteLLMCache,
+  }
+  if (standardType) {
+    data.standard_type = standardType
+  }
+
   const response = await axiosInstance.delete('/documents/delete_document', {
-    data: { doc_ids: docIds, delete_file: deleteFile, delete_llm_cache: deleteLLMCache }
+    data
   })
   return response.data
 }
@@ -934,61 +1025,151 @@ export const loginToServer = async (username: string, password: string): Promise
 }
 
 /**
- * Updates an entity's properties in the knowledge graph
- * @param entityName The name of the entity to update
- * @param updatedData Dictionary containing updated attributes
- * @param allowRename Whether to allow renaming the entity (default: false)
- * @param allowMerge Whether to merge into an existing entity when renaming to a duplicate name
- * @returns Promise with the updated entity information
- */
-export const updateEntity = async (
-  entityName: string,
-  updatedData: Record<string, any>,
-  allowRename: boolean = false,
-  allowMerge: boolean = false
-): Promise<EntityUpdateResponse> => {
-  const response = await axiosInstance.post('/graph/entity/edit', {
-    entity_name: entityName,
-    updated_data: updatedData,
-    allow_rename: allowRename,
-    allow_merge: allowMerge
-  })
-  return response.data
-}
-
-/**
- * Updates a relation's properties in the knowledge graph
- * @param sourceEntity The source entity name
- * @param targetEntity The target entity name
- * @param updatedData Dictionary containing updated attributes
- * @returns Promise with the updated relation information
- */
-export const updateRelation = async (
-  sourceEntity: string,
-  targetEntity: string,
-  updatedData: Record<string, any>
-): Promise<DocActionResponse> => {
-  const response = await axiosInstance.post('/graph/relation/edit', {
-    source_id: sourceEntity,
-    target_id: targetEntity,
-    updated_data: updatedData
-  })
-  return response.data
-}
-
-/**
  * Checks if an entity name already exists in the knowledge graph
  * @param entityName The entity name to check
+ * @param workspace The workspace to check in (optional)
  * @returns Promise with boolean indicating if the entity exists
  */
-export const checkEntityNameExists = async (entityName: string): Promise<boolean> => {
+export const checkEntityNameExists = async (entityName: string, workspace?: string): Promise<boolean> => {
   try {
-    const response = await axiosInstance.get(`/graph/entity/exists?name=${encodeURIComponent(entityName)}`)
+    const params = workspace ? `&standard_type=${encodeURIComponent(workspace)}` : ''
+    const response = await axiosInstance.get(`/graph/entity/exists?name=${encodeURIComponent(entityName)}${params}`)
     return response.data.exists
   } catch (error) {
     console.error('Error checking entity name:', error)
     return false
   }
+}
+
+/**
+ * Creates a new entity in the knowledge graph
+ * @param entityName The name of the new entity
+ * @param entityData Dictionary containing entity properties
+ * @param workspace The workspace to create entity in (optional)
+ * @returns Promise with the created entity information
+ */
+export const createEntity = async (
+  entityName: string,
+  entityData: Record<string, any>,
+  workspace?: string
+): Promise<DocActionResponse> => {
+  const params = workspace ? `?standard_type=${encodeURIComponent(workspace)}` : ''
+  const response = await axiosInstance.post(`/graph/entity/create${params}`, {
+    entity_name: entityName,
+    entity_data: entityData
+  })
+  return response.data
+}
+
+/**
+ * Creates a new relation between entities in the knowledge graph
+ * @param sourceEntity The source entity name
+ * @param targetEntity The target entity name
+ * @param relationData Dictionary containing relationship properties
+ * @param workspace The workspace to create relation in (optional)
+ * @returns Promise with the created relation information
+ */
+export const createRelation = async (
+  sourceEntity: string,
+  targetEntity: string,
+  relationData: Record<string, any>,
+  workspace?: string
+): Promise<DocActionResponse> => {
+  const params = workspace ? `?standard_type=${encodeURIComponent(workspace)}` : ''
+  const response = await axiosInstance.post(`/graph/relation/create${params}`, {
+    source_entity: sourceEntity,
+    target_entity: targetEntity,
+    relation_data: relationData
+  })
+  return response.data
+}
+
+/**
+ * Updates an entity in the knowledge graph
+ * @param entityName The name of the entity to update
+ * @param entityData Dictionary containing updated entity properties (excluding allow_rename and allow_merge)
+ * @param workspace The workspace to update entity in (optional)
+ * @param allowRename Whether to allow entity renaming (optional)
+ * @param allowMerge Whether to allow merging into existing entity when renaming causes conflict (optional)
+ * @returns Promise with the updated entity information
+ */
+export const updateEntity = async (
+  entityName: string,
+  entityData: Record<string, any>,
+  workspace?: string,
+  allowRename?: boolean,
+  allowMerge?: boolean
+): Promise<DocActionResponse> => {
+  const params = workspace ? `?standard_type=${encodeURIComponent(workspace)}` : ''
+  const requestBody: Record<string, any> = {
+    entity_name: entityName,
+    updated_data: entityData
+  }
+  if (allowRename !== undefined) {
+    requestBody.allow_rename = allowRename
+  }
+  if (allowMerge !== undefined) {
+    requestBody.allow_merge = allowMerge
+  }
+  const response = await axiosInstance.post(`/graph/entity/edit${params}`, requestBody)
+  return response.data
+}
+
+/**
+ * Updates a relation between entities in the knowledge graph
+ * @param sourceEntity The source entity name
+ * @param targetEntity The target entity name
+ * @param relationData Dictionary containing updated relationship properties
+ * @param workspace The workspace to update relation in (optional)
+ * @returns Promise with the updated relation information
+ */
+export const updateRelation = async (
+  sourceEntity: string,
+  targetEntity: string,
+  relationData: Record<string, any>,
+  workspace?: string
+): Promise<DocActionResponse> => {
+  const params = workspace ? `?standard_type=${encodeURIComponent(workspace)}` : ''
+  const response = await axiosInstance.post(`/graph/relation/edit${params}`, {
+    source_id: sourceEntity,
+    target_id: targetEntity,
+    updated_data: relationData
+  })
+  return response.data
+}
+
+/**
+ * Deletes an entity from the knowledge graph
+ * @param entityName The name of the entity to delete
+ * @param workspace The workspace to delete entity from (optional)
+ * @returns Promise with the deletion result
+ */
+export const deleteEntity = async (entityName: string, workspace?: string): Promise<DocActionResponse> => {
+  const params = workspace ? `?standard_type=${encodeURIComponent(workspace)}` : ''
+  const response = await axiosInstance.post(`/graph/entity/delete${params}`, {
+    entity_name: entityName
+  })
+  return response.data
+}
+
+/**
+ * Deletes a relation between entities from the knowledge graph
+ * @param sourceEntity The source entity name
+ * @param targetEntity The target entity name
+ * @param workspace The workspace to delete relation from (optional)
+ * @returns Promise with the deletion result
+ */
+export const deleteRelation = async (
+  sourceEntity: string,
+  targetEntity: string,
+  workspace?: string
+): Promise<DocActionResponse> => {
+  const params = workspace ? `?standard_type=${encodeURIComponent(workspace)}` : ''
+  const response = await axiosInstance.post(`/graph/relation/delete${params}`, {
+    source_entity: sourceEntity,
+    target_entity: targetEntity
+  })
+  return response.data
 }
 
 /**

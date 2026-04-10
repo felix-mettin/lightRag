@@ -6,6 +6,8 @@ import useLightragGraph from '@/hooks/useLightragGraph'
 import { useTranslation } from 'react-i18next'
 import { GitBranchPlus, Scissors } from 'lucide-react'
 import EditablePropertyRow from './EditablePropertyRow'
+import { deleteEntity, deleteRelation } from '@/api/lightrag'
+import { toast } from 'sonner'
 
 /**
  * Component that view properties of elements in graph.
@@ -275,6 +277,32 @@ const NodePropertiesView = ({ node }: { node: NodeType }) => {
     useGraphStore.getState().triggerNodePrune(node.id)
   }
 
+  const handleDeleteNode = async () => {
+    if (!node.properties['entity_id']) {
+      toast.error(t('graphPanel.propertiesView.node.deleteError'))
+      return
+    }
+
+    const confirmed = window.confirm(
+      t('graphPanel.propertiesView.node.deleteConfirm', { name: node.properties['entity_id'] })
+    )
+
+    if (!confirmed) return
+
+    try {
+      const currentWorkspace = useGraphStore.use.currentWorkspace()
+      await deleteEntity(node.properties['entity_id'], currentWorkspace)
+      toast.success(t('graphPanel.propertiesView.node.deleteSuccess'))
+
+      // Clear selection and refresh graph
+      useGraphStore.getState().clearSelection()
+      useGraphStore.getState().incrementGraphDataVersion()
+    } catch (error) {
+      console.error('Error deleting entity:', error)
+      toast.error(t('graphPanel.propertiesView.node.deleteFailed'))
+    }
+  }
+
   return (
     <div className="flex flex-col gap-2">
       <div className="flex justify-between items-center">
@@ -297,6 +325,17 @@ const NodePropertiesView = ({ node }: { node: NodeType }) => {
             tooltip={t('graphPanel.propertiesView.node.pruneNode')}
           >
             <Scissors className="h-4 w-4 text-gray-900 dark:text-gray-300" />
+          </Button>
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-7 w-7 border border-red-400 hover:bg-red-100 dark:border-red-600 dark:hover:bg-red-900"
+            onClick={handleDeleteNode}
+            tooltip={t('graphPanel.propertiesView.node.deleteNode')}
+          >
+            <svg className="h-4 w-4 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
           </Button>
         </div>
       </div>
@@ -358,9 +397,52 @@ const NodePropertiesView = ({ node }: { node: NodeType }) => {
 
 const EdgePropertiesView = ({ edge }: { edge: EdgeType }) => {
   const { t } = useTranslation()
+
+  const handleDeleteEdge = async () => {
+    const sourceName = edge.sourceNode?.properties['entity_id'] || edge.source
+    const targetName = edge.targetNode?.properties['entity_id'] || edge.target
+
+    const confirmed = window.confirm(
+      t('graphPanel.propertiesView.edge.deleteConfirm', {
+        source: sourceName,
+        target: targetName
+      })
+    )
+
+    if (!confirmed) return
+
+    try {
+      const currentWorkspace = useGraphStore.use.currentWorkspace()
+      await deleteRelation(sourceName, targetName, currentWorkspace)
+      toast.success(t('graphPanel.propertiesView.edge.deleteSuccess'))
+
+      // Clear selection and refresh graph
+      useGraphStore.getState().clearSelection()
+      useGraphStore.getState().incrementGraphDataVersion()
+    } catch (error) {
+      console.error('Error deleting relation:', error)
+      toast.error(t('graphPanel.propertiesView.edge.deleteFailed'))
+    }
+  }
+
   return (
     <div className="flex flex-col gap-2">
-      <h3 className="text-md pl-1 font-bold tracking-wide text-violet-700">{t('graphPanel.propertiesView.edge.title')}</h3>
+      <div className="flex justify-between items-center">
+        <h3 className="text-md pl-1 font-bold tracking-wide text-violet-700">{t('graphPanel.propertiesView.edge.title')}</h3>
+        <div className="flex gap-3">
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-7 w-7 border border-red-400 hover:bg-red-100 dark:border-red-600 dark:hover:bg-red-900"
+            onClick={handleDeleteEdge}
+            tooltip={t('graphPanel.propertiesView.edge.deleteEdge')}
+          >
+            <svg className="h-4 w-4 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </Button>
+        </div>
+      </div>
       <div className="bg-primary/5 max-h-96 overflow-auto rounded p-1">
         <PropertyRow name={t('graphPanel.propertiesView.edge.id')} value={edge.id} />
         {edge.type && <PropertyRow name={t('graphPanel.propertiesView.edge.type')} value={edge.type} />}

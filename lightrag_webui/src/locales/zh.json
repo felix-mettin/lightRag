@@ -37,7 +37,13 @@
     "cancel": "取消",
     "save": "保存",
     "saving": "保存中...",
-    "saveFailed": "保存失败"
+    "saveFailed": "保存失败",
+    "create": "创建",
+    "creating": "创建中...",
+    "update": "更新",
+    "updating": "更新中...",
+    "delete": "删除",
+    "deleting": "删除中..."
   },
   "documentPanel": {
     "clearDocuments": {
@@ -371,7 +377,67 @@
       "refreshCurrentLabelTooltip": "刷新当前页面图数据",
       "refreshingTooltip": "正在刷新数据..."
     },
-    "emptyGraph": "无数据(请重载图形数据)"
+    "emptyGraph": "无数据(请重载图形数据)",
+    "workspaceSelector": {
+      "selectWorkspace": "选择工作空间",
+      "loadError": "加载工作空间失败",
+      "switched": "已切换到工作空间: {{workspace}}"
+    },
+    "editControl": {
+      "title": "图编辑器",
+      "tooltip": "创建、更新和删除图元素",
+      "tabs": {
+        "createEntity": "创建实体",
+        "createRelation": "创建关系",
+        "updateEntity": "更新实体",
+        "updateRelation": "更新关系",
+        "deleteEntity": "删除实体",
+        "deleteRelation": "删除关系"
+      },
+      "entity": {
+        "name": "实体名称",
+        "namePlaceholder": "输入实体名称",
+        "type": "实体类型",
+        "typePlaceholder": "例如：PERSON, ORGANIZATION",
+        "description": "描述",
+        "descriptionPlaceholder": "输入实体描述"
+      },
+      "relation": {
+        "source": "源实体",
+        "sourcePlaceholder": "输入源实体名称",
+        "target": "目标实体",
+        "targetPlaceholder": "输入目标实体名称",
+        "description": "描述",
+        "descriptionPlaceholder": "输入关系描述",
+        "keywords": "关键词",
+        "keywordsPlaceholder": "输入关键词（逗号分隔）"
+      },
+      "delete": {
+        "warning": "警告：此操作无法撤销。"
+      },
+      "errors": {
+        "entityNameRequired": "实体名称是必需的",
+        "entityExists": "该名称的实体已存在",
+        "sourceTargetRequired": "源实体和目标实体是必需的",
+        "selfRelation": "不能在同一实体之间创建关系",
+        "sourceEntityNotFound": "源实体不存在",
+        "targetEntityNotFound": "目标实体不存在",
+        "createEntityFailed": "创建实体失败",
+        "createRelationFailed": "创建关系失败",
+        "updateEntityFailed": "更新实体失败",
+        "updateRelationFailed": "更新关系失败",
+        "deleteEntityFailed": "删除实体失败",
+        "deleteRelationFailed": "删除关系失败"
+      },
+      "success": {
+        "entityCreated": "实体创建成功",
+        "relationCreated": "关系创建成功",
+        "entityUpdated": "实体更新成功",
+        "relationUpdated": "关系更新成功",
+        "entityDeleted": "实体删除成功",
+        "relationDeleted": "关系删除成功"
+      }
+    }
   },
   "retrievePanel": {
     "chatMessage": {

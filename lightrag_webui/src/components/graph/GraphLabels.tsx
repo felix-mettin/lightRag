@@ -13,10 +13,11 @@ import { useTranslation } from 'react-i18next'
 import { RefreshCw } from 'lucide-react'
 import Button from '@/components/ui/Button'
 import { SearchHistoryManager } from '@/utils/SearchHistoryManager'
-import { getPopularLabels, searchLabels } from '@/api/lightrag'
+import { getPopularLabelsForWorkspace, searchLabelsForWorkspace } from '@/api/lightrag'
 
 const GraphLabels = () => {
   const { t } = useTranslation()
+  const currentWorkspace = useGraphStore.use.currentWorkspace()
   const label = useSettingsStore.use.queryLabel()
   const dropdownRefreshTrigger = useSettingsStore.use.searchLabelDropdownRefreshTrigger()
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -49,7 +50,7 @@ const GraphLabels = () => {
       if (history.length === 0) {
         // If no history exists, fetch popular labels and initialize
         try {
-          const popularLabels = await getPopularLabels(popularLabelsDefaultLimit)
+          const popularLabels = await getPopularLabelsForWorkspace(currentWorkspace, popularLabelsDefaultLimit)
           await SearchHistoryManager.initializeWithDefaults(popularLabels)
         } catch (error) {
           console.error('Failed to initialize search history:', error)
@@ -88,7 +89,7 @@ const GraphLabels = () => {
 
     console.log('Reloading popular labels (triggered by pipeline idle)')
     try {
-      const popularLabels = await getPopularLabels(popularLabelsDefaultLimit)
+      const popularLabels = await getPopularLabelsForWorkspace(currentWorkspace, popularLabelsDefaultLimit)
       SearchHistoryManager.clearHistory()
 
       if (popularLabels.length === 0) {
@@ -125,7 +126,7 @@ const GraphLabels = () => {
       } else {
         // Non-empty query: call backend search API
         try {
-          const apiResults = await searchLabels(query.trim(), searchLabelsDefaultLimit)
+          const apiResults = await searchLabelsForWorkspace(currentWorkspace, query.trim(), searchLabelsDefaultLimit)
           results = apiResults.length <= dropdownDisplayLimit
             ? apiResults
             : [...apiResults.slice(0, dropdownDisplayLimit), '...']
@@ -191,7 +192,7 @@ const GraphLabels = () => {
 
         try {
           // Re-fetch popular labels and update search history (if not already done)
-          const popularLabels = await getPopularLabels(popularLabelsDefaultLimit)
+          const popularLabels = await getPopularLabelsForWorkspace(currentWorkspace, popularLabelsDefaultLimit)
           SearchHistoryManager.clearHistory()
 
           if (popularLabels.length === 0) {

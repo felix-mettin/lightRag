@@ -115,7 +115,7 @@ const useSettingsStoreBase = create<SettingsState>()(
       apiKey: null,
 
       currentTab: 'documents',
-      showFileName: false,
+      showFileName: true,
       documentsPageSize: 10,
 
       retrievalHistory: [],

@@ -37,7 +37,7 @@
     }
     .toolbar {
       display: grid;
-      grid-template-columns: 1fr 1fr 110px 110px auto auto auto auto;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
       gap: 8px;
       padding: 12px;
       border: 1px solid var(--line);
@@ -45,7 +45,9 @@
       background: var(--panel);
       align-items: center;
     }
-    input, button {
+    input, select, button {
+      width: 100%;
+      min-width: 0;
       height: 36px;
       border-radius: 8px;
       border: 1px solid var(--line);
@@ -55,6 +57,12 @@
       color: var(--text);
     }
     button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
       cursor: pointer;
       background: var(--accent);
       color: white;
@@ -131,8 +139,24 @@
     .node-label {
       display: inline-flex;
       align-items: center;
+      gap: 8px;
+      max-width: min(100%, 980px);
+      min-width: 0;
+      vertical-align: middle;
+    }
+    .node-title {
+      min-width: 0;
+      flex: 0 1 auto;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .node-actions {
+      display: inline-flex;
+      align-items: center;
       gap: 6px;
-      flex-wrap: wrap;
+      flex: 0 0 auto;
+      white-space: nowrap;
     }
     .note-btn {
       height: 24px;
@@ -144,12 +168,13 @@
       color: var(--text);
     }
     .node-note {
+      display: inline-block;
       font-size: 12px;
       color: var(--muted);
       background: rgba(107, 114, 128, 0.12);
       border-radius: 6px;
       padding: 1px 6px;
-      max-width: 460px;
+      max-width: 320px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -167,6 +192,64 @@
       width: auto;
       margin: 0;
     }
+    #apiBase {
+      grid-column: span 4;
+    }
+    #apiKey {
+      grid-column: span 3;
+    }
+    #standardType {
+      grid-column: span 2;
+    }
+    #maxDepth,
+    #maxLayers {
+      grid-column: span 1;
+    }
+    .toggle {
+      grid-column: span 1;
+      min-width: 0;
+    }
+    #loadApiBtn,
+    #resetBtn,
+    #exportTreeBtn,
+    #importTreeBtn {
+      grid-column: span 2;
+    }
+    @media (max-width: 1100px) {
+      #apiBase,
+      #apiKey {
+        grid-column: span 6;
+      }
+      #standardType,
+      #maxDepth,
+      #maxLayers,
+      .toggle {
+        grid-column: span 3;
+      }
+      #loadApiBtn,
+      #resetBtn,
+      #exportTreeBtn,
+      #importTreeBtn {
+        grid-column: span 6;
+      }
+    }
+    @media (max-width: 720px) {
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+      #apiBase,
+      #apiKey,
+      #standardType,
+      #maxDepth,
+      #maxLayers,
+      .toggle,
+      #loadApiBtn,
+      #resetBtn,
+      #exportTreeBtn,
+      #importTreeBtn {
+        grid-column: span 1;
+      }
+    }
   </style>
 </head>
 <body>
@@ -175,6 +258,13 @@
     <div class="toolbar">
       <input id="apiBase" value="http://127.0.0.1:9621" placeholder="API Base URL，例如 http://127.0.0.1:9621" />
       <input id="apiKey" placeholder="可选：Bearer Token / API Key" />
+      <select id="standardType">
+        <option value="" selected disabled>请选择工作空间</option>
+        <option value="GB">GB</option>
+        <option value="HB">HB</option>
+        <option value="GJB">GJB</option>
+        <option value="others">others</option>
+      </select>
       <input id="maxDepth" type="number" min="1" value="4" placeholder="max_depth" />
       <input id="maxLayers" type="number" min="1" value="6" placeholder="递归层数" />
       <label class="toggle"><input id="recursiveMode" type="checkbox" checked />递归抓取</label>
@@ -281,8 +371,12 @@
       wrap.className = "node-label";
 
       const text = document.createElement("span");
+      text.className = "node-title";
       text.textContent = node.name;
       wrap.appendChild(text);
+
+      const actions = document.createElement("span");
+      actions.className = "node-actions";
 
       if (typeof node.note === "string" && node.note.trim()) {
         const editBtn = document.createElement("button");
@@ -295,7 +389,7 @@
           if (!editNodeNote(node)) return;
           renderTree(currentTree);
         });
-        wrap.appendChild(editBtn);
+        actions.appendChild(editBtn);
 
         const removeBtn = document.createElement("button");
         removeBtn.className = "note-btn";
@@ -307,12 +401,12 @@
           delete node.note;
           renderTree(currentTree);
         });
-        wrap.appendChild(removeBtn);
+        actions.appendChild(removeBtn);
 
         const note = document.createElement("span");
         note.className = "node-note";
         note.textContent = node.note.trim();
-        wrap.appendChild(note);
+        actions.appendChild(note);
       } else {
         const addBtn = document.createElement("button");
         addBtn.className = "note-btn";
@@ -324,8 +418,10 @@
           if (!editNodeNote(node)) return;
           renderTree(currentTree);
         });
-        wrap.appendChild(addBtn);
+        actions.appendChild(addBtn);
       }
+
+      wrap.appendChild(actions);
 
       return wrap;
     }
@@ -478,16 +574,32 @@
       for (const link of testLinks) {
         const testId = link.targetId;
         const testNode = nodeById.get(testId);
+        if (!testNode) continue;
         const tp = nodeProps(testNode);
-        if (tp.entity_type !== "TestItem") continue;
+        const isTestItem =
+          tp.entity_type === "TestItem" ||
+          Boolean(tp.test_item) ||
+          Boolean(tp.name) ||
+          (testNode.id && String(testNode.id).startsWith("test:")) ||
+          (Array.isArray(testNode.labels) && testNode.labels.includes("TestItem"));
+        if (!isTestItem) continue;
 
         const paramLinks = getTargets(testId, "HAS_PARAMETER");
         const params = [];
         for (const pl of paramLinks) {
           const paramNode = nodeById.get(pl.targetId);
+          if (!paramNode) continue;
           const pp = nodeProps(paramNode);
-          if (pp.entity_type !== "TestParameter") continue;
-          const cnName = pp.param_name || pp.name || pp.param_key || "参数";
+          const isParam =
+            pp.entity_type === "TestParameter" ||
+            Boolean(pp.param_name) ||
+            Boolean(pp.param_key) ||
+            Boolean(pp.name) ||
+            (paramNode.id && String(paramNode.id).startsWith("param:")) ||
+            (Array.isArray(paramNode.labels) && paramNode.labels.includes("TestParameter"));
+          if (!isParam) continue;
+
+          const cnName = pp.param_name || pp.name || pp.param_key || String(paramNode.id || "参数");
           const valueCore = [pp.value_text, pp.value_expr].filter(Boolean).join(" / ");
           const value = [valueCore, pp.unit].filter(Boolean).join(" ").trim() || "（未提取到具体值）";
           params.push({ name: `${cnName}: ${value}` });
@@ -564,12 +676,74 @@
       return Array.from(labels);
     }
 
-    async function fetchGraphByLabel(base, token, label, maxDepth) {
+    const PAGE_STATE_KEY = "electrical_test_tree_page_state";
+
+    function getPageState() {
+      return {
+        apiBase: document.getElementById("apiBase").value.trim(),
+        apiKey: document.getElementById("apiKey").value.trim(),
+        standardType: document.getElementById("standardType").value.trim(),
+        maxDepth: document.getElementById("maxDepth").value.trim(),
+        maxLayers: document.getElementById("maxLayers").value.trim(),
+        recursiveMode: document.getElementById("recursiveMode").checked
+      };
+    }
+
+    function persistPageState() {
+      try {
+        localStorage.setItem(PAGE_STATE_KEY, JSON.stringify(getPageState()));
+      } catch (error) {
+        console.warn("保存页面参数失败", error);
+      }
+    }
+
+    function restorePageState() {
+      try {
+        const raw = localStorage.getItem(PAGE_STATE_KEY);
+        if (!raw) return;
+        const state = JSON.parse(raw);
+        if (!state || typeof state !== "object") return;
+
+        if (typeof state.apiBase === "string") {
+          document.getElementById("apiBase").value = state.apiBase;
+        }
+        if (typeof state.apiKey === "string") {
+          document.getElementById("apiKey").value = state.apiKey;
+        }
+        if (typeof state.standardType === "string") {
+          document.getElementById("standardType").value = state.standardType;
+        }
+        if (typeof state.maxDepth === "string" && state.maxDepth) {
+          document.getElementById("maxDepth").value = state.maxDepth;
+        }
+        if (typeof state.maxLayers === "string" && state.maxLayers) {
+          document.getElementById("maxLayers").value = state.maxLayers;
+        }
+        if (typeof state.recursiveMode === "boolean") {
+          document.getElementById("recursiveMode").checked = state.recursiveMode;
+        }
+      } catch (error) {
+        console.warn("恢复页面参数失败", error);
+      }
+    }
+
+    function bindPageStatePersistence() {
+      const fieldIds = ["apiBase", "apiKey", "standardType", "maxDepth", "maxLayers"];
+      for (const id of fieldIds) {
+        const element = document.getElementById(id);
+        element.addEventListener("input", persistPageState);
+        element.addEventListener("change", persistPageState);
+      }
+      document.getElementById("recursiveMode").addEventListener("change", persistPageState);
+    }
+
+    async function fetchGraphByLabel(base, token, label, maxDepth, standardType = "") {
       const query = new URLSearchParams({
         label,
         max_depth: String(maxDepth),
         max_nodes: "1200"
       });
+      if (standardType) query.set("standard_type", standardType);
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       const response = await fetch(`${base.replace(/\/$/, "")}/graphs?${query}`, { headers });
       if (!response.ok) {
@@ -579,16 +753,17 @@
       return response.json();
     }
 
-    async function searchLabels(base, token, query, limit = 20) {
+    async function searchLabels(base, token, query, limit = 20, standardType = "") {
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       const params = new URLSearchParams({ q: query, limit: String(limit) });
+      if (standardType) params.set("standard_type", standardType);
       const response = await fetch(`${base.replace(/\/$/, "")}/graph/label/search?${params}`, { headers });
       if (!response.ok) return [];
       return response.json();
     }
 
-    async function resolveBestRootLabel(base, token, expectedRoot) {
-      const candidates = await searchLabels(base, token, expectedRoot, 30);
+    async function resolveBestRootLabel(base, token, expectedRoot, standardType = "") {
+      const candidates = await searchLabels(base, token, expectedRoot, 30, standardType);
       if (!Array.isArray(candidates) || candidates.length === 0) return expectedRoot;
 
       const exactReport = candidates.find((x) => x === `report:${expectedRoot}`);
@@ -606,7 +781,7 @@
       return candidates[0];
     }
 
-    async function fetchGraphRecursive(base, token, rootLabel, maxLayers) {
+    async function fetchGraphRecursive(base, token, rootLabel, maxLayers, standardType = "") {
       const visitedLabels = new Set([rootLabel]);
       let frontier = [rootLabel];
       const allGraphs = [];
@@ -616,7 +791,7 @@
         setStatus(`递归抓取中：${rootLabel}，第 ${layer}/${maxLayers} 层（${frontier.length} 个节点）`);
         const layerGraphs = [];
         for (const label of frontier) {
-          const graph = await fetchGraphByLabel(base, token, label, 1);
+          const graph = await fetchGraphByLabel(base, token, label, 1, standardType);
           layerGraphs.push(graph);
           allGraphs.push(graph);
         }
@@ -636,8 +811,10 @@
     }
 
     async function loadFromApi() {
+      persistPageState();
       const base = document.getElementById("apiBase").value.trim();
       const token = document.getElementById("apiKey").value.trim();
+      const standardType = document.getElementById("standardType").value.trim();
       const maxDepth = Number(document.getElementById("maxDepth").value) || 4;
       const maxLayers = Number(document.getElementById("maxLayers").value) || 6;
       const recursiveMode = document.getElementById("recursiveMode").checked;
@@ -645,16 +822,23 @@
         setStatus("请先填写 API Base URL。");
         return;
       }
+      if (!standardType) {
+        setStatus("请先选择工作空间。")
+        return;
+      }
 
-      setStatus(recursiveMode ? "正在递归抓取四大试验图..." : "正在从 API 拉取四大试验图...");
+      setStatus(
+        (recursiveMode ? "正在递归抓取四大试验图..." : "正在从 API 拉取四大试验图...") +
+        ` workspace=${standardType}`
+      );
       try {
         const trees = [];
         const summary = [];
         for (const rootLabel of ROOTS) {
-          const resolvedRoot = await resolveBestRootLabel(base, token, rootLabel);
+          const resolvedRoot = await resolveBestRootLabel(base, token, rootLabel, standardType);
           const graph = recursiveMode
-            ? await fetchGraphRecursive(base, token, resolvedRoot, maxLayers)
-            : await fetchGraphByLabel(base, token, resolvedRoot, maxDepth);
+            ? await fetchGraphRecursive(base, token, resolvedRoot, maxLayers, standardType)
+            : await fetchGraphByLabel(base, token, resolvedRoot, maxDepth, standardType);
           const tree = buildSchemaTreeFromGraph(rootLabel, resolvedRoot, graph);
           trees.push(tree);
           summary.push(`${rootLabel}:${(graph.nodes || []).length}N/${(graph.edges || []).length}E`);
@@ -662,12 +846,16 @@
         renderTree({ name: "型式试验", children: trees });
         setStatus(
           (recursiveMode ? "已递归抓取并转换为树结构。 " : "已加载 API 图并转换为树结构。 ") +
+          `workspace=${standardType}. ` +
           summary.join(" | ")
         );
       } catch (error) {
         setStatus(`API 加载失败：${error.message}`);
       }
     }
+
+    restorePageState();
+    bindPageStatePersistence();
 
     document.getElementById("loadApiBtn").addEventListener("click", loadFromApi);
     document.getElementById("resetBtn").addEventListener("click", () => {

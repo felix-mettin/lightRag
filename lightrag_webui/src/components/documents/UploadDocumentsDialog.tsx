@@ -16,6 +16,7 @@ import { uploadDocument } from '@/api/lightrag'
 
 import { UploadIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select'
 
 interface UploadDocumentsDialogProps {
   onDocumentsUploaded?: () => Promise<void>
@@ -27,6 +28,13 @@ export default function UploadDocumentsDialog({ onDocumentsUploaded }: UploadDoc
   const [isUploading, setIsUploading] = useState(false)
   const [progresses, setProgresses] = useState<Record<string, number>>({})
   const [fileErrors, setFileErrors] = useState<Record<string, string>>({})
+  const [selectedStandard, setSelectedStandard] = useState<string>('GB')
+
+  const standardOptions = [
+    { value: 'GB', label: 'GB' },
+    { value: 'HB', label: 'HB' },
+    { value: 'GJB', label: 'GJB' }
+  ]
 
   const handleRejectedFiles = useCallback(
     (rejectedFiles: FileRejection[]) => {
@@ -101,7 +109,7 @@ export default function UploadDocumentsDialog({ onDocumentsUploaded }: UploadDoc
                 ...pre,
                 [file.name]: percentCompleted
               }))
-            })
+            }, selectedStandard)
 
             if (result.status === 'duplicated') {
               uploadErrors[file.name] = t('documentPanel.uploadDocuments.fileUploader.duplicateFile')
@@ -204,6 +212,23 @@ export default function UploadDocumentsDialog({ onDocumentsUploaded }: UploadDoc
             {t('documentPanel.uploadDocuments.description')}
           </DialogDescription>
         </DialogHeader>
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-2">
+            {t('documentPanel.uploadDocuments.standardType', '选择标准类型')}
+          </label>
+          <Select value={selectedStandard} onValueChange={setSelectedStandard}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder={t('documentPanel.uploadDocuments.selectStandard', '选择标准')} />
+            </SelectTrigger>
+            <SelectContent>
+              {standardOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         <FileUploader
           maxFileCount={Infinity}
           maxSize={200 * 1024 * 1024}

@@ -91,7 +91,8 @@ const EditablePropertyRow = ({
 
         if (name === 'entity_id') {
           if (!allowMerge) {
-            const exists = await checkEntityNameExists(value)
+            const currentWorkspace = useGraphStore.getState().currentWorkspace
+            const exists = await checkEntityNameExists(value, currentWorkspace)
             if (exists) {
               const errorMsg = t('graphPanel.propertiesView.errors.duplicateName')
               setErrorMessage(errorMsg)
@@ -102,7 +103,9 @@ const EditablePropertyRow = ({
           updatedData = { 'entity_name': value }
         }
 
-        const response = await updateEntity(entityId, updatedData, true, allowMerge)
+        const currentWorkspace = useGraphStore.getState().currentWorkspace
+        const allowRename = name === 'entity_id'
+        const response = await updateEntity(entityId, updatedData, currentWorkspace, allowRename, allowMerge)
         const operationSummary = response.operation_summary
         const operationStatus = operationSummary?.operation_status || 'complete_success'
         const finalValue = operationSummary?.final_entity ?? value
@@ -195,8 +198,9 @@ const EditablePropertyRow = ({
           return
         }
       } else if (entityType === 'edge' && sourceId && targetId && edgeId && dynamicId) {
+        const currentWorkspace = useGraphStore.getState().currentWorkspace
         const updatedData = { [name]: value }
-        await updateRelation(sourceId, targetId, updatedData)
+        await updateRelation(sourceId, targetId, updatedData, currentWorkspace)
         try {
           await useGraphStore.getState().updateEdgeAndSelect(edgeId, dynamicId, sourceId, targetId, name, value)
         } catch (error) {

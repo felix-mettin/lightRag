@@ -858,7 +858,7 @@ class QueryResult:
     """
 
     content: Optional[str] = None
-    response_iterator: Optional[AsyncIterator[str]] = None
+    response_iterator: Optional[AsyncIterator[Any]] = None
     raw_data: Optional[Dict[str, Any]] = None
     is_streaming: bool = False
 

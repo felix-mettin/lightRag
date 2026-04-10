@@ -75,7 +75,7 @@ webui_description = os.getenv("WEBUI_DESCRIPTION")
 
 # Initialize config parser
 config = configparser.ConfigParser()
-config.read("config.ini")
+config.read("config.ini", encoding="utf-8")
 
 # Global authentication configuration
 auth_configured = bool(auth_handler.accounts)
@@ -163,8 +163,14 @@ def check_frontend_build():
             - assets_exist: True if WebUI build files exist
             - is_outdated: True if source is newer than build (only in dev environment)
     """
-    webui_dir = Path(__file__).parent / "webui"
+    project_root = Path(__file__).parent.parent.parent
+    webui_dir = project_root / "lightrag_webui"
     index_html = webui_dir / "index.html"
+    # webui_dir = Path(__file__).parent / "webui"
+    # index_html = webui_dir / "index.html"
+
+    # logger.info(f"Checking WebUI build: webui_dir = {webui_dir}2222222222222222222222222")
+    # logger.info(f"index.html exists? {index_html.exists()}3333333333333333333333333")
 
     # 1. Check if build files exist
     if not index_html.exists():
@@ -285,9 +291,19 @@ def check_frontend_build():
 
 
 def create_app(args):
+    from pathlib import Path
+    project_root = Path(__file__).parent.parent.parent.resolve()
+    # 强制将工作目录和输入目录设为项目根目录下的固定文件夹
+    args.working_dir = str(project_root / "rag_storage")
+    args.input_dir = str(project_root / "inputs")
+
+    # logger.info(f"LightRAG FastAPI Server is starting...!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     # Check frontend build first and get status
     webui_assets_exist, is_frontend_outdated = check_frontend_build()
-
+    # --- 添加以下两行调试日志 ---
+    from pathlib import Path
+    logger.info(f"Checking WebUI assets. Current working dir: {Path.cwd()}")
+    logger.info(f"WebUI assets exist: {webui_assets_exist}")
     # Create unified API version display with warning symbol if frontend is outdated
     api_version_display = (
         f"{__api_version__}⚠️" if is_frontend_outdated else __api_version__
@@ -353,20 +369,25 @@ def create_app(args):
         app.state.background_tasks = set()
 
         try:
+            # 初始化所有 LightRAG 实例
+            for std_type, rag in rag_instances.items():
+                logger.info(f"Initializing {std_type} instance...")
+                await rag.initialize_storages()
+                await rag.check_and_migrate_data()
             # Initialize database connections
             # Note: initialize_storages() now auto-initializes pipeline_status for rag.workspace
-            await rag.initialize_storages()
-
-            # Data migration regardless of storage implementation
-            await rag.check_and_migrate_data()
-
             ASCIIColors.green("\nServer is ready to accept connections! 🚀\n")
 
             yield
 
         finally:
             # Clean up database connections
-            await rag.finalize_storages()
+            # 清理所有实例
+            for rag in rag_instances.values():
+                await rag.finalize_storages()
+            if "LIGHTRAG_GUNICORN_MODE" not in os.environ:
+                finalize_share_data()
+            # await rag.finalize_storages()
 
             if "LIGHTRAG_GUNICORN_MODE" not in os.environ:
                 # Only perform cleanup in Uvicorn single-process mode
@@ -1048,55 +1069,66 @@ def create_app(args):
     )
 
     # Initialize RAG with unified configuration
+    # 定义标准类型列表，包含 "others" 作为默认类型
+    STANDARD_TYPES = ["GB", "HB", "GJB", "others"]
+    # logger.info(f"#####################Standard types: {STANDARD_TYPES}!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     try:
-        rag = LightRAG(
-            working_dir=args.working_dir,
-            workspace=args.workspace,
-            llm_model_func=create_llm_model_func(args.llm_binding),
-            llm_model_name=args.llm_model,
-            llm_model_max_async=args.max_async,
-            summary_max_tokens=args.summary_max_tokens,
-            summary_context_size=args.summary_context_size,
-            chunk_token_size=int(args.chunk_size),
-            chunk_overlap_token_size=int(args.chunk_overlap_size),
-            llm_model_kwargs=create_llm_model_kwargs(
-                args.llm_binding, args, llm_timeout
-            ),
-            embedding_func=embedding_func,
-            default_llm_timeout=llm_timeout,
-            default_embedding_timeout=embedding_timeout,
-            kv_storage=args.kv_storage,
-            graph_storage=args.graph_storage,
-            vector_storage=args.vector_storage,
-            doc_status_storage=args.doc_status_storage,
-            vector_db_storage_cls_kwargs={
-                "cosine_better_than_threshold": args.cosine_threshold
-            },
-            enable_llm_cache_for_entity_extract=args.enable_llm_cache_for_extract,
-            enable_llm_cache=args.enable_llm_cache,
-            rerank_model_func=rerank_model_func,
-            max_parallel_insert=args.max_parallel_insert,
-            max_graph_nodes=args.max_graph_nodes,
-            addon_params={
-                "language": args.summary_language,
-                "entity_types": args.entity_types,
-            },
-            ollama_server_infos=ollama_server_infos,
-        )
+        rag_instances = {}
+        for std_type in STANDARD_TYPES:
+                rag = LightRAG(
+                    working_dir=args.working_dir,
+                    workspace=std_type,
+                    llm_model_func=create_llm_model_func(args.llm_binding),
+                    llm_model_name=args.llm_model,
+                    llm_model_max_async=args.max_async,
+                    summary_max_tokens=args.summary_max_tokens,
+                    summary_context_size=args.summary_context_size,
+                    chunk_token_size=int(args.chunk_size),
+                    chunk_overlap_token_size=int(args.chunk_overlap_size),
+                    llm_model_kwargs=create_llm_model_kwargs(
+                        args.llm_binding, args, llm_timeout
+                    ),
+                    embedding_func=embedding_func,
+                    default_llm_timeout=llm_timeout,
+                    default_embedding_timeout=embedding_timeout,
+                    kv_storage=args.kv_storage,
+                    graph_storage=args.graph_storage,
+                    vector_storage=args.vector_storage,
+                    doc_status_storage=args.doc_status_storage,
+                    vector_db_storage_cls_kwargs={
+                        "cosine_better_than_threshold": args.cosine_threshold
+                    },
+                    enable_llm_cache_for_entity_extract=args.enable_llm_cache_for_extract,
+                    enable_llm_cache=args.enable_llm_cache,
+                    rerank_model_func=rerank_model_func,
+                    max_parallel_insert=args.max_parallel_insert,
+                    max_graph_nodes=args.max_graph_nodes,
+                    addon_params={
+                        "language": args.summary_language,
+                        "entity_types": args.entity_types,
+                    },
+                    ollama_server_infos=ollama_server_infos,
+                )
+                rag_instances[std_type] = rag
+
     except Exception as e:
         logger.error(f"Failed to initialize LightRAG: {e}")
         raise
+    # 导入 DocumentManager（如果尚未导入）
+    # from lightrag.api.routers.document_routes import DocumentManager
+     # 文档管理器使用同一个输入目录，不按 workspace 分子目录
+    doc_manager = DocumentManager(args.input_dir, workspace="")
 
-    # Add routes
-    app.include_router(
-        create_document_routes(
-            rag,
-            doc_manager,
-            api_key,
-        )
-    )
-    app.include_router(create_query_routes(rag, api_key, args.top_k))
-    app.include_router(create_graph_routes(rag, api_key))
+    # 注册路由时传入 rag_instances 和 doc_manager
+    # from lightrag.api.routers.document_routes import create_document_routes
+    # from lightrag.api.routers.query_routes import create_query_routes
+    # from lightrag.api.routers.graph_routes import create_graph_routes
+
+     # Add routes
+    app.include_router(create_document_routes(rag_instances, doc_manager, api_key))
+    app.include_router(create_query_routes(rag_instances, api_key, args.top_k))
+    app.include_router(create_graph_routes(rag_instances, api_key))
+
 
     # Add Ollama API routes
     ollama_api = OllamaAPI(rag, top_k=args.top_k, api_key=api_key)
@@ -1124,10 +1156,13 @@ def create_app(args):
     @app.get("/")
     async def redirect_to_webui():
         """Redirect root path based on WebUI availability"""
-        if webui_assets_exist:
-            return RedirectResponse(url="/webui")
-        else:
-            return RedirectResponse(url="/docs")
+        # if webui_assets_exist:
+        #     return RedirectResponse(url="/webui")
+        # else:
+        #     return RedirectResponse(url="/docs")
+
+        logger.warning("Forcing redirect to /webui for debugging.")
+        return RedirectResponse(url="/webui")
 
     @app.get("/auth-status")
     async def get_auth_status():
@@ -1374,7 +1409,13 @@ def configure_logging():
     """Configure logging for uvicorn startup"""
 
     # Reset any existing handlers to ensure clean configuration
-    for logger_name in ["uvicorn", "uvicorn.access", "uvicorn.error", "lightrag"]:
+    for logger_name in [
+        "uvicorn",
+        "uvicorn.access",
+        "uvicorn.error",
+        "lightrag",
+        "lightrag.electrical_debug",
+    ]:
         logger = logging.getLogger(logger_name)
         logger.handlers = []
         logger.filters = []
@@ -1382,9 +1423,16 @@ def configure_logging():
     # Get log directory path from environment variable
     log_dir = os.getenv("LOG_DIR", os.getcwd())
     log_file_path = os.path.abspath(os.path.join(log_dir, DEFAULT_LOG_FILENAME))
+    electrical_debug_log_path = os.path.abspath(
+        os.getenv(
+            "LIGHTRAG_ELECTRICAL_DEBUG_LOG",
+            os.path.join(log_dir, "lightrag_electrical_debug.log"),
+        )
+    )
 
     print(f"\nLightRAG log file: {log_file_path}\n")
-    os.makedirs(os.path.dirname(log_dir), exist_ok=True)
+    os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
+    os.makedirs(os.path.dirname(electrical_debug_log_path), exist_ok=True)
 
     # Get log file max size and backup count from environment variables
     log_max_bytes = get_env_value("LOG_MAX_BYTES", DEFAULT_LOG_MAX_BYTES, int)
@@ -1416,6 +1464,14 @@ def configure_logging():
                     "backupCount": log_backup_count,
                     "encoding": "utf-8",
                 },
+                "electrical_file": {
+                    "formatter": "detailed",
+                    "class": "logging.handlers.RotatingFileHandler",
+                    "filename": electrical_debug_log_path,
+                    "maxBytes": log_max_bytes,
+                    "backupCount": log_backup_count,
+                    "encoding": "utf-8",
+                },
             },
             "loggers": {
                 # Configure all uvicorn related loggers
@@ -1440,6 +1496,11 @@ def configure_logging():
                     "level": "INFO",
                     "propagate": False,
                     "filters": ["path_filter"],
+                },
+                "lightrag.electrical_debug": {
+                    "handlers": ["electrical_file"],
+                    "level": "INFO",
+                    "propagate": False,
                 },
             },
             "filters": {
@@ -1468,6 +1529,7 @@ def check_and_install_dependencies():
 
 
 def main():
+    # print("LightRAG FastAPI Server is starting...!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     # Explicitly initialize configuration for clarity
     # (The proxy will auto-initialize anyway, but this makes intent clear)
     from .config import initialize_config
