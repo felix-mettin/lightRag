@@ -7,53 +7,27 @@ from typing import Any, Dict, List, Literal, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from lightrag.base import QueryParam
 from lightrag.api.utils_api import get_combined_auth_dependency
+from lightrag.standards import (
+    detect_standard_type_from_query as detect_standard_type_from_query_by_keywords,
+    detect_standard_types_from_query as detect_standard_types_from_query_by_keywords,
+    normalize_standard_type,
+)
 from lightrag.utils import logger
 from pydantic import BaseModel, Field, field_validator
 
 router = APIRouter(tags=["query"])
 
-STANDARD_TYPE_KEYWORDS = {
-    "GB": ["国标", "国家标准", "GB/T", "GBT", "GB-T", "GB", "gb/t", "gbt", "gb-t", "gb"],
-    "HB": ["行标", "行业标准", "HB", "hb", "DL/T", "DLT", "DL-T", "DL", "dl/t", "dlt", "dl-t", "dl"],
-    "GJB": ["国际标准", "国际标", "IEC", "ISO", "IEEE", "GJB", "gjb", "iec", "iso", "ieee", "国际"],
-}
-
 
 def _normalize_standard_type(value: str | None) -> str | None:
-    if not value:
-        return None
-    normalized = value.strip().upper()
-    if normalized in {"GB", "HB", "GJB", "OTHERS"}:
-        return "others" if normalized == "OTHERS" else normalized
-
-    lowered = value.strip().lower()
-    for std_type, keywords in STANDARD_TYPE_KEYWORDS.items():
-        if any(keyword.lower() == lowered for keyword in keywords):
-            return std_type
-    return None
+    return normalize_standard_type(value)
 
 
 def detect_standard_types_from_query(query: str) -> list[str]:
-    if not query:
-        return ["GB"]
-
-    query_upper = query.upper()
-    matches: list[tuple[int, str]] = []
-    for std_type, keywords in STANDARD_TYPE_KEYWORDS.items():
-        positions = [query_upper.find(keyword.upper()) for keyword in keywords]
-        positions = [position for position in positions if position >= 0]
-        if positions:
-            matches.append((min(positions), std_type))
-
-    if not matches:
-        return ["GB"]
-
-    matches.sort(key=lambda item: item[0])
-    return [std_type for _, std_type in matches]
+    return detect_standard_types_from_query_by_keywords(query, default_standard="GB")
 
 
 def detect_standard_type_from_query(query: str) -> str:
-    return detect_standard_types_from_query(query)[0]
+    return detect_standard_type_from_query_by_keywords(query, default_standard="GB")
 
 
 def _resolve_standard_type(
@@ -201,7 +175,7 @@ class QueryRequest(BaseModel):
 
     standard_type: Optional[str] = Field(
         default=None,
-        description="Filter by a single standard type/workspace. If omitted, it is inferred from query keywords.",
+        description="Filter by a single standard type/workspace. Supported values include GB, DLT, IEC, others. If omitted, it is inferred from query keywords.",
     )
 
     @field_validator("query", mode="after")

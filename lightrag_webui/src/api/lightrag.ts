@@ -138,7 +138,7 @@ export type QueryRequest = {
   user_prompt?: string
   /** Enable reranking for retrieved text chunks. If True but no rerank model is configured, a warning will be issued. Default is True. */
   enable_rerank?: boolean
-  /** Optional standard type filter: GB, HB, GJB, others. If not provided, auto-detects from query. */
+  /** Optional standard type filter: GB, DLT, IEC, others. If not provided, auto-detects from query. */
   standard_type?: string
   /** Explicit standard list for multi-standard fusion retrieval. */
   standard_types?: string[]

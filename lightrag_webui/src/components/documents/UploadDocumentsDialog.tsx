@@ -32,8 +32,8 @@ export default function UploadDocumentsDialog({ onDocumentsUploaded }: UploadDoc
 
   const standardOptions = [
     { value: 'GB', label: 'GB' },
-    { value: 'HB', label: 'HB' },
-    { value: 'GJB', label: 'GJB' }
+    { value: 'DLT', label: 'DLT' },
+    { value: 'IEC', label: 'IEC' }
   ]
 
   const handleRejectedFiles = useCallback(

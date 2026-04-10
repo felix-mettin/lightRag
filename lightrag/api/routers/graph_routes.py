@@ -8,9 +8,28 @@ from fastapi import APIRouter, Depends, Query, HTTPException
 from pydantic import BaseModel, Field
 
 from lightrag.utils import logger
+from lightrag.standards import normalize_standard_type
 from ..utils_api import get_combined_auth_dependency
 
 router = APIRouter(tags=["graph"])
+
+
+async def _resolve_graph_standard_type(
+    standard_type: str | None,
+    rag_instances: dict,
+    preferred_order: list[str] | None = None,
+) -> str:
+    if standard_type is None:
+        return await _get_workspace_with_data(
+            rag_instances,
+            preferred_order=preferred_order,
+        )
+
+    normalized = normalize_standard_type(standard_type)
+    if normalized and normalized in rag_instances:
+        return normalized
+
+    raise HTTPException(status_code=400, detail=f"Invalid standard_type: {standard_type}")
 
 
 async def _get_workspace_with_data(
@@ -18,7 +37,7 @@ async def _get_workspace_with_data(
 ) -> str:
     """未指定标准时默认返回 GB，不存在时再按顺序回退。"""
     if preferred_order is None:
-        preferred_order = ["GB", "HB", "GJB", "others"]
+        preferred_order = ["GB", "DLT", "IEC", "others"]
     if "GB" in rag_instances:
         return "GB"
     for ws in preferred_order:
@@ -175,14 +194,7 @@ def create_graph_routes(rag_instances: dict, api_key: Optional[str] = None):
             List[str]: List of graph labels
         """
         try:
-            if standard_type is None:
-                std_type = await _get_workspace_with_data(rag_instances)
-            else:
-                std_type = standard_type
-
-            if std_type not in rag_instances:
-                raise HTTPException(status_code=400, detail=f"Invalid standard_type: {std_type}")
-
+            std_type = await _resolve_graph_standard_type(standard_type, rag_instances)
             rag = rag_instances[std_type]
             return await rag.get_graph_labels()
         except Exception as e:
@@ -196,14 +208,7 @@ def create_graph_routes(rag_instances: dict, api_key: Optional[str] = None):
     standard_type: Optional[str] = Query(None, description="可选的标准类型，不填则自动选择")
 ):
         try:
-            if standard_type is None:
-                std_type = await _get_workspace_with_data(rag_instances)
-            else:
-                std_type = standard_type
-
-            if std_type not in rag_instances:
-                raise HTTPException(status_code=400, detail=f"Invalid standard_type: {std_type}")
-
+            std_type = await _resolve_graph_standard_type(standard_type, rag_instances)
             rag = rag_instances[std_type]
             return await rag.chunk_entity_relation_graph.get_popular_labels(limit)
         except Exception as e:
@@ -218,14 +223,7 @@ def create_graph_routes(rag_instances: dict, api_key: Optional[str] = None):
     standard_type: Optional[str] = Query(None, description="可选的标准类型，不填则自动选择")
 ):
         try:
-            if standard_type is None:
-                std_type = await _get_workspace_with_data(rag_instances)
-            else:
-                std_type = standard_type
-
-            if std_type not in rag_instances:
-                raise HTTPException(status_code=400, detail=f"Invalid standard_type: {std_type}")
-
+            std_type = await _resolve_graph_standard_type(standard_type, rag_instances)
             rag = rag_instances[std_type]
             return await rag.chunk_entity_relation_graph.search_labels(q, limit)
         except Exception as e:
@@ -241,14 +239,7 @@ def create_graph_routes(rag_instances: dict, api_key: Optional[str] = None):
     standard_type: Optional[str] = Query(None, description="可选的标准类型，不填则自动选择")
 ):
         try:
-            if standard_type is None:
-                std_type = await _get_workspace_with_data(rag_instances)
-            else:
-                std_type = standard_type
-
-            if std_type not in rag_instances:
-                raise HTTPException(status_code=400, detail=f"Invalid standard_type: {std_type}")
-
+            std_type = await _resolve_graph_standard_type(standard_type, rag_instances)
             rag = rag_instances[std_type]
             return await rag.get_knowledge_graph(
                 node_label=label,
@@ -266,14 +257,7 @@ def create_graph_routes(rag_instances: dict, api_key: Optional[str] = None):
     standard_type: Optional[str] = Query(None, description="可选的标准类型，不填则自动选择")
 ):
         try:
-            if standard_type is None:
-                std_type = await _get_workspace_with_data(rag_instances)
-            else:
-                std_type = standard_type
-
-            if std_type not in rag_instances:
-                raise HTTPException(status_code=400, detail=f"Invalid standard_type: {std_type}")
-
+            std_type = await _resolve_graph_standard_type(standard_type, rag_instances)
             rag = rag_instances[std_type]
             exists = await rag.chunk_entity_relation_graph.has_node(name)
             return {"exists": exists}
@@ -418,14 +402,7 @@ def create_graph_routes(rag_instances: dict, api_key: Optional[str] = None):
             }
         """
         try:
-            if standard_type is None:
-                std_type = await _get_workspace_with_data(rag_instances)
-            else:
-                std_type = standard_type
-
-            if std_type not in rag_instances:
-                raise HTTPException(status_code=400, detail=f"Invalid standard_type: {std_type}")
-
+            std_type = await _resolve_graph_standard_type(standard_type, rag_instances)
             rag = rag_instances[std_type]
             result = await rag.aedit_entity(
                 entity_name=request.entity_name,
@@ -487,14 +464,7 @@ def create_graph_routes(rag_instances: dict, api_key: Optional[str] = None):
     standard_type: Optional[str] = Query(None, description="可选的标准类型，不填则自动选择")
 ):
         try:
-            if standard_type is None:
-                std_type = await _get_workspace_with_data(rag_instances)
-            else:
-                std_type = standard_type
-
-            if std_type not in rag_instances:
-                raise HTTPException(status_code=400, detail=f"Invalid standard_type: {std_type}")
-
+            std_type = await _resolve_graph_standard_type(standard_type, rag_instances)
             rag = rag_instances[std_type]
             result = await rag.aedit_relation(
                 source_entity=request.source_id,
@@ -513,14 +483,7 @@ def create_graph_routes(rag_instances: dict, api_key: Optional[str] = None):
     standard_type: Optional[str] = Query(None, description="可选的标准类型，不填则自动选择")
 ):
         try:
-            if standard_type is None:
-                std_type = await _get_workspace_with_data(rag_instances)
-            else:
-                std_type = standard_type
-
-            if std_type not in rag_instances:
-                raise HTTPException(status_code=400, detail=f"Invalid standard_type: {std_type}")
-
+            std_type = await _resolve_graph_standard_type(standard_type, rag_instances)
             rag = rag_instances[std_type]
             result = await rag.acreate_entity(
                 entity_name=request.entity_name,
@@ -538,14 +501,7 @@ def create_graph_routes(rag_instances: dict, api_key: Optional[str] = None):
     standard_type: Optional[str] = Query(None, description="可选的标准类型，不填则自动选择")
 ):
         try:
-            if standard_type is None:
-                std_type = await _get_workspace_with_data(rag_instances)
-            else:
-                std_type = standard_type
-
-            if std_type not in rag_instances:
-                raise HTTPException(status_code=400, detail=f"Invalid standard_type: {std_type}")
-
+            std_type = await _resolve_graph_standard_type(standard_type, rag_instances)
             rag = rag_instances[std_type]
             result = await rag.acreate_relation(
                 source_entity=request.source_entity,
@@ -564,10 +520,10 @@ def create_graph_routes(rag_instances: dict, api_key: Optional[str] = None):
     standard_type: str = Query(..., description="必填的标准类型/workspace")
 ):
         try:
-            if standard_type not in rag_instances:
-                raise HTTPException(status_code=400, detail=f"Invalid standard_type: {standard_type}")
-
-            rag = rag_instances[standard_type]
+            resolved_standard_type = await _resolve_graph_standard_type(
+                standard_type, rag_instances
+            )
+            rag = rag_instances[resolved_standard_type]
             result = await rag.adelete_by_entity(request.entity_name)
             return {"status": "success", "message": f"Entity '{request.entity_name}' deleted successfully", "data": result}
         except Exception as e:
@@ -581,10 +537,10 @@ def create_graph_routes(rag_instances: dict, api_key: Optional[str] = None):
     standard_type: str = Query(..., description="必填的标准类型/workspace")
 ):
         try:
-            if standard_type not in rag_instances:
-                raise HTTPException(status_code=400, detail=f"Invalid standard_type: {standard_type}")
-
-            rag = rag_instances[standard_type]
+            resolved_standard_type = await _resolve_graph_standard_type(
+                standard_type, rag_instances
+            )
+            rag = rag_instances[resolved_standard_type]
             result = await rag.adelete_by_relation(
                 source_entity=request.source_entity,
                 target_entity=request.target_entity
@@ -601,14 +557,7 @@ def create_graph_routes(rag_instances: dict, api_key: Optional[str] = None):
     standard_type: Optional[str] = Query(None, description="可选的标准类型，不填则自动选择")
 ):
         try:
-            if standard_type is None:
-                std_type = await _get_workspace_with_data(rag_instances)
-            else:
-                std_type = standard_type
-
-            if std_type not in rag_instances:
-                raise HTTPException(status_code=400, detail=f"Invalid standard_type: {std_type}")
-
+            std_type = await _resolve_graph_standard_type(standard_type, rag_instances)
             rag = rag_instances[std_type]
             result = await rag.amerge_entities(
                 source_entities=request.entities_to_change,

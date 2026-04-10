@@ -1,5 +1,33 @@
 from __future__ import annotations
-from typing import Any
+from typing import Any, Mapping
+
+
+def build_prompt_templates(prompt_overrides: Mapping[str, Any] | None = None) -> dict[str, Any]:
+  templates = dict(PROMPTS)
+  if not prompt_overrides:
+    return templates
+
+  prompt_keys = {key.lower(): key for key in templates.keys()}
+  for raw_key, raw_value in prompt_overrides.items():
+    key = prompt_keys.get(str(raw_key).lower())
+    if key:
+      templates[key] = raw_value
+  return templates
+
+
+def get_prompt_templates(global_config: dict[str, Any] | None = None) -> dict[str, Any]:
+  if isinstance(global_config, dict):
+    addon_params = global_config.get("addon_params")
+    if isinstance(addon_params, dict):
+      prompt_templates = addon_params.get("prompt_templates")
+      if isinstance(prompt_templates, dict):
+        return prompt_templates
+  return PROMPTS
+
+
+def get_prompt(global_config: dict[str, Any] | None, key: str) -> Any:
+  prompt_templates = get_prompt_templates(global_config)
+  return prompt_templates.get(key, PROMPTS[key])
 
 
 PROMPTS: dict[str, Any] = {}

@@ -10,6 +10,7 @@ import warnings
 from dataclasses import asdict, dataclass, field, replace
 from datetime import datetime, timezone
 from functools import partial
+from pathlib import Path
 from typing import (
     Any,
     AsyncIterator,
@@ -24,7 +25,7 @@ from typing import (
     Dict,
     Union,
 )
-from lightrag.prompt import PROMPTS
+from lightrag.prompt import PROMPTS, build_prompt_templates, get_prompt
 from lightrag.exceptions import PipelineCancelledException
 from lightrag.constants import (
     DEFAULT_MAX_GLEANING,
@@ -120,9 +121,130 @@ from dotenv import load_dotenv
 # the OS environment variables take precedence over the .env file
 load_dotenv(dotenv_path=".env", override=False)
 
-# TODO: TO REMOVE @Yannick
-config = configparser.ConfigParser(interpolation=None)
-config.read("config.ini", "utf-8")
+def _resolve_runtime_config_path(config_path: str | None = None) -> Path:
+    path = Path(config_path or "config.ini").expanduser()
+    if not path.is_absolute():
+        path = Path.cwd() / path
+    return path.resolve()
+
+
+def _load_runtime_config(config_path: str | None = None) -> tuple[configparser.ConfigParser, Path]:
+    resolved_path = _resolve_runtime_config_path(config_path)
+    parser = configparser.ConfigParser(interpolation=None)
+    loaded_files = parser.read(resolved_path, "utf-8")
+    if loaded_files:
+        logger.info("Loaded runtime config file: %s", resolved_path)
+    else:
+        logger.warning(
+            "Runtime config file not found or unreadable, continuing with defaults: %s",
+            resolved_path,
+        )
+    return parser, resolved_path
+
+
+def _parse_electrical_schema_config(
+    parser: configparser.ConfigParser,
+) -> dict[str, Any]:
+    if not parser.has_section("ELECTRICAL_SCHEMA"):
+        return {}
+
+    section = parser["ELECTRICAL_SCHEMA"]
+
+    def _parse_list(value: str) -> list[str]:
+        return [v.strip() for v in value.split(",") if v.strip()]
+
+    def _parse_map(value: str) -> dict[str, str]:
+        pairs = [v.strip() for v in value.split(";") if v.strip()]
+        mapping = {}
+        for pair in pairs:
+            if ":" not in pair:
+                continue
+            key, val = pair.split(":", 1)
+            mapping[key.strip()] = val.strip()
+        return mapping
+
+    def _parse_map_list(value: str, list_sep: str = "|") -> dict[str, list[str]]:
+        pairs = [v.strip() for v in value.split(";") if v.strip()]
+        mapping: dict[str, list[str]] = {}
+        for pair in pairs:
+            if ":" not in pair:
+                continue
+            key, val = pair.split(":", 1)
+            items = [v.strip() for v in val.split(list_sep) if v.strip()]
+            mapping[key.strip()] = items
+        return mapping
+
+    return {
+        "standard_id": section.get("standard_id", "").strip(),
+        "standard_name": section.get("standard_name", "").strip(),
+        "report_types": _parse_list(section.get("report_types", "")),
+        "report_aliases": _parse_map(section.get("report_aliases", "")),
+        "report_scope_fallback_high_level_keywords": _parse_map_list(
+            section.get("report_scope_fallback_high_level_keywords", "")
+        ),
+        "report_scope_fallback_low_level_keywords": _parse_map_list(
+            section.get("report_scope_fallback_low_level_keywords", "")
+        ),
+        "report_scope_multi_fallback_high_level_keywords": _parse_map_list(
+            section.get("report_scope_multi_fallback_high_level_keywords", "")
+        ),
+        "report_scope_multi_fallback_low_level_keywords": _parse_map_list(
+            section.get("report_scope_multi_fallback_low_level_keywords", "")
+        ),
+        "test_items": _parse_list(section.get("test_items", "")),
+        "test_aliases": _parse_map(section.get("test_aliases", "")),
+        "param_map": _parse_map(section.get("param_map", "")),
+        "test_item_param_requirements": _parse_map_list(
+            section.get("test_item_param_requirements", "")
+        ),
+        "enforce_param_whitelist": section.get(
+            "enforce_param_whitelist", "true"
+        ).strip(),
+        "client_requirements": section.get("client_requirements", "").strip(),
+        "equipment_reports": _parse_map(section.get("equipment_reports", "")),
+        "clause_pattern": section.get(
+            "clause_pattern", r"^(\\d+(?:\\.\\d+)+)\\s*(.*)$"
+        ).strip(),
+        "annotation_memory_path": section.get("annotation_memory_path", "").strip(),
+        "electrical_rules_path": section.get("electrical_rules_path", "").strip(),
+        "annotation_source_json_paths": section.get(
+            "annotation_source_json_paths", ""
+        ).strip(),
+        "annotation_auto_merge_to_memory": section.get(
+            "annotation_auto_merge_to_memory", "false"
+        ).strip(),
+        "strict_tree_override_match": section.get(
+            "strict_tree_override_match", "true"
+        ).strip(),
+        "override_param_filter_to_template": section.get(
+            "override_param_filter_to_template", "true"
+        ).strip(),
+        "annotation_guardrail_mode": section.get(
+            "annotation_guardrail_mode", "true"
+        ).strip(),
+        "annotation_guardrail_only_override": section.get(
+            "annotation_guardrail_only_override", "false"
+        ).strip(),
+    }
+
+
+
+def _extract_prompt_overrides(parser: configparser.ConfigParser) -> dict[str, Any]:
+    if not parser.has_section("PROMPTS"):
+        return {}
+
+    prompt_keys = {key.lower(): key for key in PROMPTS.keys()}
+    overrides: dict[str, Any] = {}
+    for raw_key, raw_value in parser.items("PROMPTS"):
+        key = prompt_keys.get(raw_key.lower())
+        if not key:
+            logger.warning(
+                "Ignoring unknown prompt override '%s' in [PROMPTS]",
+                raw_key,
+            )
+            continue
+        overrides[key] = raw_value
+    return overrides
 
 
 @final
@@ -434,6 +556,7 @@ class LightRAG:
             "entity_types": get_env_value("ENTITY_TYPES", DEFAULT_ENTITY_TYPES, list),
         }
     )
+    config_path: str | None = field(default=None)
 
     # Storages Management
     # ---
@@ -520,108 +643,26 @@ class LightRAG:
                 f"force_llm_summary_on_merge should be at least 3, got {self.force_llm_summary_on_merge}"
             )
 
-        # Apply prompt overrides from config.ini if present
-        if config.has_section("PROMPTS"):
-            prompt_keys = {key.lower(): key for key in PROMPTS.keys()}
-            for raw_key, raw_value in config.items("PROMPTS"):
-                key = prompt_keys.get(raw_key.lower())
-                if not key:
-                    logger.warning(
-                        "Ignoring unknown prompt override '%s' in [PROMPTS]",
-                        raw_key,
-                    )
-                    continue
-                PROMPTS[key] = raw_value
+        runtime_config, resolved_config_path = _load_runtime_config(self.config_path)
+        logger.info(
+            "LightRAG instance initialized with workspace '%s' using config file: %s",
+            self.workspace,
+            resolved_config_path,
+        )
 
-        # Load electrical schema config from config.ini if present
-        electrical_schema = {}
-        if config.has_section("ELECTRICAL_SCHEMA"):
-            section = config["ELECTRICAL_SCHEMA"]
-
-            def _parse_list(value: str) -> list[str]:
-                return [v.strip() for v in value.split(",") if v.strip()]
-
-            def _parse_map(value: str) -> dict[str, str]:
-                pairs = [v.strip() for v in value.split(";") if v.strip()]
-                mapping = {}
-                for pair in pairs:
-                    if ":" not in pair:
-                        continue
-                    key, val = pair.split(":", 1)
-                    mapping[key.strip()] = val.strip()
-                return mapping
-
-            def _parse_map_list(value: str, list_sep: str = "|") -> dict[str, list[str]]:
-                pairs = [v.strip() for v in value.split(";") if v.strip()]
-                mapping: dict[str, list[str]] = {}
-                for pair in pairs:
-                    if ":" not in pair:
-                        continue
-                    key, val = pair.split(":", 1)
-                    items = [v.strip() for v in val.split(list_sep) if v.strip()]
-                    mapping[key.strip()] = items
-                return mapping
-
-            electrical_schema = {
-                "standard_id": section.get("standard_id", "").strip(),
-                "standard_name": section.get("standard_name", "").strip(),
-                "report_types": _parse_list(section.get("report_types", "")),
-                "report_aliases": _parse_map(section.get("report_aliases", "")),
-                "report_scope_fallback_high_level_keywords": _parse_map_list(
-                    section.get("report_scope_fallback_high_level_keywords", "")
-                ),
-                "report_scope_fallback_low_level_keywords": _parse_map_list(
-                    section.get("report_scope_fallback_low_level_keywords", "")
-                ),
-                "report_scope_multi_fallback_high_level_keywords": _parse_map_list(
-                    section.get("report_scope_multi_fallback_high_level_keywords", "")
-                ),
-                "report_scope_multi_fallback_low_level_keywords": _parse_map_list(
-                    section.get("report_scope_multi_fallback_low_level_keywords", "")
-                ),
-                "test_items": _parse_list(section.get("test_items", "")),
-                "test_aliases": _parse_map(section.get("test_aliases", "")),
-                "param_map": _parse_map(section.get("param_map", "")),
-                "test_item_param_requirements": _parse_map_list(
-                    section.get("test_item_param_requirements", "")
-                ),
-                "enforce_param_whitelist": section.get(
-                    "enforce_param_whitelist", "true"
-                ).strip(),
-                "client_requirements": section.get("client_requirements", "").strip(),
-                "equipment_reports": _parse_map(section.get("equipment_reports", "")),
-                "clause_pattern": section.get(
-                    "clause_pattern", r"^(\\d+(?:\\.\\d+)+)\\s*(.*)$"
-                ).strip(),
-                "annotation_memory_path": section.get(
-                    "annotation_memory_path", ""
-                ).strip(),
-                "electrical_rules_path": section.get(
-                    "electrical_rules_path", ""
-                ).strip(),
-                "annotation_source_json_paths": section.get(
-                    "annotation_source_json_paths", ""
-                ).strip(),
-                "annotation_auto_merge_to_memory": section.get(
-                    "annotation_auto_merge_to_memory", "false"
-                ).strip(),
-                "strict_tree_override_match": section.get(
-                    "strict_tree_override_match", "true"
-                ).strip(),
-                "override_param_filter_to_template": section.get(
-                    "override_param_filter_to_template", "true"
-                ).strip(),
-                "annotation_guardrail_mode": section.get(
-                    "annotation_guardrail_mode", "true"
-                ).strip(),
-                "annotation_guardrail_only_override": section.get(
-                    "annotation_guardrail_only_override", "false"
-                ).strip(),
-            }
+        prompt_templates = build_prompt_templates(_extract_prompt_overrides(runtime_config))
+        electrical_schema = _parse_electrical_schema_config(runtime_config)
+        logger.info(
+            "Loading electrical schema config for workspace '%s' from %s",
+            self.workspace,
+            resolved_config_path,
+        )
 
         # Store in addon_params for downstream use
         if isinstance(self.addon_params, dict):
+            self.addon_params["prompt_templates"] = prompt_templates
             self.addon_params["electrical_schema"] = electrical_schema
+            self.addon_params["resolved_config_path"] = str(resolved_config_path)
         if self.summary_context_size > self.max_total_tokens:
             logger.warning(
                 f"summary_context_size({self.summary_context_size}) should no greater than max_total_tokens({self.max_total_tokens})"
@@ -2926,7 +2967,7 @@ class LightRAG:
                         "mode": param.mode,
                     },
                     "llm_response": {
-                        "content": PROMPTS["fail_response"],
+                        "content": get_prompt({"addon_params": self.addon_params}, "fail_response"),
                         "response_iterator": None,
                         "is_streaming": False,
                     },

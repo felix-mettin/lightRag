@@ -52,6 +52,7 @@ from lightrag.api.routers.document_routes import (
 from lightrag.api.routers.query_routes import create_query_routes
 from lightrag.api.routers.graph_routes import create_graph_routes
 from lightrag.api.routers.ollama_api import OllamaAPI
+from lightrag.standards import STANDARD_TYPES, get_standard_config_path, get_standard_workspace
 
 from lightrag.utils import logger, set_verbose_debug
 from lightrag.kg.shared_storage import (
@@ -1069,47 +1070,53 @@ def create_app(args):
     )
 
     # Initialize RAG with unified configuration
-    # 定义标准类型列表，包含 "others" 作为默认类型
-    STANDARD_TYPES = ["GB", "HB", "GJB", "others"]
-    # logger.info(f"#####################Standard types: {STANDARD_TYPES}!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     try:
         rag_instances = {}
         for std_type in STANDARD_TYPES:
-                rag = LightRAG(
-                    working_dir=args.working_dir,
-                    workspace=std_type,
-                    llm_model_func=create_llm_model_func(args.llm_binding),
-                    llm_model_name=args.llm_model,
-                    llm_model_max_async=args.max_async,
-                    summary_max_tokens=args.summary_max_tokens,
-                    summary_context_size=args.summary_context_size,
-                    chunk_token_size=int(args.chunk_size),
-                    chunk_overlap_token_size=int(args.chunk_overlap_size),
-                    llm_model_kwargs=create_llm_model_kwargs(
-                        args.llm_binding, args, llm_timeout
-                    ),
-                    embedding_func=embedding_func,
-                    default_llm_timeout=llm_timeout,
-                    default_embedding_timeout=embedding_timeout,
-                    kv_storage=args.kv_storage,
-                    graph_storage=args.graph_storage,
-                    vector_storage=args.vector_storage,
-                    doc_status_storage=args.doc_status_storage,
-                    vector_db_storage_cls_kwargs={
-                        "cosine_better_than_threshold": args.cosine_threshold
-                    },
-                    enable_llm_cache_for_entity_extract=args.enable_llm_cache_for_extract,
-                    enable_llm_cache=args.enable_llm_cache,
-                    rerank_model_func=rerank_model_func,
-                    max_parallel_insert=args.max_parallel_insert,
-                    max_graph_nodes=args.max_graph_nodes,
-                    addon_params={
-                        "language": args.summary_language,
-                        "entity_types": args.entity_types,
-                    },
-                    ollama_server_infos=ollama_server_infos,
-                )
-                rag_instances[std_type] = rag
+            config_path = get_standard_config_path(std_type)
+            workspace = get_standard_workspace(std_type)
+            rag = LightRAG(
+                working_dir=args.working_dir,
+                workspace=workspace,
+                config_path=config_path,
+                llm_model_func=create_llm_model_func(args.llm_binding),
+                llm_model_name=args.llm_model,
+                llm_model_max_async=args.max_async,
+                summary_max_tokens=args.summary_max_tokens,
+                summary_context_size=args.summary_context_size,
+                chunk_token_size=int(args.chunk_size),
+                chunk_overlap_token_size=int(args.chunk_overlap_size),
+                llm_model_kwargs=create_llm_model_kwargs(
+                    args.llm_binding, args, llm_timeout
+                ),
+                embedding_func=embedding_func,
+                default_llm_timeout=llm_timeout,
+                default_embedding_timeout=embedding_timeout,
+                kv_storage=args.kv_storage,
+                graph_storage=args.graph_storage,
+                vector_storage=args.vector_storage,
+                doc_status_storage=args.doc_status_storage,
+                vector_db_storage_cls_kwargs={
+                    "cosine_better_than_threshold": args.cosine_threshold
+                },
+                enable_llm_cache_for_entity_extract=args.enable_llm_cache_for_extract,
+                enable_llm_cache=args.enable_llm_cache,
+                rerank_model_func=rerank_model_func,
+                max_parallel_insert=args.max_parallel_insert,
+                max_graph_nodes=args.max_graph_nodes,
+                addon_params={
+                    "language": args.summary_language,
+                    "entity_types": args.entity_types,
+                },
+                ollama_server_infos=ollama_server_infos,
+            )
+            rag_instances[std_type] = rag
+            logger.info(
+                "Initialized LightRAG standard '%s' with workspace '%s' and config %s",
+                std_type,
+                workspace,
+                config_path,
+            )
 
     except Exception as e:
         logger.error(f"Failed to initialize LightRAG: {e}")

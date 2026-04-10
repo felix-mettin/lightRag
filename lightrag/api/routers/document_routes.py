@@ -32,10 +32,25 @@ from lightrag.utils import (
     sanitize_text_for_encoding,
 )
 from lightrag.api.utils_api import get_combined_auth_dependency
+from lightrag.standards import normalize_standard_type
 from ..config import global_args
 
 
-# 根据文件名识别标准类型, 返回"GB"、"HB"、"GJB"或"others"
+# 根据文件名识别标准类型, 返回"GB"、"DLT"、"IEC"或"others"
+
+
+def _resolve_standard_type(standard_type: str | None, rag_instances: dict) -> str | None:
+    normalized = normalize_standard_type(standard_type)
+    if normalized and normalized in rag_instances:
+        return normalized
+    return None
+
+
+def _require_standard_type(standard_type: str | None, rag_instances: dict) -> str:
+    normalized = _resolve_standard_type(standard_type, rag_instances)
+    if normalized is None:
+        raise HTTPException(status_code=400, detail=f"Invalid standard_type: {standard_type}")
+    return normalized
 
 def detect_standard_type(filename: str) -> str:    
     """根据文件名识别标准类型：国标/行标/国际标/others"""
@@ -53,12 +68,12 @@ def detect_standard_type(filename: str) -> str:
        re.search(r'^ISO[\s\-_]?\d', upper_name) or \
        re.search(r'^IEEE[\s\-_]?\d', upper_name) or \
        '国际标准' in upper_name:
-        return "GJB"
+        return "IEC"
 
     # 行标：JB、DL、YD、HG、SY、QB、FZ 等代号，后跟可选分隔符和可选 T
     if re.search(r'^(JB|DL|YD|HG|SY|QB|FZ)[\s\-_./]?T?[\s\-_./]?\d', upper_name) or \
        '行业标准' in upper_name or '行标' in upper_name:
-        return "HB"
+        return "DLT"
 
     return "others"
 
@@ -455,7 +470,10 @@ class DeleteEntityRequest(BaseModel):
     def validate_standard_type(cls, standard_type: str) -> str:
         if not standard_type or not standard_type.strip():
             raise ValueError("standard_type cannot be empty")
-        return standard_type.strip()
+        normalized = normalize_standard_type(standard_type)
+        if normalized is None:
+            raise ValueError("Invalid standard_type")
+        return normalized
 
 
 class DeleteRelationRequest(BaseModel):
@@ -475,7 +493,10 @@ class DeleteRelationRequest(BaseModel):
     def validate_relation_standard_type(cls, standard_type: str) -> str:
         if not standard_type or not standard_type.strip():
             raise ValueError("standard_type cannot be empty")
-        return standard_type.strip()
+        normalized = normalize_standard_type(standard_type)
+        if normalized is None:
+            raise ValueError("Invalid standard_type")
+        return normalized
 
 
 class DocStatusResponse(BaseModel):
@@ -2310,9 +2331,10 @@ def create_document_routes(
                 raise HTTPException(status_code=400, detail="Uploaded file must include a filename")
 
             # ===== 1. 确定标准类型 =====
-            if standard_type and standard_type in rag_instances:
+            normalized_standard_type = _resolve_standard_type(standard_type, rag_instances)
+            if normalized_standard_type:
                 # 使用用户指定的标准类型
-                selected_standard_type = standard_type
+                selected_standard_type = normalized_standard_type
             else:
                 # 自动检测标准类型
                 selected_standard_type = detect_standard_type(incoming_filename)
@@ -2324,7 +2346,7 @@ def create_document_routes(
             # 生成包含标准类型的 track_id
             track_id = generate_track_id(f"upload_{selected_standard_type}")
 
-            logger.info(f"文件 '{incoming_filename}' 使用标准类型: {selected_standard_type} (用户指定: {standard_type is not None})")
+            logger.info(f"文件 '{incoming_filename}' 使用标准类型: {selected_standard_type} (用户指定: {normalized_standard_type is not None})")
             # ===========================
             # Sanitize filename to prevent Path Traversal attacks
             safe_filename = sanitize_filename(incoming_filename, doc_manager.input_dir)
@@ -2698,10 +2720,9 @@ def create_document_routes(
         try:
             if standard_type is not None:
                 # 清除单个 workspace
-                if standard_type not in rag_instances:
-                    raise HTTPException(status_code=400, detail=f"Invalid standard_type: {standard_type}")
-                rag = rag_instances[standard_type]
-                status, message = await clear_single_workspace(standard_type, rag)
+                resolved_standard_type = _require_standard_type(standard_type, rag_instances)
+                rag = rag_instances[resolved_standard_type]
+                status, message = await clear_single_workspace(resolved_standard_type, rag)
                 return ClearDocumentsResponse(status=status, message=message)
             else:
                 # 清除所有 workspace
@@ -2927,7 +2948,11 @@ def create_document_routes(
 ) -> DeleteDocByIdResponse:
 
         doc_ids = delete_request.doc_ids
-        std_type = delete_request.standard_type
+        std_type = (
+            _require_standard_type(delete_request.standard_type, rag_instances)
+            if delete_request.standard_type
+            else None
+        )
 
         try:
             from lightrag.kg.shared_storage import (
@@ -2937,9 +2962,6 @@ def create_document_routes(
 
             # If user specified a workspace, validate and schedule on that workspace only
             if std_type:
-                if std_type not in rag_instances:
-                    raise HTTPException(status_code=400, detail=f"Invalid standard_type: {std_type}")
-
                 missing: list[str] = []
                 for doc_id in doc_ids:
                     doc = await rag_instances[std_type].doc_status.get_by_id(doc_id)
@@ -3103,18 +3125,13 @@ def create_document_routes(
             HTTPException: If the entity is not found (404) or an error occurs (500).
         """
         try:
-            if request.standard_type not in rag_instances:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Invalid standard_type: {request.standard_type}",
-                )
-
-            rag = rag_instances[request.standard_type]
+            standard_type = _require_standard_type(request.standard_type, rag_instances)
+            rag = rag_instances[standard_type]
             exists = await rag.chunk_entity_relation_graph.has_node(request.entity_name)
             if not exists:
                 raise HTTPException(
                     status_code=404,
-                    detail=f"Entity '{request.entity_name}' not found in workspace {request.standard_type}",
+                    detail=f"Entity '{request.entity_name}' not found in workspace {standard_type}",
                 )
 
             result = await rag.adelete_by_entity(entity_name=request.entity_name)
@@ -3152,13 +3169,8 @@ def create_document_routes(
             HTTPException: If the relation is not found (404) or an error occurs (500).
         """
         try:
-            if request.standard_type not in rag_instances:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Invalid standard_type: {request.standard_type}",
-                )
-
-            rag = rag_instances[request.standard_type]
+            standard_type = _require_standard_type(request.standard_type, rag_instances)
+            rag = rag_instances[standard_type]
             exists = await rag.chunk_entity_relation_graph.has_edge(
                 request.source_entity,
                 request.target_entity,
@@ -3168,7 +3180,7 @@ def create_document_routes(
                     status_code=404,
                     detail=(
                         f"Relation from '{request.source_entity}' to '{request.target_entity}' "
-                        f"not found in workspace {request.standard_type}"
+                        f"not found in workspace {standard_type}"
                     ),
                 )
 
@@ -3353,9 +3365,8 @@ def create_document_routes(
     ) -> StatusCountsResponse:
         try:
             if standard_type is not None:
-                if standard_type not in rag_instances:
-                    raise HTTPException(status_code=400, detail=f"Invalid standard_type: {standard_type}")
-                rag = rag_instances[standard_type]
+                resolved_standard_type = _require_standard_type(standard_type, rag_instances)
+                rag = rag_instances[resolved_standard_type]
                 status_counts = await rag.doc_status.get_all_status_counts()
             else:
                 # 合并所有 workspace
