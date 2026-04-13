@@ -1107,6 +1107,7 @@ def create_app(args):
                 addon_params={
                     "language": args.summary_language,
                     "entity_types": args.entity_types,
+                    "standard_type": std_type,
                 },
                 ollama_server_infos=ollama_server_infos,
             )

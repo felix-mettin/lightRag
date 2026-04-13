@@ -27,6 +27,7 @@ from typing import (
 )
 from lightrag.prompt import PROMPTS, build_prompt_templates, get_prompt
 from lightrag.exceptions import PipelineCancelledException
+from lightrag.standards import normalize_standard_type
 from lightrag.constants import (
     DEFAULT_MAX_GLEANING,
     DEFAULT_FORCE_LLM_SUMMARY_ON_MERGE,
@@ -140,6 +141,21 @@ def _load_runtime_config(config_path: str | None = None) -> tuple[configparser.C
             resolved_path,
         )
     return parser, resolved_path
+
+
+def _resolve_operate_standard_type(
+    workspace: str, addon_params: dict[str, Any] | None = None
+) -> str:
+    if isinstance(addon_params, dict):
+        explicit = normalize_standard_type(addon_params.get("standard_type"))
+        if explicit:
+            return explicit
+
+    normalized_workspace = normalize_standard_type(workspace)
+    if normalized_workspace:
+        return normalized_workspace
+
+    return "others"
 
 
 def _parse_electrical_schema_config(
@@ -660,6 +676,9 @@ class LightRAG:
 
         # Store in addon_params for downstream use
         if isinstance(self.addon_params, dict):
+            self.addon_params["standard_type"] = _resolve_operate_standard_type(
+                self.workspace, self.addon_params
+            )
             self.addon_params["prompt_templates"] = prompt_templates
             self.addon_params["electrical_schema"] = electrical_schema
             self.addon_params["resolved_config_path"] = str(resolved_config_path)
@@ -2183,6 +2202,9 @@ class LightRAG:
                                     current_file_number=current_file_number,
                                     total_files=total_files,
                                     file_path=file_path,
+                                    stand_type=_resolve_operate_standard_type(
+                                        self.workspace, self.addon_params
+                                    ),
                                 )
 
                                 # Record processing end time
@@ -2352,6 +2374,9 @@ class LightRAG:
         self, chunk: dict[str, Any], pipeline_status=None, pipeline_status_lock=None
     ) -> list:
         try:
+            operate_standard_type = _resolve_operate_standard_type(
+                self.workspace, self.addon_params
+            )
             chunk_results = await extract_entities(
                 chunk,
                 global_config=asdict(self),
@@ -2359,6 +2384,7 @@ class LightRAG:
                 pipeline_status_lock=pipeline_status_lock,
                 llm_response_cache=self.llm_response_cache,
                 text_chunks_storage=self.text_chunks,
+                stand_type=operate_standard_type,
             )
             return chunk_results
         except Exception as e:
@@ -2792,6 +2818,9 @@ class LightRAG:
         )
 
         query_result = None
+        operate_standard_type = _resolve_operate_standard_type(
+            self.workspace, self.addon_params
+        )
 
         if data_param.mode in ["local", "global", "hybrid", "mix"]:
             logger.debug(f"[aquery_data] Using kg_query for mode: {data_param.mode}")
@@ -2806,6 +2835,7 @@ class LightRAG:
                 hashing_kv=self.llm_response_cache,
                 system_prompt=None,
                 chunks_vdb=self.chunks_vdb,
+                stand_type=operate_standard_type,
             )
         elif data_param.mode == "naive":
             logger.debug(f"[aquery_data] Using naive_query for mode: {data_param.mode}")
@@ -2890,6 +2920,9 @@ class LightRAG:
 
         try:
             query_result = None
+            operate_standard_type = _resolve_operate_standard_type(
+                self.workspace, self.addon_params
+            )
 
             if param.mode in ["local", "global", "hybrid", "mix"]:
                 query_result = await kg_query(
@@ -2903,6 +2936,7 @@ class LightRAG:
                     hashing_kv=self.llm_response_cache,
                     system_prompt=system_prompt,
                     chunks_vdb=self.chunks_vdb,
+                    stand_type=operate_standard_type,
                 )
             elif param.mode == "naive":
                 query_result = await naive_query(
