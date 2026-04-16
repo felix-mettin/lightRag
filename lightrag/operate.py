@@ -1564,11 +1564,13 @@ def _evaluate_domain_rule_decisions(
                 continue
             pattern = (
                 rf"{re.escape(str(label).strip())}\s*(?:[:：=]\s*)?"
-                rf"([0-9]+(?:\.[0-9]+)?){unit_pattern}"
+                rf"([0-9]+(?:\.[0-9]+)?(?:\s*\+\s*[0-9]+(?:\.[0-9]+)?)*){unit_pattern}"
             )
             match = re.search(pattern, normalized, flags=re.IGNORECASE)
             if match:
-                return float(match.group(1))
+                parts = re.findall(r"[0-9]+(?:\.[0-9]+)?", match.group(1))
+                if parts:
+                    return sum(float(part) for part in parts)
         return None
 
     def _extract_named_voltage_kv(query_text: str, labels: list[str]) -> float | None:
@@ -1661,17 +1663,59 @@ def _evaluate_domain_rule_decisions(
             return _extract_named_numeric(query_text, alias_labels, unit=unit)
         return None
 
+    def _extract_condition_numeric_from_candidates(
+        query_text: str, labels: list[str], unit: str
+    ) -> float | None:
+        for candidate in labels:
+            normalized_candidate = str(candidate or "").strip()
+            if not normalized_candidate:
+                continue
+            actual = _extract_condition_numeric(query_text, normalized_candidate, unit)
+            if actual is not None:
+                return actual
+        return None
+
     def _matches_condition(condition: dict[str, Any], query_text: str) -> bool:
         cond_type = str(condition.get("type", "") or "").strip()
         label = str(condition.get("label", "") or "").strip()
+        configured_reports = {
+            str(item).strip()
+            for item in (schema_cfg.get("report_types", []) or [])
+            if str(item).strip()
+        }
+        report_alias_map = schema_cfg.get("report_aliases", {}) or {}
+        query_report_scopes = set(_extract_current_report_scopes(query_text, schema_cfg))
+
+        def _is_report_scope_label(text: str) -> bool:
+            normalized_text = str(text or "").strip()
+            if not normalized_text:
+                return False
+            if normalized_text in configured_reports:
+                return True
+            if isinstance(report_alias_map, dict):
+                canonical_text = str(report_alias_map.get(normalized_text, "") or "").strip()
+                return canonical_text in configured_reports if canonical_text else False
+            return False
+
+        def _matches_text_label(text: str) -> bool:
+            normalized_text = str(text or "").strip()
+            if not normalized_text:
+                return False
+            if _is_report_scope_label(normalized_text):
+                if normalized_text in query_report_scopes:
+                    return True
+                canonical_text = str(report_alias_map.get(normalized_text, "") or "").strip()
+                return canonical_text in query_report_scopes if canonical_text else False
+            return _query_contains(query_text, normalized_text)
+
         if cond_type == "contains":
-            return _query_contains(query_text, label)
+            return _matches_text_label(label)
         if cond_type == "not_contains":
             return bool(label) and label not in query_text
         if cond_type == "contains_any":
             labels = condition.get("labels", []) or []
             return isinstance(labels, list) and any(
-                _query_contains(query_text, str(item or "").strip())
+                _matches_text_label(str(item or "").strip())
                 for item in labels
                 if str(item or "").strip()
             )
@@ -1688,6 +1732,14 @@ def _evaluate_domain_rule_decisions(
                 str(condition.get("unit", "") or "").strip(),
             )
             return actual is not None and float(actual) == float(value)
+        if cond_type == "not_equals_numeric":
+            value = condition.get("value")
+            actual = _extract_condition_numeric(
+                query_text,
+                label,
+                str(condition.get("unit", "") or "").strip(),
+            )
+            return actual is not None and float(actual) != float(value)
         if cond_type == "greater_numeric":
             value = condition.get("value")
             actual = _extract_condition_numeric(
@@ -1704,6 +1756,82 @@ def _evaluate_domain_rule_decisions(
                 str(condition.get("unit", "") or "").strip(),
             )
             return actual is not None and float(actual) <= float(value)
+        if cond_type == "greater_or_equal_numeric":
+            value = condition.get("value")
+            actual = _extract_condition_numeric(
+                query_text,
+                label,
+                str(condition.get("unit", "") or "").strip(),
+            )
+            return actual is not None and float(actual) >= float(value)
+        if cond_type == "less_numeric":
+            value = condition.get("value")
+            actual = _extract_condition_numeric(
+                query_text,
+                label,
+                str(condition.get("unit", "") or "").strip(),
+            )
+            return actual is not None and float(actual) < float(value)
+        if cond_type == "ratio_greater_or_equal":
+            numerator_labels = [
+                str(item or "").strip()
+                for item in (condition.get("numerator_labels", []) or [])
+                if str(item or "").strip()
+            ]
+            denominator_labels = [
+                str(item or "").strip()
+                for item in (condition.get("denominator_labels", []) or [])
+                if str(item or "").strip()
+            ]
+            numerator_label = str(condition.get("numerator_label", "") or "").strip()
+            denominator_label = str(condition.get("denominator_label", "") or "").strip()
+            value = condition.get("value")
+            unit = str(condition.get("unit", "") or "").strip()
+            if numerator_label:
+                numerator_labels.append(numerator_label)
+            if denominator_label:
+                denominator_labels.append(denominator_label)
+            if not numerator_labels or not denominator_labels or value is None:
+                return False
+            num_val = _extract_condition_numeric_from_candidates(
+                query_text, numerator_labels, unit
+            )
+            den_val = _extract_condition_numeric_from_candidates(
+                query_text, denominator_labels, unit
+            )
+            if num_val is None or den_val is None or float(den_val) == 0:
+                return False
+            return float(num_val) / float(den_val) >= float(value)
+        if cond_type == "ratio_less":
+            numerator_labels = [
+                str(item or "").strip()
+                for item in (condition.get("numerator_labels", []) or [])
+                if str(item or "").strip()
+            ]
+            denominator_labels = [
+                str(item or "").strip()
+                for item in (condition.get("denominator_labels", []) or [])
+                if str(item or "").strip()
+            ]
+            numerator_label = str(condition.get("numerator_label", "") or "").strip()
+            denominator_label = str(condition.get("denominator_label", "") or "").strip()
+            value = condition.get("value")
+            unit = str(condition.get("unit", "") or "").strip()
+            if numerator_label:
+                numerator_labels.append(numerator_label)
+            if denominator_label:
+                denominator_labels.append(denominator_label)
+            if not numerator_labels or not denominator_labels or value is None:
+                return False
+            num_val = _extract_condition_numeric_from_candidates(
+                query_text, numerator_labels, unit
+            )
+            den_val = _extract_condition_numeric_from_candidates(
+                query_text, denominator_labels, unit
+            )
+            if num_val is None or den_val is None or float(den_val) == 0:
+                return False
+            return float(num_val) / float(den_val) < float(value)
         if cond_type == "regex_extract_not_equals":
             pattern = str(condition.get("pattern", "") or "").strip()
             disallowed = str(condition.get("value", "") or "").strip().upper()
@@ -1736,10 +1864,31 @@ def _evaluate_domain_rule_decisions(
         and pf_fracture_for_split is not None
         and pf_fracture_for_split > pf_base_for_split
     )
+    current_report_scopes = set(_extract_current_report_scopes(query, schema_cfg))
+
+    def _rule_matches_current_scope(raw_rule: dict[str, Any]) -> bool:
+        if not current_report_scopes:
+            return True
+        rule_domain = str(raw_rule.get("domain", "") or "").strip()
+        if not rule_domain:
+            return True
+        domain_scope_map = {
+            "insulation": "绝缘性能型式试验",
+            "temperature_rise": "温升性能型式试验",
+            "switching": "开合性能型式试验",
+            "short_circuit": "短路性能型式试验",
+        }
+        expected_scope = domain_scope_map.get(rule_domain)
+        if not expected_scope:
+            return True
+        return expected_scope in current_report_scopes
+
     decisions: dict[str, Any] = {}
 
     for raw_rule in rules:
         if not isinstance(raw_rule, dict):
+            continue
+        if not _rule_matches_current_scope(raw_rule):
             continue
 
         rule_id = str(raw_rule.get("rule_id", "") or "").strip()
@@ -1750,6 +1899,7 @@ def _evaluate_domain_rule_decisions(
         if rule_kind == "split":
             input_cfg = raw_rule.get("inputs", {}) or {}
             trigger_when_any = input_cfg.get("trigger_when_any", []) or []
+            require_when_all = input_cfg.get("require_when_all", []) or []
             base_labels = input_cfg.get("base_voltage_labels", []) or []
             fracture_labels = input_cfg.get("fracture_voltage_labels", []) or []
             split_enabled = False
@@ -1777,6 +1927,16 @@ def _evaluate_domain_rule_decisions(
                     if split_enabled
                     else "未命中任何拆分触发条件，保持未拆分。"
                 )
+                if split_enabled and isinstance(require_when_all, list) and require_when_all:
+                    unmet_conditions = [
+                        condition
+                        for condition in require_when_all
+                        if not isinstance(condition, dict) or not _matches_condition(condition, query)
+                    ]
+                    if unmet_conditions:
+                        split_enabled = False
+                        reason_code = "split_constraints_not_met"
+                        reason_text = "已命中拆分触发词，但未满足全部附加约束条件，保持未拆分。"
                 normalized_stand_type = _normalize_operate_standard_type(stand_type)
                 expected_rule_id = rule_id
                 if normalized_stand_type == "DLT":
@@ -1824,6 +1984,16 @@ def _evaluate_domain_rule_decisions(
                     else:
                         reason_code = "fracture_not_greater"
                         reason_text = f"断口{domain_label}值小于或等于本体值，必须保持未拆分。"
+                if split_enabled and isinstance(require_when_all, list) and require_when_all:
+                    unmet_conditions = [
+                        condition
+                        for condition in require_when_all
+                        if not isinstance(condition, dict) or not _matches_condition(condition, query)
+                    ]
+                    if unmet_conditions:
+                        split_enabled = False
+                        reason_code = "split_constraints_not_met"
+                        reason_text = "已满足断口值拆分条件，但未满足全部附加约束条件，保持未拆分。"
                 normalized_stand_type = _normalize_operate_standard_type(stand_type)
                 expected_rule_id = rule_id
                 if normalized_stand_type == "DLT":
@@ -1881,6 +2051,7 @@ def _evaluate_domain_rule_decisions(
                 },
                 "decision": "split" if split_enabled else "single",
                 "enabled": split_enabled,
+                "remove_original": bool(raw_rule.get("remove_original", True)),
                 "reason_code": reason_code,
                 "reason_text": reason_text,
                 "single_output": single_output,
@@ -1888,117 +2059,33 @@ def _evaluate_domain_rule_decisions(
             }
             continue
 
-        if rule_kind == "pair_merge":
-            input_cfg = raw_rule.get("inputs", {}) or {}
-            strategy = str(raw_rule.get("strategy", "") or "short_peak_ratio_2_6")
-            merged_output = deepcopy(raw_rule.get("merged_output", {}) or {})
-            enabled = False
-            decision_name = "separate"
-            reason_code = "inputs_missing"
-            reason_text = "未提供可判定输入，保持分开输出。"
-            decision_inputs: dict[str, Any] = {}
-
-            if strategy == "short_peak_ratio_2_6":
-                base_labels = input_cfg.get("base_current_labels", []) or []
-                peak_labels = input_cfg.get("peak_current_labels", []) or []
-                if not isinstance(base_labels, list) or not isinstance(peak_labels, list):
-                    continue
-                base_current_ka = _extract_named_current_ka(query, [str(v) for v in base_labels])
-                peak_current_ka = _extract_named_current_ka(query, [str(v) for v in peak_labels])
-                decision_inputs = {
-                    "base_current_ka": base_current_ka,
-                    "peak_current_ka": peak_current_ka,
-                }
-                if base_current_ka is not None and peak_current_ka is not None:
-                    ratio_target = round(base_current_ka * 2.6, 6)
-                    if peak_current_ka + 1e-6 < ratio_target:
-                        enabled = True
-                        decision_name = "merge"
-                        reason_code = "merge_enabled"
-                        reason_text = "峰值耐受电流小于短时耐受电流的2.6倍，合并输出短时耐受电流和峰值耐受电流试验。"
-                    else:
-                        reason_code = "separate_peak_not_2_6x"
-                        reason_text = "峰值耐受电流大于或等于短时耐受电流的2.6倍，保持分开输出。"
-            elif strategy == "interval_intersection_to_secondary":
-                primary_labels = input_cfg.get("primary_current_labels", []) or []
-                secondary_labels = input_cfg.get("secondary_current_labels", []) or []
-                primary_preferred = str(input_cfg.get("primary_preferred_kind", "") or "")
-                secondary_preferred = str(input_cfg.get("secondary_preferred_kind", "") or "")
-                primary_current_a = _extract_named_current_a(query, [str(v) for v in primary_labels])
-                secondary_current_a = _extract_named_current_a(query, [str(v) for v in secondary_labels])
-                if stand_type == "DLT":
-                    pass
-                else :
-                    if primary_current_a is None:
-                        primary_current_a = _preferred_capacitive_current_a(primary_preferred, rated_voltage_kv)
-                    if secondary_current_a is None:
-                        secondary_current_a = _preferred_capacitive_current_a(secondary_preferred, rated_voltage_kv)
-                decision_inputs = {
-                    "primary_current_a": primary_current_a,
-                    "secondary_current_a": secondary_current_a,
-                }
-                if primary_current_a is not None and secondary_current_a is not None:
-                    low = max(primary_current_a * 0.1, secondary_current_a * 0.1)
-                    high = min(primary_current_a * 0.4, secondary_current_a * 0.4)
-                    decision_inputs["intersection_low_a"] = low
-                    decision_inputs["intersection_high_a"] = high
-                    if low <= high:
-                        enabled = True
-                        decision_name = "merge"
-                        reason_code = "intersection_exists"
-                        reason_text = "LC1 与 CC1 的试验电流区间存在交集，合并输出容性电流开断试验(CC1)。"
-                        merged_output.setdefault("parameter_overrides", {})
-                        merged_output["parameter_overrides"]["试验电流A"] = f"{_format_current_a(low)}~{_format_current_a(high)}"
-                    else:
-                        reason_code = "intersection_empty"
-                        reason_text = "LC1 与 CC1 的试验电流区间无交集，保持分开输出。"
-            elif strategy == "max_to_secondary":
-                primary_labels = input_cfg.get("primary_current_labels", []) or []
-                secondary_labels = input_cfg.get("secondary_current_labels", []) or []
-                primary_preferred = str(input_cfg.get("primary_preferred_kind", "") or "")
-                secondary_preferred = str(input_cfg.get("secondary_preferred_kind", "") or "")
-                primary_current_a = _extract_named_current_a(query, [str(v) for v in primary_labels])
-                secondary_current_a = _extract_named_current_a(query, [str(v) for v in secondary_labels])
-                if stand_type == "DLT":
-                    pass
-                else :
-                    if primary_current_a is None:
-                        primary_current_a = _preferred_capacitive_current_a(primary_preferred, rated_voltage_kv)
-                    if secondary_current_a is None:
-                        secondary_current_a = _preferred_capacitive_current_a(secondary_preferred, rated_voltage_kv)
-                decision_inputs = {
-                    "primary_current_a": primary_current_a,
-                    "secondary_current_a": secondary_current_a,
-                }
-                if primary_current_a is not None and secondary_current_a is not None:
-                    enabled = True
-                    decision_name = "merge"
-                    reason_code = "max_selected"
-                    reason_text = "LC2 与 CC2 合并输出容性电流开断试验(CC2)，试验电流取两者较大者。"
-                    merged_output.setdefault("parameter_overrides", {})
-                    merged_output["parameter_overrides"]["试验电流A"] = _format_current_a(max(primary_current_a, secondary_current_a))
-
-            decisions[rule_id] = {
-                "rule_id": rule_id,
-                "domain": raw_rule.get("domain", ""),
-                "test_item": raw_rule.get("test_item", ""),
-                "secondary_test_item": raw_rule.get("secondary_test_item", ""),
-                "kind": "pair_merge",
-                "strategy": strategy,
-                "decision": decision_name,
-                "enabled": enabled,
-                "reason_code": reason_code,
-                "reason_text": reason_text,
-                "inputs": decision_inputs,
-                "merged_output": merged_output,
-            }
-            continue
-
         if rule_kind == "applicability":
             allow_when_any = raw_rule.get("allow_when_any", []) or []
+            deny_when_any = raw_rule.get("deny_when_any", []) or []
             matched_conditions: list[str] = []
             matched_reason_texts: list[str] = []
+            matched_deny_conditions: list[str] = []
+            matched_deny_reason_texts: list[str] = []
             test_item = str(raw_rule.get("test_item", "") or "").strip()
+            for condition in deny_when_any:
+                if not isinstance(condition, dict):
+                    continue
+                if _matches_condition(condition, query):
+                    label = str(condition.get("label", "") or condition.get("type", "") or "")
+                    if condition.get("type") == "all":
+                        label = "组合禁止条件命中"
+                        matched_deny_reason_texts.append("命中组合禁止条件")
+                    elif condition.get("type") == "contains":
+                        matched_deny_reason_texts.append(str(condition.get("label", "") or ""))
+                    elif condition.get("type") == "regex_match":
+                        matched_deny_reason_texts.append(str(condition.get("pattern", "") or "regex_match"))
+                    elif condition.get("type") == "contains_any":
+                        matched_deny_reason_texts.append(
+                            f"含有{'|'.join(str(l) for l in (condition.get('labels', []) or []))}"
+                        )
+                    else:
+                        matched_deny_reason_texts.append(label)
+                    matched_deny_conditions.append(label)
             for condition in allow_when_any:
                 if not isinstance(condition, dict):
                     continue
@@ -2013,6 +2100,10 @@ def _evaluate_domain_rule_decisions(
                         matched_reason_texts.append(
                             f"{condition.get('label', '')}={condition.get('value', '')}{condition.get('unit', '')}"
                         )
+                    elif condition.get("type") == "not_equals_numeric":
+                        matched_reason_texts.append(
+                            f"{condition.get('label', '')}!={condition.get('value', '')}{condition.get('unit', '')}"
+                        )
                     elif condition.get("type") == "greater_numeric":
                         matched_reason_texts.append(
                             f"{condition.get('label', '')}>{condition.get('value', '')}{condition.get('unit', '')}"
@@ -2021,20 +2112,59 @@ def _evaluate_domain_rule_decisions(
                         matched_reason_texts.append(
                             f"{condition.get('label', '')}<={condition.get('value', '')}{condition.get('unit', '')}"
                         )
+                    elif condition.get("type") == "greater_or_equal_numeric":
+                        matched_reason_texts.append(
+                            f"{condition.get('label', '')}>={condition.get('value', '')}{condition.get('unit', '')}"
+                        )
+                    elif condition.get("type") == "less_numeric":
+                        matched_reason_texts.append(
+                            f"{condition.get('label', '')}<{condition.get('value', '')}{condition.get('unit', '')}"
+                        )
+                    elif condition.get("type") in ("ratio_greater_or_equal", "ratio_less"):
+                        numerator_desc = str(condition.get("numerator_label", "") or "").strip()
+                        denominator_desc = str(condition.get("denominator_label", "") or "").strip()
+                        if not numerator_desc:
+                            numerator_desc = "|".join(
+                                str(item or "").strip()
+                                for item in (condition.get("numerator_labels", []) or [])
+                                if str(item or "").strip()
+                            )
+                        if not denominator_desc:
+                            denominator_desc = "|".join(
+                                str(item or "").strip()
+                                for item in (condition.get("denominator_labels", []) or [])
+                                if str(item or "").strip()
+                            )
+                        matched_reason_texts.append(
+                            f"{numerator_desc}/{denominator_desc}"
+                            f"{'>='+str(condition.get('value','')) if condition.get('type')=='ratio_greater_or_equal' else '<'+str(condition.get('value',''))}"
+                        )
+                    elif condition.get("type") == "contains_any":
+                        matched_reason_texts.append(
+                            f"含有{'|'.join(str(l) for l in (condition.get('labels', []) or []))}"
+                        )
                     matched_conditions.append(label)
-            enabled = bool(matched_conditions)
+            deny_hit = bool(matched_deny_conditions)
+            enabled = bool(matched_conditions) and not deny_hit
             reason_code = "allowed" if enabled else "denied"
-            reason_text = (
-                f"{test_item}适用。命中条件："
-                + "；".join(matched_reason_texts or matched_conditions)
-                + (
-                    "。该结论只决定是否输出局部放电试验，不决定试验次数。"
-                    if test_item == "局部放电试验"
-                    else "。"
+            if enabled:
+                reason_text = (
+                    f"{test_item}适用。命中条件："
+                    + "；".join(matched_reason_texts or matched_conditions)
+                    + (
+                        "。该结论只决定是否输出局部放电试验，不决定试验次数。"
+                        if test_item == "局部放电试验"
+                        else "。"
+                    )
                 )
-                if enabled
-                else f"未命中任何{test_item}适用条件，禁止输出{test_item}。"
-            )
+            elif deny_hit:
+                reason_text = (
+                    f"命中{test_item}禁止条件："
+                    + "；".join(matched_deny_reason_texts or matched_deny_conditions)
+                    + f"，禁止输出{test_item}。"
+                )
+            else:
+                reason_text = f"未命中任何{test_item}适用条件，禁止输出{test_item}。"
             decisions[rule_id] = {
                 "rule_id": rule_id,
                 "domain": raw_rule.get("domain", ""),
@@ -2045,6 +2175,7 @@ def _evaluate_domain_rule_decisions(
                 "reason_code": reason_code,
                 "reason_text": reason_text,
                 "matched_conditions": matched_conditions,
+                "matched_deny_conditions": matched_deny_conditions,
                 "inputs": {
                     "rated_voltage_kv": rated_voltage_kv,
                     "rated_current_amp": rated_current_amp,
@@ -2147,6 +2278,14 @@ def _apply_domain_rule_decisions_to_project_context(
         updated_param_map[test_name] = params
         updated_value_map.setdefault(test_name, {})
 
+    def _get_config_required_params(test_name: str) -> list[str]:
+        raw_params = configured_requirements.get(test_name, [])
+        return [
+            str(param).strip()
+            for param in (raw_params if isinstance(raw_params, list) else [])
+            if str(param).strip()
+        ]
+
     def _set_param(
         test_name: str,
         param_name: str,
@@ -2216,10 +2355,12 @@ def _apply_domain_rule_decisions_to_project_context(
             return None
         normalized = text.replace("（", "(").replace("）", ")")
         for label in labels:
-            pattern = rf"{re.escape(label)}\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*(?:kV)?"
+            pattern = rf"{re.escape(label)}\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?(?:\s*\+\s*[0-9]+(?:\.[0-9]+)?)*)\s*(?:kV)?"
             match = re.search(pattern, normalized, flags=re.IGNORECASE)
             if match:
-                return float(match.group(1))
+                parts = re.findall(r"[0-9]+(?:\.[0-9]+)?", match.group(1))
+                if parts:
+                    return sum(float(part) for part in parts)
         return None
 
     def _preferred_capacitive_current_a_local(
@@ -2323,13 +2464,13 @@ def _apply_domain_rule_decisions_to_project_context(
             break
     c_grade = None
     c_grade_match = re.search(
-        r"容性电流开合时重击穿等级\s*(?:[:：=]\s*)?(C[12])",
+        r"(?:容性电流开合时重击穿等级|开合容性电流能力的级别)\s*(?:[:：=]\s*)?(C[12])",
         query_text,
         flags=re.IGNORECASE,
     )
     if c_grade_match:
         c_grade = c_grade_match.group(1).upper()
-    if c_grade != "C2":
+    if c_grade == "C1":
         updated_param_map.pop("T60(预备试验)", None)
         updated_value_map.pop("T60(预备试验)", None)
     rated_peak_ka = _extract_named_current_ka_local(
@@ -2347,7 +2488,7 @@ def _apply_domain_rule_decisions_to_project_context(
         query_text, ["额定短路关合电流", "短路关合电流"]
     )
     first_pole_match = re.search(
-        r"首开极系数\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)",
+        r"首开极系数(?:kpp)?\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)",
         query_text,
         flags=re.IGNORECASE,
     )
@@ -2502,85 +2643,6 @@ def _apply_domain_rule_decisions_to_project_context(
                 )
             continue
 
-        if rule_kind == "pair_merge":
-            secondary_test_item = str(decision.get("secondary_test_item", "") or "")
-            if not test_item or not secondary_test_item:
-                continue
-            if not decision.get("enabled"):
-                continue
-            merged_output = decision.get("merged_output", {}) or {}
-            target_name = str(merged_output.get("test_item", "") or "").strip()
-            if not target_name:
-                continue
-
-            secondary_params = list(updated_param_map.get(secondary_test_item, []) or [])
-            secondary_values = deepcopy(updated_value_map.get(secondary_test_item, {}) or {})
-            primary_params = list(updated_param_map.get(test_item, []) or [])
-            primary_values = deepcopy(updated_value_map.get(test_item, {}) or {})
-            if not primary_params and not secondary_params:
-                continue
-
-            if target_name == secondary_test_item and secondary_params:
-                merged_params = list(secondary_params)
-                merged_values = deepcopy(secondary_values)
-            else:
-                merged_params = list(primary_params)
-                for param_name in secondary_params:
-                    if param_name not in merged_params:
-                        merged_params.append(param_name)
-                merged_values = deepcopy(primary_values)
-                for param_name, value in secondary_values.items():
-                    merged_values.setdefault(param_name, deepcopy(value))
-
-            updated_param_map.pop(test_item, None)
-            updated_value_map.pop(test_item, None)
-            updated_param_map.pop(secondary_test_item, None)
-            updated_value_map.pop(secondary_test_item, None)
-
-            updated_param_map[target_name] = merged_params
-            updated_value_map[target_name] = merged_values
-            strategy = str(decision.get("strategy", "") or "")
-            if strategy == "interval_intersection_to_secondary":
-                primary_current_a = _resolve_param_current_a(
-                    test_item, "试验电流A", "I1"
-                )
-                secondary_current_a = _resolve_param_current_a(
-                    secondary_test_item, "试验电流A", "Ic"
-                )
-                if primary_current_a is not None and secondary_current_a is not None:
-                    low = max(primary_current_a * 0.1, secondary_current_a * 0.1)
-                    high = min(primary_current_a * 0.4, secondary_current_a * 0.4)
-                    if low <= high:
-                        merged_output.setdefault("parameter_overrides", {})
-                        merged_output["parameter_overrides"]["试验电流A"] = (
-                            f"{_format_current_a_local(low)}~{_format_current_a_local(high)}"
-                        )
-            elif strategy == "max_to_secondary":
-                primary_current_a = _resolve_param_current_a(
-                    test_item, "试验电流A", "I1"
-                )
-                secondary_current_a = _resolve_param_current_a(
-                    secondary_test_item, "试验电流A", "Ic"
-                )
-                if primary_current_a is not None and secondary_current_a is not None:
-                    merged_output.setdefault("parameter_overrides", {})
-                    merged_output["parameter_overrides"]["试验电流A"] = _format_current_a_local(
-                        max(primary_current_a, secondary_current_a)
-                    )
-            for param_name, value_text in (
-                merged_output.get("parameter_overrides", {}) or {}
-            ).items():
-                _set_param(
-                    target_name,
-                    str(param_name),
-                    str(value_text),
-                    value_source="rule",
-                    value_type="text",
-                    constraints=str(value_text),
-                    resolution_mode="graph_final",
-                )
-            continue
-
         if rule_kind != "split" or not test_item:
             continue
 
@@ -2590,16 +2652,32 @@ def _apply_domain_rule_decisions_to_project_context(
             continue
 
         if decision.get("enabled"):
-            updated_param_map.pop(test_item, None)
-            updated_value_map.pop(test_item, None)
+            remove_original = bool(decision.get("remove_original", True))
+            if remove_original:
+                updated_param_map.pop(test_item, None)
+                updated_value_map.pop(test_item, None)
             for split_output in decision.get("split_output", []) or []:
                 if not isinstance(split_output, dict):
                     continue
                 target_name = str(split_output.get("test_item", "") or "").strip()
                 if not target_name:
                     continue
-                updated_param_map[target_name] = list(source_params)
-                updated_value_map[target_name] = deepcopy(source_values)
+                target_params = _get_config_required_params(target_name) or list(source_params)
+                updated_param_map[target_name] = list(target_params)
+                inherited_value_map: dict[str, dict[str, str]] = {}
+                for param_name in target_params:
+                    if param_name in source_values:
+                        inherited_value_map[param_name] = deepcopy(source_values[param_name])
+                updated_value_map[target_name] = inherited_value_map
+                additional_params = split_output.get("additional_params", []) or []
+                if isinstance(additional_params, list):
+                    for param_name in additional_params:
+                        normalized_param_name = str(param_name or "").strip()
+                        if not normalized_param_name:
+                            continue
+                        if normalized_param_name not in updated_param_map[target_name]:
+                            updated_param_map[target_name].append(normalized_param_name)
+                        updated_value_map[target_name].setdefault(normalized_param_name, {})
                 for param_name, value_text in (
                     split_output.get("parameter_overrides", {}) or {}
                 ).items():
@@ -2764,7 +2842,7 @@ def _apply_domain_rule_decisions_to_project_context(
                 value_source="rule" if c_grade else "default",
                 value_type="text",
                 constraints=c_grade or "C2",
-                calc_rule="用户已提供容性电流开合时重击穿等级，直接采用。" if c_grade else "未提供开合容性电流能力级别时默认按C2处理。",
+                calc_rule="用户已提供开合容性电流能力级别信息，直接采用。" if c_grade else "未提供开合容性电流能力级别时默认按C2处理。",
                 resolution_mode="graph_final",
             )
 
@@ -2812,12 +2890,13 @@ def _apply_domain_rule_decisions_to_project_context(
             "工频耐受电压试验(断口)",
             "工频耐受电压试验(相间及对地)",
             "雷电冲击耐受电压试验",
+            "雷电冲击耐受电压试验(联合电压)",
             "雷电冲击耐受电压试验(断口)",
             "雷电冲击耐受电压试验(相间及对地)",
             "局部放电试验",
             "T60(预备试验)",
             "连续电流试验",
-            "作为状态检查的T10试验",
+            "状态检查试验（T10）",
             "电寿命(单分)",
             "电寿命(合分)",
             "电寿命(循环)",
@@ -2865,7 +2944,7 @@ def _apply_domain_rule_decisions_to_project_context(
                 test_name,
                 "开合容性电流能力的级别",
                 c_grade or "C2",
-                calc_rule="用户已提供容性电流开合时重击穿等级，直接采用。" if c_grade else "未提供开合容性电流能力级别时默认按C2处理。",
+                calc_rule="用户已提供开合容性电流能力级别信息，直接采用。" if c_grade else "未提供开合容性电流能力级别时默认按C2处理。",
             )
             _set_if_value_missing(
                 test_name,
@@ -2907,47 +2986,6 @@ def _apply_domain_rule_decisions_to_project_context(
             constraints=f"{str(t60_current_ka).rstrip('0').rstrip('.')} kA",
             calc_rule=f"额定短路开断电流 {short_break_ka} kA 的60%为 {str(t60_current_ka).rstrip('0').rstrip('.')} kA。",
             resolution_mode="graph_final",
-        )
-
-    if rated_voltage_kv is not None:
-        _set_if_present(
-            "短时耐受电流和峰值耐受电流试验",
-            "额定电压",
-            _format_voltage_value(rated_voltage_kv),
-            calc_rule="用户已明确提供额定电压，问答阶段直接采用该值。",
-        )
-        _set_if_present(
-            "短时耐受电流和峰值耐受电流试验",
-            "试验部位",
-            "主回路",
-            calc_rule="短时耐受电流和峰值耐受电流试验试验部位固定为主回路。",
-        )
-        _set_if_present(
-            "短时耐受电流和峰值耐受电流试验",
-            "试验工位",
-            "老站",
-            calc_rule="短时耐受电流和峰值耐受电流试验默认试验工位为老站。",
-        )
-    if short_break_ka is not None:
-        _set_if_present(
-            "短时耐受电流和峰值耐受电流试验",
-            "短时耐受电流",
-            f"{str(short_break_ka).rstrip('0').rstrip('.')} kA",
-            calc_rule="用户已明确提供额定短时耐受电流，问答阶段直接采用该值。",
-        )
-    if rated_peak_ka is not None:
-        _set_if_present(
-            "短时耐受电流和峰值耐受电流试验",
-            "峰值电流kA",
-            f"{str(rated_peak_ka).rstrip('0').rstrip('.')} kA",
-            calc_rule="用户已明确提供额定峰值耐受电流，问答阶段直接采用该值。",
-        )
-    if rated_short_time_s is not None:
-        _set_if_present(
-            "短时耐受电流和峰值耐受电流试验",
-            "短路持续时间",
-            f"{str(rated_short_time_s).rstrip('0').rstrip('.')} s",
-            calc_rule="用户已明确提供额定短路持续时间，问答阶段直接采用该值。",
         )
 
     short_circuit_outputs = {
@@ -2994,14 +3032,14 @@ def _apply_domain_rule_decisions_to_project_context(
 
     if rated_voltage_kv is not None:
         _set_if_present(
-            "作为状态检查的T10试验",
+            "状态检查试验（T10）",
             "额定电压",
             _format_voltage_value(rated_voltage_kv),
             calc_rule="用户已明确提供额定电压，问答阶段直接采用该值。",
         )
         state_t10_voltage = round(rated_voltage_kv * 0.5, 3)
         _set_if_present(
-            "作为状态检查的T10试验",
+            "状态检查试验（T10）",
             "试验电压",
             _format_voltage_value(state_t10_voltage),
             calc_rule=f"50% × {rated_voltage_kv} kV = {_format_voltage_value(state_t10_voltage)}。",
@@ -3009,7 +3047,7 @@ def _apply_domain_rule_decisions_to_project_context(
     if short_break_ka is not None:
         state_t10_current = round(short_break_ka * 0.1, 3)
         _set_if_present(
-            "作为状态检查的T10试验",
+            "状态检查试验（T10）",
             "试验电流kA",
             f"{str(state_t10_current).rstrip('0').rstrip('.')} kA",
             calc_rule=f"10% × {short_break_ka} kA = {str(state_t10_current).rstrip('0').rstrip('.')} kA。",
@@ -3048,6 +3086,7 @@ def _apply_domain_rule_decisions_to_project_context(
         "工频耐受电压试验(相间及对地)",
         "作为状态检查的工频耐受电压试验",
         "雷电冲击耐受电压试验",
+        "雷电冲击耐受电压试验(联合电压)",
         "雷电冲击耐受电压试验(断口)",
         "雷电冲击耐受电压试验(相间及对地)",
         "局部放电试验",
@@ -3105,6 +3144,24 @@ def _apply_domain_rule_decisions_to_project_context(
         "试验状态",
         "干",
         calc_rule="未命中特殊拆分规则时，相间及对地工频耐受电压试验默认按干态输出。",
+    )
+    _set_if_present(
+        "工频耐受电压试验(联合电压)",
+        "试验状态",
+        "干",
+        calc_rule="工频耐受联合电压试验固定按干态输出。",
+    )
+    _set_if_present(
+        "雷电冲击耐受电压试验(联合电压)",
+        "试验状态",
+        "干",
+        calc_rule="雷电冲击联合电压试验固定按干态输出。",
+    )
+    _set_if_present(
+        "操作冲击耐受电压试验(联合电压)",
+        "试验状态",
+        "干",
+        calc_rule="操作冲击联合电压试验固定按干态输出。",
     )
 
     _set_if_present("工频耐受电压试验", "试验次数", "9次", calc_rule="未拆分工频耐受电压试验按9次。")
@@ -3185,9 +3242,10 @@ def _build_resolved_rule_overrides(
 
         if rule_kind == "split":
             if decision.get("enabled"):
+                remove_original = bool(decision.get("remove_original", True))
                 resolved[test_item] = {
                     "decision": "split",
-                    "remove_original": True,
+                    "remove_original": remove_original,
                     "outputs": decision.get("split_output", []),
                     "reason_text": decision.get("reason_text", ""),
                 }
@@ -3198,27 +3256,6 @@ def _build_resolved_rule_overrides(
                     "reason_text": decision.get("reason_text", ""),
                 }
             continue
-
-        if rule_kind == "pair_merge":
-            secondary_test_item = str(decision.get("secondary_test_item", "") or "")
-            merged_output = decision.get("merged_output", {}) or {}
-            target_name = str(merged_output.get("test_item", "") or "").strip()
-            resolved[test_item] = {
-                "decision": "merge" if decision.get("enabled") else "separate",
-                "kind": "pair_merge",
-                "secondary_test_item": secondary_test_item,
-                "remove_original": bool(decision.get("enabled")),
-                "merged_output": merged_output if decision.get("enabled") else {},
-                "reason_text": decision.get("reason_text", ""),
-            }
-            if secondary_test_item:
-                resolved.setdefault(secondary_test_item, {})
-                resolved[secondary_test_item]["paired_with"] = test_item
-                resolved[secondary_test_item]["pair_merge_decision"] = {
-                    "decision": "merge" if decision.get("enabled") else "separate",
-                    "target_test_item": target_name or secondary_test_item,
-                    "reason_text": decision.get("reason_text", ""),
-                }
 
     return resolved
 
@@ -3242,19 +3279,9 @@ def _build_final_test_item_scope(
             removed_items.append(test_item)
             hard_removed_items.add(test_item)
         if rule_kind == "split" and decision.get("enabled"):
-            removed_items.append(test_item)
-            hard_removed_items.add(test_item)
-        if rule_kind == "pair_merge" and decision.get("enabled"):
-            removed_items.append(test_item)
-            hard_removed_items.add(test_item)
-            secondary_test_item = str(decision.get("secondary_test_item", "") or "").strip()
-            merged_output = decision.get("merged_output", {}) or {}
-            target_test_item = str(merged_output.get("test_item", "") or "").strip()
-            if secondary_test_item:
-                if secondary_test_item != target_test_item:
-                    removed_items.append(secondary_test_item)
-                    hard_removed_items.add(secondary_test_item)
-
+            if bool(decision.get("remove_original", True)):
+                removed_items.append(test_item)
+                hard_removed_items.add(test_item)
     # Guard against stale project_param_map entries leaking into the final whitelist.
     # If runtime rule decisions explicitly removed an item, it must never remain allowed.
     allowed_deduped = list(
@@ -3373,7 +3400,6 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
     #     },
     #     "短时耐受电流试验": {"回路电阻"},
     #     "峰值耐受电流试验": {"回路电阻"},
-    #     "短时耐受电流和峰值耐受电流试验": {"回路电阻"},
     #     "短路开断试验(T10)": {"不均匀系数", "外壳是否带电", "失败次数"},
     #     "短路开断试验(T30)": {"不均匀系数", "外壳是否带电", "失败次数"},
     #     "短路开断试验(T60)": {"不均匀系数", "外壳是否带电", "失败次数"},
@@ -3403,11 +3429,13 @@ def _get_report_scope_test_whitelist() -> dict[str, set[str]]:
             "控制和辅助回路的绝缘试验",
             "操作冲击耐受电压试验",
             "局部放电试验",
+            "全套绝缘型式试验",
         },
         "温升性能型式试验": {
             "前后回路电阻测量试验",
             "辅助和控制回路温升试验",
             "连续电流试验",
+            "连续电流试验(60HZ)",
         },
         "开合性能型式试验": {
             "容性电流开断试验(LC1)",
@@ -3417,20 +3445,25 @@ def _get_report_scope_test_whitelist() -> dict[str, set[str]]:
             "容性电流开断试验(BC1)",
             "容性电流开断试验(BC2)",
             "T60(预备试验)",
+            "状态检查试验（T10）",
             "作为状态检查的工频耐受电压试验",
             "空载特性测量",
             "空载特性测量#1",
             "空载特性测量#2",
+            "BC1(60HZ)",
+            "BC2(60HZ)",
+            "CC1(60HZ)",
+            "CC2(60HZ)",
+            "LC1(60HZ)",
+            "LC2(60HZ)",
         },
         "短路性能型式试验": {
             "短时耐受电流试验",
             "峰值耐受电流试验",
-            "短时耐受电流和峰值耐受电流试验",
             "空载特性测量",
             "空载特性测量#1",
             "空载特性测量#2",
             "短路开断试验(T100s)",
-            "作为状态检查的T10试验",
             "短路开断试验(T10)",
             "失步关合和开断试验(OP1)",
             "失步关合和开断试验(OP2)",
@@ -3446,6 +3479,19 @@ def _get_report_scope_test_whitelist() -> dict[str, set[str]]:
             "短路开断试验(T100a)",
             "近区故障试验(L90)",
             "近区故障试验(L75)",
+            "L75(60HZ)",
+            "L90(60HZ)",
+            "OP2关合",
+            "T10(60Hz)",
+            "T100A(60HZ)",
+            "T100S(60HZ)",
+            "T100s（a）",
+            "T100s（b）",
+            "T60(60HZ)",
+            "三相共机构验证",
+            "状态检查试验（T10）",
+            "短路开断试验(T100A)",
+            "短路开断试验(T100S)",
         },
     }
 
@@ -3479,6 +3525,62 @@ def _extract_current_report_scopes(query_text: str, schema_cfg: dict[str, Any] |
                 and canonical_text not in matched
             ):
                 matched.append(canonical_text)
+
+    # Handle compound Chinese expressions like "绝缘性能及温升性能型式试验"
+    # which means both "绝缘性能型式试验" and "温升性能型式试验".
+    # The simple substring match misses "绝缘性能型式试验" because "及温升性能"
+    # is inserted between "绝缘性能" and "型式试验".
+    unmatched = [r for r in configured_reports if r not in matched]
+    if len(configured_reports) >= 2 and unmatched:
+        # Find the longest suffix shared by ALL configured report types
+        min_rpt_len = min(len(r) for r in configured_reports)
+        max_shared_suffix = ""
+        for i in range(1, min_rpt_len):
+            s = configured_reports[0][-i:]
+            if all(r.endswith(s) for r in configured_reports):
+                max_shared_suffix = s
+            else:
+                break
+
+        if len(max_shared_suffix) >= 2:
+            # Try suffix lengths from short to long; stop at first that produces matches
+            for suffix_len in range(2, len(max_shared_suffix) + 1):
+                candidate_suffix = configured_reports[0][-suffix_len:]
+                if candidate_suffix not in text:
+                    continue
+
+                prefix_map: dict[str, str] = {}
+                for rn in configured_reports:
+                    p = rn[:-suffix_len]
+                    if p:
+                        prefix_map[p] = rn
+
+                if len(prefix_map) < 2:
+                    continue
+
+                newly_matched: list[str] = []
+                for prefix, report_name in prefix_map.items():
+                    if report_name in matched:
+                        continue
+                    other_alts = "|".join(
+                        re.escape(p) for p in prefix_map if p != prefix
+                    )
+                    if not other_alts:
+                        continue
+                    # Pattern: this prefix, then (connector + another known prefix)*,
+                    # then optional connector, then the shared suffix.
+                    pat = (
+                        re.escape(prefix)
+                        + r"(?:[及和、,，\s]+(?:" + other_alts + r"))*"
+                        + r"[及和、,，\s]*"
+                        + re.escape(candidate_suffix)
+                    )
+                    if re.search(pat, text):
+                        newly_matched.append(report_name)
+
+                if newly_matched:
+                    matched.extend(newly_matched)
+                    break
 
     return matched
 
@@ -3531,6 +3633,7 @@ def _filter_project_context_by_report_scope(
     project_param_map: dict[str, list[str]],
     project_param_value_map: dict[str, dict[str, dict[str, str]]],
     current_report_scopes: list[str],
+    domain_rule_decisions: dict[str, Any] | None = None,
 ) -> tuple[dict[str, list[str]], dict[str, dict[str, dict[str, str]]]]:
     if not current_report_scopes:
         return project_param_map, project_param_value_map
@@ -3539,6 +3642,19 @@ def _filter_project_context_by_report_scope(
     allowed_tests: set[str] = set()
     for scope in current_report_scopes:
         allowed_tests.update(whitelist_map.get(str(scope).strip(), set()))
+    for decision in (domain_rule_decisions or {}).values():
+        if not isinstance(decision, dict):
+            continue
+        if str(decision.get("kind", "") or "").strip() != "split":
+            continue
+        if not decision.get("enabled"):
+            continue
+        for split_output in decision.get("split_output", []) or []:
+            if not isinstance(split_output, dict):
+                continue
+            split_name = str(split_output.get("test_item", "") or "").strip()
+            if split_name:
+                allowed_tests.add(split_name)
     if not allowed_tests:
         return project_param_map, project_param_value_map
 
@@ -10869,10 +10985,12 @@ async def _build_context_str(
             return None
         normalized = text.replace("（", "(").replace("）", ")")
         for label in labels:
-            pattern = rf"{re.escape(label)}\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*(?:kV)?"
+            pattern = rf"{re.escape(label)}\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?(?:\s*\+\s*[0-9]+(?:\.[0-9]+)?)*)\s*(?:kV)?"
             match = re.search(pattern, normalized, flags=re.IGNORECASE)
             if match:
-                return float(match.group(1))
+                parts = re.findall(r"[0-9]+(?:\.[0-9]+)?", match.group(1))
+                if parts:
+                    return sum(float(part) for part in parts)
         return None
 
     def _extract_model_prefix(query_text: str) -> str | None:
@@ -11015,6 +11133,19 @@ async def _build_context_str(
                     if canonical_name and canonical_name not in test_candidates:
                         test_candidates[canonical_name] = _stable_test_id(canonical_name)
 
+        current_report_scopes = _extract_current_report_scopes(rule_query_text, schema_cfg)
+        if current_report_scopes:
+            whitelist_map = _get_report_scope_test_whitelist()
+            scoped_test_items: set[str] = set()
+            for scope in current_report_scopes:
+                scoped_test_items.update(whitelist_map.get(str(scope).strip(), set()))
+            for test_name in configured_test_items:
+                canonical_name = str(test_name).strip()
+                if canonical_name and canonical_name in scoped_test_items:
+                    test_candidates.setdefault(
+                        canonical_name, _stable_test_id(canonical_name)
+                    )
+
         if not test_candidates:
             # Retrieval may miss explicit test-item entities. Fall back to config
             # whitelist so downstream QA still sees the full expected parameter set.
@@ -11147,6 +11278,7 @@ async def _build_context_str(
             project_param_map,
             project_param_value_map,
             current_report_scopes,
+            domain_rule_decisions,
         )
         post_scope_test_items = {
             str(test_name).strip()

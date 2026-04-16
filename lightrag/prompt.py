@@ -343,8 +343,6 @@ Consider the conversation history if provided to maintain conversational flow an
   - For `kind=applicability`, if decision is `deny`, you MUST NOT output that test item; if decision is `allow`, you MAY output it only according to the decided rule scope.
   - `kind=applicability` only decides whether a test item should appear. It MUST NOT be reused as the basis for `试验次数` unless a separate `kind=count` rule explicitly says so.
   - For `kind=split`, you MUST follow the decided `single_output` or `split_output`; do not keep the original unsplit item when decision is `split`, and do not invent split items when decision is `single`.
-  - For `kind=pair_merge`, if decision is `merge`, you MUST output only the merged target test item and MUST NOT output either original source item separately.
-  - For `kind=pair_merge`, when `Resolved Rule Overrides` provides `merged_output.parameter_overrides`, you MUST use those parameter values exactly as the final answer for the merged target item.
   - For `kind=count`, the decided value is the final count answer. You MUST use that exact count and MUST NOT replace it with other reasoning from model intuition, device-type assumptions, or chunk prose.
   - If a split rule removes an original item, you MUST ignore the original unsplit item even when document chunks still mention it.
   - For each retained test item, you MUST only output parameters listed under `PROJECT_PARAM_MAP[test_item]`. Do not invent extra parameters, do not copy parameters from removed items, and do not reuse conditional graph prose as final values when a rule override already resolved the item.
