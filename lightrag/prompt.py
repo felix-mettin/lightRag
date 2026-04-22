@@ -325,59 +325,29 @@ Consider the conversation history if provided to maintain conversational flow an
 
 ---Instructions---
 
-1. Step-by-Step Instruction:
-  - Carefully determine the user's query intent in the context of the conversation history to fully understand the user's information need.
-  - Scrutinize both `Knowledge Graph Data` and `Document Chunks` in the **Context**. Identify and extract all pieces of information that are directly relevant to answering the user query.
-  - Weave the extracted facts into a coherent and logical response. Your own knowledge must ONLY be used to formulate fluent sentences and connect ideas, NOT to introduce any external information.
-  - Track the reference_id of the document chunk which directly support the facts presented in the response. Correlate reference_id with the entries in the `Reference Document List` to generate the appropriate citations.
-  - Generate a references section at the end of the response. Each reference document must directly support the facts presented in the response.
-  - Do not generate anything after the reference section.
-
-2. Content & Grounding:
-  - Strictly adhere to the provided context from the **Context**; DO NOT invent, assume, or infer any information not explicitly stated.
+1. Ground the answer strictly in the provided **Context**. Do not invent, assume, or infer facts that are not explicitly supported.
+2. Use both `Knowledge Graph Data` and `Document Chunks`, but obey this runtime priority order:
+  - `Resolved Rule Overrides` is the highest-priority final answer sheet.
+  - `Allowed Final Test Items` is the final whitelist for sections A/C/D.
+  - `Removed Test Items` must never appear in sections A/C/D.
   - `Domain Rule Decisions` is the highest-priority business decision source for applicability, split/merge, count, and override logic.
-  - `Resolved Rule Overrides` is the highest-priority final answer sheet distilled from `Domain Rule Decisions`. If a parameter or output structure appears there, you MUST use it exactly as the final answer.
-  - `Allowed Final Test Items` is the final whitelist for A/C/D sections. Section A MUST contain exactly that set of test items, no more and no less. Sections C/D MUST cover only those same items.
-  - `Removed Test Items` is the final deny-list for A/C/D sections. You MUST NOT output any test item from that list, even if it appears in document chunks or graph entities.
-  - If `Domain Rule Decisions` provides a decision for a test item, you MUST obey it even when document chunks, standard prose, or other graph hints suggest a different tendency.
-  - For `kind=applicability`, if decision is `deny`, you MUST NOT output that test item; if decision is `allow`, you MAY output it only according to the decided rule scope.
-  - `kind=applicability` only decides whether a test item should appear. It MUST NOT be reused as the basis for `试验次数` unless a separate `kind=count` rule explicitly says so.
-  - For `kind=split`, you MUST follow the decided `single_output` or `split_output`; do not keep the original unsplit item when decision is `split`, and do not invent split items when decision is `single`.
-  - For `kind=count`, the decided value is the final count answer. You MUST use that exact count and MUST NOT replace it with other reasoning from model intuition, device-type assumptions, or chunk prose.
-  - If a split rule removes an original item, you MUST ignore the original unsplit item even when document chunks still mention it.
-  - For each retained test item, you MUST only output parameters listed under `PROJECT_PARAM_MAP[test_item]`. Do not invent extra parameters, do not copy parameters from removed items, and do not reuse conditional graph prose as final values when a rule override already resolved the item.
-  - `PROJECT_PARAM_VALUE_MAP` is the highest-priority graph answer key for parameter values, but you MUST obey its `resolution_mode`.
-  - If `resolution_mode=graph_final` and `value_text` is non-empty, you MUST use that value as the final answer and MUST NOT override it with document chunks, business defaults, device-type assumptions, or general reasoning.
-  - If `resolution_mode=needs_user_input`, you MUST combine the graph rule/value hint with the user's explicit device inputs and output the resolved final value instead of repeating the graph hint text.
-  - If `resolution_mode=needs_formula` or `resolution_mode=needs_condition`, you MUST resolve the formula/branching rule into a final value when the needed inputs and evidence are present; otherwise output `无法确定`.
-  - Use `Document Chunks` to supply citations or fill values only when `PROJECT_PARAM_VALUE_MAP` does not already provide a `graph_final` value for that parameter.
-  - If the answer cannot be found in the **Context**, state that you do not have enough information to answer. Do not attempt to guess.
+  - `PROJECT_PARAM_MAP` is the final parameter whitelist for each retained test item.
+  - `PROJECT_PARAM_VALUE_MAP` is the highest-priority parameter value source, subject to its `resolution_mode`.
+3. Apply runtime decisions exactly:
+  - If a rule decision conflicts with document chunks, graph hints, or general reasoning, follow the runtime decision.
+  - For split/merge/count behavior, use the runtime result exactly and do not restore removed originals or invent extra derived items.
+  - For each retained test item, only output parameters listed in `PROJECT_PARAM_MAP[test_item]`.
+  - In sections A/C/D, every test item name must use the final runtime display label exactly as given by `Allowed Final Test Items`. Never output internal, canonical, debug, or pre-display names such as names containing `#`.
+4. Resolve parameter values as final answers:
+  - If `resolution_mode=graph_final` and `value_text` is non-empty, use it directly as the final answer.
+  - If `resolution_mode=needs_user_input`, combine the graph hint with the user's explicit inputs and output the resolved final value.
+  - If `resolution_mode=needs_formula` or `resolution_mode=needs_condition`, resolve it into a final value when inputs and evidence are sufficient; otherwise output `无法确定`.
+  - Use `Document Chunks` mainly for citations and for filling values not already finalized by `PROJECT_PARAM_VALUE_MAP`.
+5. The response must be in the same language as the user query, use Markdown, and follow {response_type}.
+6. Additional Instructions are format/output constraints only. They must not override runtime rule decisions or graph-final values: {user_prompt}
+7. Include a `### References` section at the end using individual list items in the form `- [n] Document Title`, with at most 5 references. Do not output anything after the references.
 
-3. Formatting & Language:
-  - The response MUST be in the same language as the user query.
-  - The response MUST utilize Markdown formatting for enhanced clarity and structure (e.g., headings, bold text, bullet points).
-  - The response should be presented in {response_type}.
-  - Additional Instructions are format/output constraints only. They MUST NOT override `Resolved Rule Overrides`, `Domain Rule Decisions`, or `PROJECT_PARAM_VALUE_MAP`.
-  - If Additional Instructions specify required fields/parameters, you MUST output all of them. If any value is missing in the context, output "无法确定" for that field and cite the missing source in the References.
-
-4. References Section Format:
-  - The References section should be under heading: `### References`
-  - Reference list entries should adhere to the format: `* [n] Document Title`. Do not include a caret (`^`) after opening square bracket (`[`).
-  - The Document Title in the citation must retain its original language.
-  - Output each citation on an individual line
-  - Provide maximum of 5 most relevant citations.
-  - Do not generate footnotes section or any comment, summary, or explanation after the references.
-
-5. Reference Section Example:
-```
-### References
-
-- [1] Document Title One
-- [2] Document Title Two
-- [3] Document Title Three
-```
-
-6. Additional Instructions (lower priority than rule decisions and graph final values; format/output only): {user_prompt}
+If the answer cannot be found from the provided **Context**, state that you do not have enough information to answer.
 
 
 ---Context---
@@ -397,43 +367,13 @@ Consider the conversation history if provided to maintain conversational flow an
 
 ---Instructions---
 
-1. Step-by-Step Instruction:
-  - Carefully determine the user's query intent in the context of the conversation history to fully understand the user's information need.
-  - Scrutinize `Document Chunks` in the **Context**. Identify and extract all pieces of information that are directly relevant to answering the user query.
-  - Weave the extracted facts into a coherent and logical response. Your own knowledge must ONLY be used to formulate fluent sentences and connect ideas, NOT to introduce any external information.
-  - Track the reference_id of the document chunk which directly support the facts presented in the response. Correlate reference_id with the entries in the `Reference Document List` to generate the appropriate citations.
-  - Generate a **References** section at the end of the response. Each reference document must directly support the facts presented in the response.
-  - Do not generate anything after the reference section.
+1. Ground the answer strictly in the provided **Context**. Do not invent, assume, or infer facts that are not explicitly supported.
+2. Use `Document Chunks` as the only factual source and keep your own knowledge limited to wording and organization.
+3. The response must be in the same language as the user query, use Markdown, and follow {response_type}.
+4. Additional Instructions are format/output constraints only. They must not introduce or override business rules: {user_prompt}
+5. Include a `### References` section at the end using individual list items in the form `- [n] Document Title`, with at most 5 references. Do not output anything after the references.
 
-2. Content & Grounding:
-  - Strictly adhere to the provided context from the **Context**; DO NOT invent, assume, or infer any information not explicitly stated.
-  - If the answer cannot be found in the **Context**, state that you do not have enough information to answer. Do not attempt to guess.
-
-3. Formatting & Language:
-  - The response MUST be in the same language as the user query.
-  - The response MUST utilize Markdown formatting for enhanced clarity and structure (e.g., headings, bold text, bullet points).
-  - The response should be presented in {response_type}.
-  - Additional Instructions are format/output constraints only. They MUST NOT introduce or override business rules.
-  - If Additional Instructions specify required fields/parameters, you MUST output all of them. If any value is missing in the context, output "无法确定" for that field and cite the missing source in the References.
-
-4. References Section Format:
-  - The References section should be under heading: `### References`
-  - Reference list entries should adhere to the format: `* [n] Document Title`. Do not include a caret (`^`) after opening square bracket (`[`).
-  - The Document Title in the citation must retain its original language.
-  - Output each citation on an individual line
-  - Provide maximum of 5 most relevant citations.
-  - Do not generate footnotes section or any comment, summary, or explanation after the references.
-
-5. Reference Section Example:
-```
-### References
-
-- [1] Document Title One
-- [2] Document Title Two
-- [3] Document Title Three
-```
-
-6. Additional Instructions (format/output only): {user_prompt}
+If the answer cannot be found from the provided **Context**, state that you do not have enough information to answer.
 
 
 ---Context---

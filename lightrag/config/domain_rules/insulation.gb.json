@@ -440,7 +440,7 @@
       "domain": "short_circuit",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "作为状态检查的T10试验",
+      "test_item": "状态检查试验(T10)",
       "status": "active",
       "allow_when_any": [
         {
