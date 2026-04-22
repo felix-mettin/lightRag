@@ -1,10 +1,10 @@
 {
   "rules": [
     {
-      "rule_id": "insulation.gb.power_frequency_split",
+      "rule_id": "insulation.dlt.power_frequency_split",
       "domain": "insulation",
       "kind": "split",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "工频耐受电压试验",
       "status": "active",
       "remove_original": false,
@@ -48,10 +48,10 @@
       ]
     },
     {
-      "rule_id": "insulation.gb.power_frequency_joint_voltage_split",
+      "rule_id": "insulation.dlt.power_frequency_joint_voltage_split",
       "domain": "insulation",
       "kind": "split",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "工频耐受电压试验",
       "status": "active",
       "remove_original": false,
@@ -95,10 +95,10 @@
       ]
     },
     {
-      "rule_id": "insulation.gb.power_frequency_outdoor_state_split",
+      "rule_id": "insulation.dlt.power_frequency_outdoor_state_split",
       "domain": "insulation",
       "kind": "split",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "工频耐受电压试验",
       "status": "active",
       "inputs": {
@@ -137,10 +137,10 @@
       ]
     },
     {
-      "rule_id": "switching.gb.no_load_applicability",
+      "rule_id": "switching.dlt.no_load_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "空载特性测量",
       "status": "active",
       "allow_when_any": [
@@ -185,10 +185,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "insulation.gb.lightning_impulse_split",
+      "rule_id": "insulation.dlt.lightning_impulse_split",
       "domain": "insulation",
       "kind": "split",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "雷电冲击耐受电压试验",
       "status": "active",
       "remove_original": false,
@@ -233,10 +233,10 @@
       ]
     },
     {
-      "rule_id": "insulation.gb.lightning_impulse_joint_voltage_split",
+      "rule_id": "insulation.dlt.lightning_impulse_joint_voltage_split",
       "domain": "insulation",
       "kind": "split",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "雷电冲击耐受电压试验",
       "status": "active",
       "remove_original": false,
@@ -275,10 +275,10 @@
       ]
     },
     {
-      "rule_id": "short_circuit.gb.electrical_life_applicability",
+      "rule_id": "short_circuit.dlt.electrical_life_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "电寿命试验",
       "status": "active",
       "allow_when_any": [
@@ -304,10 +304,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.electrical_life_split_30",
+      "rule_id": "short_circuit.dlt.electrical_life_split_30",
       "domain": "short_circuit",
       "kind": "split",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "电寿命试验",
       "status": "active",
       "inputs": {
@@ -368,10 +368,10 @@
       ]
     },
     {
-      "rule_id": "short_circuit.gb.electrical_life_split_50",
+      "rule_id": "short_circuit.dlt.electrical_life_split_50",
       "domain": "short_circuit",
       "kind": "split",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "电寿命试验",
       "status": "active",
       "inputs": {
@@ -432,10 +432,10 @@
       ]
     },
     {
-      "rule_id": "short_circuit.gb.electrical_life_split",
+      "rule_id": "short_circuit.dlt.electrical_life_split",
       "domain": "short_circuit",
       "kind": "split",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "电寿命试验",
       "status": "active",
       "inputs": {
@@ -506,10 +506,10 @@
       ]
     },
     {
-      "rule_id": "short_circuit.gb.op1_applicability",
+      "rule_id": "short_circuit.dlt.op1_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "失步关合和开断试验(OP1)",
       "status": "active",
       "allow_when_any": [
@@ -540,10 +540,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.op2_applicability",
+      "rule_id": "short_circuit.dlt.op2_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "失步关合和开断试验(OP2)",
       "status": "active",
       "allow_when_any": [
@@ -571,10 +571,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.t10_applicability",
+      "rule_id": "short_circuit.dlt.t10_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "短路开断试验(T10)",
       "status": "active",
       "allow_when_any": [
@@ -587,10 +587,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.t30_applicability",
+      "rule_id": "short_circuit.dlt.t30_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "短路开断试验(T30)",
       "status": "active",
       "allow_when_any": [
@@ -603,10 +603,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.t60_applicability",
+      "rule_id": "short_circuit.dlt.t60_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "短路开断试验(T60)",
       "status": "active",
       "allow_when_any": [
@@ -619,10 +619,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.t100s_applicability",
+      "rule_id": "short_circuit.dlt.t100s_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "短路开断试验(T100s)",
       "status": "active",
       "allow_when_any": [
@@ -655,10 +655,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.state_check_t10_applicability",
+      "rule_id": "short_circuit.dlt.state_check_t10_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "状态检查试验（T10）",
       "status": "active",
       "allow_when_any": [
@@ -693,10 +693,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.gb.state_check_t10_applicability",
+      "rule_id": "switching.dlt.state_check_t10_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "状态检查试验（T10）",
       "status": "active",
       "allow_when_any": [
@@ -731,10 +731,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.single_phase_ground_fault_applicability",
+      "rule_id": "short_circuit.dlt.single_phase_ground_fault_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "单相接地故障试验",
       "status": "active",
       "allow_when_any": [
@@ -778,10 +778,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.phase_to_ground_fault_applicability",
+      "rule_id": "short_circuit.dlt.phase_to_ground_fault_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "异相接地故障试验",
       "status": "active",
       "allow_when_any": [
@@ -828,10 +828,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.l90_applicability",
+      "rule_id": "short_circuit.dlt.l90_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "近区故障试验(L90)",
       "status": "active",
       "allow_when_any": [
@@ -969,10 +969,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.l75_applicability",
+      "rule_id": "short_circuit.dlt.l75_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "近区故障试验(L75)",
       "status": "active",
       "allow_when_any": [
@@ -1110,10 +1110,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.gb.lc1_applicability",
+      "rule_id": "switching.dlt.lc1_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "容性电流开断试验(LC1)",
       "status": "active",
       "deny_when_any": [
@@ -1223,10 +1223,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.gb.lc2_applicability",
+      "rule_id": "switching.dlt.lc2_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "容性电流开断试验(LC2)",
       "status": "active",
       "deny_when_any": [
@@ -1327,10 +1327,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.gb.cc1_applicability",
+      "rule_id": "switching.dlt.cc1_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "容性电流开断试验(CC1)",
       "status": "active",
       "deny_when_any": [
@@ -1370,10 +1370,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.gb.cc2_applicability",
+      "rule_id": "switching.dlt.cc2_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "容性电流开断试验(CC2)",
       "status": "active",
       "deny_when_any": [
@@ -1474,10 +1474,10 @@
       "deny_when_no_match": true
     },
       {
-        "rule_id": "switching.gb.cc2_final_split",
+        "rule_id": "switching.dlt.cc2_final_split",
         "domain": "switching",
         "kind": "split",
-        "standard": "gb",
+        "standard": "dlt",
         "test_item": "容性电流开断试验(CC2)",
         "status": "active",
         "inputs": {
@@ -1516,10 +1516,10 @@
         ]
       },
       {
-        "rule_id": "switching.gb.lc2_final_split",
+        "rule_id": "switching.dlt.lc2_final_split",
         "domain": "switching",
         "kind": "split",
-        "standard": "gb",
+        "standard": "dlt",
         "test_item": "容性电流开断试验(LC2)",
         "status": "active",
         "inputs": {
@@ -1558,10 +1558,10 @@
         ]
       },
     {
-      "rule_id": "insulation.gb.lightning_impulse_applicability",
+      "rule_id": "insulation.dlt.lightning_impulse_applicability",
       "domain": "insulation",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "雷电冲击耐受电压试验",
       "status": "active",
       "allow_when_any": [
@@ -1577,10 +1577,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "insulation.gb.switching_impulse_joint_voltage_split",
+      "rule_id": "insulation.dlt.switching_impulse_joint_voltage_split",
       "domain": "insulation",
       "kind": "split",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "操作冲击耐受电压试验",
       "status": "active",
       "remove_original": false,
@@ -1623,10 +1623,10 @@
       ]
     },
     {
-      "rule_id": "insulation.gb.switching_impulse_wet_split",
+      "rule_id": "insulation.dlt.switching_impulse_wet_split",
       "domain": "insulation",
       "kind": "split",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "操作冲击耐受电压试验",
       "status": "active",
       "remove_original": false,
@@ -1678,10 +1678,10 @@
       ]
     },
     {
-      "rule_id": "insulation.gb.switching_impulse_applicability",
+      "rule_id": "insulation.dlt.switching_impulse_applicability",
       "domain": "insulation",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "操作冲击耐受电压试验",
       "status": "active",
       "allow_when_any": [
@@ -1696,10 +1696,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.state_check_pf_applicability",
+      "rule_id": "short_circuit.dlt.state_check_pf_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "作为状态检查的工频耐受电压试验",
       "status": "active",
       "allow_when_any": [
@@ -1718,6 +1718,13 @@
               "label": "额定电压",
               "value": 40.5,
               "unit": "kV"
+            },
+            {
+              "source": "query",
+              "type": "contains_any",
+              "labels": [
+                "真空"
+              ]
             }
           ]
         }
@@ -1725,10 +1732,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.gb.state_check_pf_applicability",
+      "rule_id": "switching.dlt.state_check_pf_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "作为状态检查的工频耐受电压试验",
       "status": "active",
       "allow_when_any": [
@@ -1754,7 +1761,8 @@
               "labels": [
                 "短路",
                 "容性",
-                "电寿命"
+                "电寿命",
+                "真空"
               ]
             }
           ]
@@ -1763,10 +1771,82 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.gb.bc1_applicability",
+      "rule_id": "short_circuit.dlt.lei_dian_chogn_ji_state",
+      "domain": "short_circuit",
+      "kind": "applicability",
+      "standard": "dlt",
+      "test_item": "作为状态检查的雷电冲击耐受电压试验",
+      "status": "active",
+      "allow_when_any": [
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "短路性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "less_or_equal_numeric",
+              "label": "额定电压",
+              "value": 72.5,
+              "unit": "kV"
+            },
+            {
+              "source": "query",
+              "type": "contains_any",
+              "labels": [
+                "真空"
+              ]
+            }
+          ]
+        }
+      ],
+      "deny_when_no_match": true
+    },
+    {
+      "rule_id": "switching.dlt.lei_dian_chogn_ji_state",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
+      "test_item": "作为状态检查的雷电冲击耐受电压试验",
+      "status": "active",
+      "allow_when_any": [
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "开合性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "less_or_equal_numeric",
+              "label": "额定电压",
+              "value": 72.5,
+              "unit": "kV"
+            },
+            {
+              "source": "query",
+              "type": "contains_any",
+              "labels": [
+                "真空"
+              ]
+            }
+          ]
+        }
+      ],
+      "deny_when_no_match": true
+    },
+    {
+      "rule_id": "switching.dlt.bc1_applicability",
+      "domain": "switching",
+      "kind": "applicability",
+      "standard": "dlt",
       "test_item": "容性电流开断试验(BC1)",
       "status": "active",
       "deny_when_any": [
@@ -1869,10 +1949,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.gb.bc2_applicability",
+      "rule_id": "switching.dlt.bc2_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "容性电流开断试验(BC2)",
       "status": "active",
       "deny_when_any": [
@@ -1975,10 +2055,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.no_load_applicability",
+      "rule_id": "short_circuit.dlt.no_load_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "空载特性测量",
       "status": "active",
       "allow_when_any": [
@@ -2023,10 +2103,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "insulation.gb.loop_resistance_applicability",
+      "rule_id": "insulation.dlt.loop_resistance_applicability",
       "domain": "insulation",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "前后回路电阻测量试验",
       "status": "active",
       "allow_when_any": [
@@ -2039,10 +2119,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "insulation.gb.partial_discharge_applicability",
+      "rule_id": "insulation.dlt.partial_discharge_applicability",
       "domain": "insulation",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "局部放电试验",
       "status": "active",
       "allow_when_any": [
@@ -2059,10 +2139,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "insulation.gb.partial_discharge_count",
+      "rule_id": "insulation.dlt.partial_discharge_count",
       "domain": "insulation",
       "kind": "count",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "局部放电试验",
       "status": "active",
       "inputs": {
@@ -2093,10 +2173,10 @@
       }
     },
     {
-      "rule_id": "switching.gb.bc1_60hz_applicability",
+      "rule_id": "switching.dlt.bc1_60hz_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "BC1(60HZ)",
       "status": "active",
       "allow_when_any": [
@@ -2202,10 +2282,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.gb.bc2_60hz_applicability",
+      "rule_id": "switching.dlt.bc2_60hz_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "BC2(60HZ)",
       "status": "active",
       "allow_when_any": [
@@ -2315,10 +2395,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.gb.cc1_60hz_applicability",
+      "rule_id": "switching.dlt.cc1_60hz_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "CC1(60HZ)",
       "status": "active",
       "allow_when_any": [
@@ -2422,10 +2502,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.gb.cc2_60hz_applicability",
+      "rule_id": "switching.dlt.cc2_60hz_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "CC2(60HZ)",
       "status": "active",
       "allow_when_any": [
@@ -2487,10 +2567,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.l75_60hz_applicability",
+      "rule_id": "short_circuit.dlt.l75_60hz_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "L75(60HZ)",
       "status": "active",
       "allow_when_any": [
@@ -2656,10 +2736,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.l90_60hz_applicability",
+      "rule_id": "short_circuit.dlt.l90_60hz_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "L90(60HZ)",
       "status": "active",
       "allow_when_any": [
@@ -2825,10 +2905,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.gb.lc1_60hz_applicability",
+      "rule_id": "switching.dlt.lc1_60hz_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "LC1(60HZ)",
       "status": "active",
       "allow_when_any": [
@@ -2936,10 +3016,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.gb.lc2_60hz_applicability",
+      "rule_id": "switching.dlt.lc2_60hz_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "LC2(60HZ)",
       "status": "active",
       "allow_when_any": [
@@ -3047,10 +3127,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.op2_making_applicability",
+      "rule_id": "short_circuit.dlt.op2_making_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "OP2关合",
       "status": "active",
       "allow_when_any": [
@@ -3081,10 +3161,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.t10_60hz_applicability",
+      "rule_id": "short_circuit.dlt.t10_60hz_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "T10(60Hz)",
       "status": "active",
       "allow_when_any": [
@@ -3110,10 +3190,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.t100a_60hz_applicability",
+      "rule_id": "short_circuit.dlt.t100a_60hz_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "T100A(60HZ)",
       "status": "active",
       "allow_when_any": [
@@ -3139,10 +3219,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.t100s_60hz_applicability",
+      "rule_id": "short_circuit.dlt.t100s_60hz_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "T100S(60HZ)",
       "status": "active",
       "allow_when_any": [
@@ -3175,10 +3255,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.t100s_a_applicability",
+      "rule_id": "short_circuit.dlt.t100s_a_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "T100s（a）",
       "status": "active",
       "allow_when_any": [
@@ -3211,10 +3291,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.t100s_b_applicability",
+      "rule_id": "short_circuit.dlt.t100s_b_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "T100s（b）",
       "status": "active",
       "allow_when_any": [
@@ -3247,10 +3327,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.t100s_a_60hz_applicability",
+      "rule_id": "short_circuit.dlt.t100s_a_60hz_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "T100s(a)(60Hz)",
       "status": "active",
       "allow_when_any": [
@@ -3283,10 +3363,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.t100s_b_60hz_applicability",
+      "rule_id": "short_circuit.dlt.t100s_b_60hz_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "T100s(b)(60Hz)",
       "status": "active",
       "allow_when_any": [
@@ -3319,10 +3399,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.t60_60hz_applicability",
+      "rule_id": "short_circuit.dlt.t60_60hz_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "T60(60HZ)",
       "status": "active",
       "allow_when_any": [
@@ -3348,10 +3428,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.gb.t60_preparatory_applicability",
+      "rule_id": "switching.dlt.t60_preparatory_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "T60(预备试验)",
       "status": "active",
       "allow_when_any": [
@@ -3371,10 +3451,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.three_phase_mechanism_verify_applicability",
+      "rule_id": "short_circuit.dlt.three_phase_mechanism_verify_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "三相共机构验证",
       "status": "active",
       "allow_when_any": [
@@ -3405,10 +3485,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "insulation.gb.full_insulation_type_test_applicability",
+      "rule_id": "insulation.dlt.full_insulation_type_test_applicability",
       "domain": "insulation",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "全套绝缘型式试验",
       "status": "active",
       "allow_when_any": [
@@ -3437,10 +3517,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.short_peak_current_merge",
+      "rule_id": "short_circuit.dlt.short_peak_current_merge",
       "domain": "short_circuit",
       "kind": "pair_merge",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "短时耐受电流试验",
       "secondary_test_item": "峰值耐受电流试验",
       "status": "active",
@@ -3463,10 +3543,10 @@
       }
     },
     {
-      "rule_id": "short_circuit.gb.peak_withstand_current_applicability",
+      "rule_id": "short_circuit.dlt.peak_withstand_current_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "峰值耐受电流试验",
       "status": "active",
       "allow_when_any": [
@@ -3495,10 +3575,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "insulation.gb.control_aux_insulation_applicability",
+      "rule_id": "insulation.dlt.control_aux_insulation_applicability",
       "domain": "insulation",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "控制和辅助回路的绝缘试验",
       "status": "active",
       "allow_when_any": [
@@ -3511,10 +3591,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.t100a_applicability",
+      "rule_id": "short_circuit.dlt.t100a_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "短路开断试验(T100A)",
       "status": "active",
       "allow_when_any": [
@@ -3540,10 +3620,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.t100s_sym_applicability",
+      "rule_id": "short_circuit.dlt.t100s_sym_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "短路开断试验(T100S)",
       "status": "active",
       "allow_when_any": [
@@ -3569,10 +3649,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "temperature_rise.gb.aux_control_temp_rise_applicability",
+      "rule_id": "temperature_rise.dlt.aux_control_temp_rise_applicability",
       "domain": "temperature_rise",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "辅助和控制回路温升试验",
       "status": "active",
       "allow_when_any": [
@@ -3585,10 +3665,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "temperature_rise.gb.continuous_current_applicability",
+      "rule_id": "temperature_rise.dlt.continuous_current_applicability",
       "domain": "temperature_rise",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "连续电流试验",
       "status": "active",
       "allow_when_any": [
@@ -3612,10 +3692,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "temperature_rise.gb.continuous_current_60hz_applicability",
+      "rule_id": "temperature_rise.dlt.continuous_current_60hz_applicability",
       "domain": "temperature_rise",
       "kind": "applicability",
-      "standard": "gb",
+      "standard": "dlt",
       "test_item": "连续电流试验(60HZ)",
       "status": "active",
       "allow_when_any": [

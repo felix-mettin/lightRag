@@ -239,13 +239,15 @@ def _split_name_and_value(raw_name: str) -> tuple[str, str]:
 
 def _infer_value_source(value_text: str, note_text: str) -> str:
     merged = f"{value_text} {note_text}".strip()
+    # 先检查是否是公式（包含计算符号）
+    if any(token in merged for token in ("计算", "公式", "%", "×", "*", "/", "÷", "+", "-", "=")):
+        return "formula"
+    # 再检查是否需要用户输入
     if any(
             token in merged
             for token in ("用户录入", "用户输入", "用户提供", "客户录入", "客户输入", "客户提供")
     ):
         return "user_input"
-    if any(token in merged for token in ("计算", "公式", "%", "×", "*")):
-        return "formula"
     if "默认" in merged:
         return "default"
     return "standard"
@@ -6587,6 +6589,10 @@ def _build_controlled_nodes_edges(
         if any(p in merged for p in placeholders):
             return True
 
+        # formula类型参数通常包含计算表达式，不应被过滤
+        if value_source == "formula":
+            return False
+
         # Drop reference-only texts (e.g. "按 GB/Txxxx 规定", "T11022-2011规定")
         # when they do not contain executable values/defaults/enums.
         ref_markers = ("规定", "依据", "按照", "见")
@@ -6662,8 +6668,9 @@ def _build_controlled_nodes_edges(
             return False
         if "\n" in text:
             return True
-        # Drop long prose-like texts that usually come from clause narration leakage.
-        if len(text) > 80 and any(token in text for token in ("。", "；", "，", "适用于", "规定了", "应装设")):
+        # 不再过滤长文本，因为公式类型参数通常包含较长表达式
+        # 只过滤明显是条款叙述泄漏的文本
+        if any(token in text for token in ("适用于", "规定了", "应装设", "本标准", "本规范")):
             return True
         return False
 
