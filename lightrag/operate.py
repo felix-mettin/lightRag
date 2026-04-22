@@ -148,6 +148,33 @@ def _uses_normal_count_label(test_name: str | None) -> bool:
     )
 
 
+def _normalize_count_param_names(
+    test_name: str | None,
+    param_names: list[str] | None,
+) -> list[str]:
+    preferred_count_name = "正常次数" if _uses_normal_count_label(test_name) else "试验次数"
+    fallback_count_name = "试验次数" if preferred_count_name == "正常次数" else "正常次数"
+    normalized_params: list[str] = []
+    count_inserted = False
+
+    for raw_param_name in param_names or []:
+        param_name = str(raw_param_name or "").strip()
+        if not param_name:
+            continue
+        if param_name in {"试验次数", "正常次数"}:
+            if count_inserted:
+                continue
+            normalized_params.append(preferred_count_name)
+            count_inserted = True
+            continue
+        normalized_params.append(param_name)
+
+    if not count_inserted and fallback_count_name in normalized_params:
+        normalized_params.append(preferred_count_name)
+
+    return _dedupe_preserve_order(normalized_params)
+
+
 def _dedupe_preserve_order(values: list[str] | None) -> list[str]:
     result: list[str] = []
     seen: set[str] = set()
@@ -2971,11 +2998,18 @@ def _apply_domain_rule_decisions_to_project_context(
                 if not target_name:
                     continue
                 target_params = _get_config_required_params(target_name) or list(source_params)
-                updated_param_map[target_name] = list(target_params)
+                updated_param_map[target_name] = _normalize_count_param_names(
+                    target_name,
+                    list(target_params),
+                )
                 inherited_value_map: dict[str, dict[str, str]] = {}
-                for param_name in target_params:
+                for param_name in updated_param_map[target_name]:
                     if param_name in source_values:
                         inherited_value_map[param_name] = deepcopy(source_values[param_name])
+                    elif param_name == "正常次数" and "试验次数" in source_values:
+                        inherited_value_map[param_name] = deepcopy(source_values["试验次数"])
+                    elif param_name == "试验次数" and "正常次数" in source_values:
+                        inherited_value_map[param_name] = deepcopy(source_values["正常次数"])
                 updated_value_map[target_name] = inherited_value_map
                 additional_params = split_output.get("additional_params", []) or []
                 if isinstance(additional_params, list):
@@ -3923,7 +3957,11 @@ def _build_test_item_display_map(project_param_map: dict[str, list[str]]) -> dic
         name = str(test_name or "").strip()
         if not name:
             continue
-        if "#" in name:
+        if name.endswith("#干"):
+            display_map[name] = f"{name[:-2]}(干)"
+        elif name.endswith("#湿"):
+            display_map[name] = f"{name[:-2]}(湿)"
+        elif "#" in name:
             display_map[name] = name.split("#", 1)[0]
         else:
             display_map[name] = name
@@ -3978,17 +4016,19 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "工频耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
         "工频耐受电压试验(干)":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
         "工频耐受电压试验(湿)":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
+        "工频耐受电压试验#干":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
+        "工频耐受电压试验#湿":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
         "工频耐受电压试验(断口)":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
         "工频耐受电压试验(相间及对地)":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
         "工频耐受电压试验(联合电压)":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
         "雷电冲击耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","额定直流电压(±)","放电次数"},
-        "雷电冲击耐受电压试验(断口)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)"},
-        "雷电冲击耐受电压试验(相间及对地)": {"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)"},
-        "雷电冲击耐受电压试验(联合电压)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)"},
-        "操作冲击耐受电压试验(联合电压)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)"},
-        "操作冲击耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)"},
-        "操作冲击耐受电压试验(湿)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)"},
-        "操作冲击耐受电压试验(干)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)"},
+        "雷电冲击耐受电压试验(断口)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
+        "雷电冲击耐受电压试验(相间及对地)": {"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
+        "雷电冲击耐受电压试验(联合电压)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
+        "操作冲击耐受电压试验(联合电压)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
+        "操作冲击耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
+        "操作冲击耐受电压试验(湿)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
+        "操作冲击耐受电压试验(干)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
         "局部放电试验":{"辅助和控制设备的电阻","SF6气体的最低功能压力(20℃表压)","回路电阻(μΩ)","回路电阻"},
         "前后回路电阻测量试验":{"回路电阻","辅助和控制设备的电阻"},
         "连续电流试验":{"是否所配元件","SF6气体的最低功能压力(20℃表压)","材料绝热等级"},
@@ -4059,10 +4099,7 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "LC1(60Hz)":{"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电"},
         "LC2(60Hz)":{"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电"},
         "T100s(a)(60Hz)":{"外壳是否带电","SF6气体的最低功能压力(20℃表压)"},
-        "T100s(b)(60Hz)": {
-        "金短时间",
-        "外壳是否带电",
-        "SF6气体的最低功能压力(20℃表压)"},
+        "T100s(b)(60Hz)": {"金短时间","外壳是否带电","SF6气体的最低功能压力(20℃表压)"},
         "短路开断试验(T10)": {"外壳是否带电", "失败次数","SF6气体的最低功能压力(20℃表压)"},
         "短路开断试验(T30)": {"外壳是否带电", "失败次数","SF6气体的最低功能压力(20℃表压)"},
         "短路开断试验(T60)": {"外壳是否带电", "失败次数","SF6气体的最低功能压力(20℃表压)"},
@@ -4345,6 +4382,8 @@ def _postprocess_electrical_markdown_response(
     metadata = raw_data.get("metadata", {}) if isinstance(raw_data, dict) else {}
     allowed_items = metadata.get("allowed_final_test_items", []) or []
     removed_items = metadata.get("removed_test_items", []) or []
+    allowed_items_raw = metadata.get("allowed_final_test_items_raw", allowed_items) or []
+    removed_items_raw = metadata.get("removed_test_items_raw", removed_items) or []
     value_map = metadata.get("project_param_value_map", {}) or {}
     param_map = metadata.get("project_param_map", {}) or {}
     display_map = metadata.get("test_item_display_map", {}) or {}
@@ -4358,10 +4397,10 @@ def _postprocess_electrical_markdown_response(
         if str(k).strip() and str(v).strip()
     }
     ordered_allowed_items = [
-        str(item).strip() for item in allowed_items if str(item).strip()
+        str(item).strip() for item in allowed_items_raw if str(item).strip()
     ]
     allowed_set = set(ordered_allowed_items)
-    removed_set = set(str(item).strip() for item in removed_items if str(item).strip())
+    removed_set = set(str(item).strip() for item in removed_items_raw if str(item).strip())
     allowed_display_set = {
         normalized_display_map.get(item, item) for item in allowed_set
     }
@@ -4492,7 +4531,7 @@ def _postprocess_electrical_markdown_response(
                 if canonical_name in allowed_set or (
                     display_name in allowed_display_set and display_name not in removed_display_set
                 ):
-                    filtered.append(line)
+                    filtered.append(f"- {display_name}")
                     seen_items.add(canonical_name or item)
             else:
                 filtered.append(line)
@@ -4542,7 +4581,10 @@ def _postprocess_electrical_markdown_response(
             ):
                 seen_items.add(canonical_name)
                 seen_param_names: set[str] = set()
-                for block_line in current_block:
+                for index, block_line in enumerate(current_block):
+                    if index == 0 and current_name:
+                        filtered.append(f"## 试验项目：{display_name}")
+                        continue
                     if block_line.lstrip().startswith("- "):
                         match = re.match(r"^\s*-\s*([^：:]+)[：:]", block_line)
                         if match:
@@ -4603,8 +4645,12 @@ def _postprocess_electrical_markdown_response(
                 if canonical_name in allowed_set or (
                     display_name in allowed_display_set and display_name not in removed_display_set
                 ):
-                    filtered.append(line)
-                    total_items.append((display_name, stripped.split(count_label, 1)[1].strip()))
+                    count_text = stripped.split(count_label, 1)[1].strip()
+                    preferred_count_label = (
+                        "正常次数" if _uses_normal_count_label(canonical_name) else "试验次数"
+                    )
+                    filtered.append(f"- {display_name}{preferred_count_label}：{count_text}")
+                    total_items.append((display_name, count_text))
                     seen_items.add(canonical_name or item)
                 continue
             if stripped.startswith("- 绝缘性能型式试验总次数："):
@@ -11982,6 +12028,16 @@ async def _build_context_str(
             {str(item).strip() for item in (removed_test_items + scoped_out_test_items) if str(item).strip()}
         )
     test_item_display_map = _build_test_item_display_map(display_project_param_map)
+    allowed_final_test_items_display = [
+        test_item_display_map.get(str(item).strip(), str(item).strip())
+        for item in allowed_final_test_items
+        if str(item).strip()
+    ]
+    removed_test_items_display = [
+        test_item_display_map.get(str(item).strip(), str(item).strip())
+        for item in removed_test_items
+        if str(item).strip()
+    ]
     entities_context, relations_context = _filter_context_by_final_test_item_scope(
         entities_context,
         relations_context,
@@ -12008,13 +12064,13 @@ async def _build_context_str(
         else "{}"
     )
     allowed_final_test_items_str = (
-        json.dumps(allowed_final_test_items, ensure_ascii=False, indent=2)
-        if allowed_final_test_items
+        json.dumps(allowed_final_test_items_display, ensure_ascii=False, indent=2)
+        if allowed_final_test_items_display
         else "[]"
     )
     removed_test_items_str = (
-        json.dumps(removed_test_items, ensure_ascii=False, indent=2)
-        if removed_test_items
+        json.dumps(removed_test_items_display, ensure_ascii=False, indent=2)
+        if removed_test_items_display
         else "[]"
     )
     test_item_display_map_str = (
@@ -12203,12 +12259,14 @@ async def _build_context_str(
     final_data["metadata"]["project_param_value_map_raw"] = project_param_value_map_raw
     final_data["metadata"]["project_param_value_map"] = display_project_param_value_map
     final_data["metadata"]["current_report_scopes"] = current_report_scopes
-    final_data["metadata"]["project_param_value_map"] = project_param_value_map
+    final_data["metadata"]["project_param_value_map_display"] = display_project_param_value_map
     final_data["metadata"]["rule_query_text"] = rule_query_text
     final_data["metadata"]["domain_rule_decisions"] = domain_rule_decisions
     final_data["metadata"]["resolved_rule_overrides"] = resolved_rule_overrides
-    final_data["metadata"]["allowed_final_test_items"] = allowed_final_test_items
-    final_data["metadata"]["removed_test_items"] = removed_test_items
+    final_data["metadata"]["allowed_final_test_items_raw"] = allowed_final_test_items
+    final_data["metadata"]["allowed_final_test_items"] = allowed_final_test_items_display
+    final_data["metadata"]["removed_test_items_raw"] = removed_test_items
+    final_data["metadata"]["removed_test_items"] = removed_test_items_display
     final_data["metadata"]["test_item_display_map"] = test_item_display_map
     final_data["metadata"]["project_split_rules"] = {
         "pf_fracture_enabled": fracture_pf_enabled,
