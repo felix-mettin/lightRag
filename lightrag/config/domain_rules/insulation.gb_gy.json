@@ -7,7 +7,7 @@
       "standard": "gb",
       "test_item": "工频耐受电压试验",
       "status": "active",
-      "remove_original": false,
+      "remove_original": true,
       "inputs": {
         "base_voltage_labels": [
           "额定短时工频耐受电压",
@@ -33,9 +33,12 @@
       },
       "split_output": [
         {
-          "test_item": "工频耐受电压试验",
+          "test_item": "工频耐受电压试验(相间及对地)",
           "inherits_from": "工频耐受电压试验",
-          "parameter_overrides": {}
+          "parameter_overrides": {
+            "试验部位": "相间及对地",
+            "试验状态": "干"
+          }
         },
         {
           "test_item": "工频耐受电压试验(断口)",
@@ -191,7 +194,7 @@
       "standard": "gb",
       "test_item": "雷电冲击耐受电压试验",
       "status": "active",
-      "remove_original": false,
+      "remove_original": true,
       "inputs": {
         "base_voltage_labels": [
           "额定雷电冲击耐受电压"
@@ -800,27 +803,6 @@
               "label": "首开极系数",
               "value": 1.5,
               "unit": ""
-            }
-          ]
-        },
-        {
-          "source": "query",
-          "type": "all",
-          "conditions": [
-            {
-              "source": "query",
-              "type": "contains",
-              "label": "短路性能型式试验"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "首开极系数"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "首开极系数kpp"
             }
           ]
         }
@@ -1583,7 +1565,7 @@
       "standard": "gb",
       "test_item": "操作冲击耐受电压试验",
       "status": "active",
-      "remove_original": false,
+      "remove_original": true,
       "inputs": {
         "trigger_when_any": [
           {
@@ -1660,7 +1642,7 @@
       },
       "split_output": [
         {
-          "test_item": "操作冲击耐受电压试验",
+          "test_item": "操作冲击耐受电压试验(干)",
           "inherits_from": "操作冲击耐受电压试验",
           "parameter_overrides": {
             "试验状态": "干",

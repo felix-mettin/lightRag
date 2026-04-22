@@ -1949,6 +1949,7 @@ def _evaluate_domain_rule_decisions(
             base_kv = None
             fracture_kv = None
             fracture_provided = False
+            remove_original = bool(raw_rule.get("remove_original", True))
 
             single_output = raw_rule.get("single_output", {}) or {}
             split_outputs = raw_rule.get("split_output", []) or []
@@ -2002,7 +2003,7 @@ def _evaluate_domain_rule_decisions(
                     if rated_voltage_kv is not None and rated_voltage_kv > 252:
                         split_outputs = [
                             {
-                                "test_item": "工频耐受电压试验#干",
+                                "test_item": "工频耐受电压试验(相间及对地)",
                                 "inherits_from": "工频耐受电压试验",
                                 "parameter_overrides": {
                                     "试验部位": "相间及对地",
@@ -2011,11 +2012,11 @@ def _evaluate_domain_rule_decisions(
                                 },
                             }
                         ]
-                        reason_text = "高压户外工频试验保留联合电压，同时将相间及对地结果收敛为干态输出。"
+                        reason_text = "额定电压高于252kV时，高压户外工频不再设置湿态原项，仅保留相间及对地干态项，联合电压由高压联合电压规则承载。"
                     elif rated_voltage_kv is not None and rated_voltage_kv > 40.5:
                         split_outputs = [
                             {
-                                "test_item": "工频耐受电压试验#干",
+                                "test_item": "工频耐受电压试验(相间及对地)",
                                 "inherits_from": "工频耐受电压试验",
                                 "parameter_overrides": {
                                     "试验部位": "相间及对地",
@@ -2024,7 +2025,7 @@ def _evaluate_domain_rule_decisions(
                                 },
                             },
                             {
-                                "test_item": "工频耐受电压试验#湿",
+                                "test_item": "工频耐受电压试验",
                                 "inherits_from": "工频耐受电压试验",
                                 "parameter_overrides": {
                                     "试验部位": "相间及对地",
@@ -2033,7 +2034,92 @@ def _evaluate_domain_rule_decisions(
                                 },
                             },
                         ]
-                        reason_text = "高压户外工频试验保留联合电压，同时将相间及对地拆分为干态和湿态两条输出。"
+                        reason_text = "高压户外工频试验将相间及对地拆分为干态显式项和湿态原项，联合电压由高压联合电压规则承载。"
+                joint_voltage_rule_id = rule_id
+                if normalized_stand_type == "DLT":
+                    joint_voltage_rule_id = "insulation.dlt.power_frequency_joint_voltage_split"
+                elif normalized_stand_type == "IEC":
+                    joint_voltage_rule_id = "insulation.gb.power_frequency_joint_voltage_split"
+                else:
+                    joint_voltage_rule_id = "insulation.gb.power_frequency_joint_voltage_split"
+                if (
+                    rule_id == joint_voltage_rule_id
+                    and split_enabled
+                    and rated_voltage_kv is not None
+                    and rated_voltage_kv > 252
+                    and ("户外产品" in query or "户外" in query)
+                ):
+                    split_outputs = [
+                        {
+                            "test_item": "工频耐受电压试验(联合电压)",
+                            "inherits_from": "工频耐受电压试验",
+                            "parameter_overrides": {
+                                "试验部位": "断口",
+                                "试验状态": "干"
+                            },
+                            "additional_params": ["交流电压(辅)"],
+                        }
+                    ]
+                    reason_text = "额定电压高于252kV且命中户外条件时，高压工频联合电压仅保留干态联合电压项，不再复用原项。"
+                switching_joint_voltage_rule_id = rule_id
+                if normalized_stand_type == "DLT":
+                    switching_joint_voltage_rule_id = "insulation.dlt.switching_impulse_joint_voltage_split"
+                elif normalized_stand_type == "IEC":
+                    switching_joint_voltage_rule_id = "insulation.iec.switching_impulse_joint_voltage_split"
+                else:
+                    switching_joint_voltage_rule_id = "insulation.gb.switching_impulse_joint_voltage_split"
+                if (
+                    rule_id == switching_joint_voltage_rule_id
+                    and split_enabled
+                    and rated_voltage_kv is not None
+                    and rated_voltage_kv > 252
+                    and ("户外产品" in query or "户外" in query)
+                ):
+                    remove_original = True
+                    split_outputs = [
+                        {
+                            "test_item": "操作冲击耐受电压试验(干)",
+                            "inherits_from": "操作冲击耐受电压试验",
+                            "parameter_overrides": {
+                                "试验部位": "相间及对地",
+                                "试验状态": "干"
+                            },
+                        },
+                        {
+                            "test_item": "操作冲击耐受电压试验(湿)",
+                            "inherits_from": "操作冲击耐受电压试验",
+                            "parameter_overrides": {
+                                "试验部位": "相间及对地",
+                                "试验状态": "湿"
+                            },
+                        },
+                        {
+                            "test_item": "操作冲击耐受电压试验(联合电压)",
+                            "inherits_from": "操作冲击耐受电压试验",
+                            "parameter_overrides": {
+                                "试验部位": "断口",
+                                "试验状态": "干"
+                            },
+                        }
+                    ]
+                    reason_text = "额定电压高于252kV且命中户外条件时，操作冲击耐受电压试验拆分为相间及对地(干)、相间及对地(湿)和联合电压(干)，并移除原项。"
+                switching_wet_rule_id = rule_id
+                if normalized_stand_type == "DLT":
+                    switching_wet_rule_id = "insulation.dlt.switching_impulse_wet_split"
+                elif normalized_stand_type == "IEC":
+                    switching_wet_rule_id = "insulation.iec.switching_impulse_wet_split"
+                else:
+                    switching_wet_rule_id = "insulation.gb.switching_impulse_wet_split"
+                if (
+                    rule_id == switching_wet_rule_id
+                    and split_enabled
+                    and rated_voltage_kv is not None
+                    and rated_voltage_kv > 252
+                    and ("户外产品" in query or "户外" in query)
+                ):
+                    split_enabled = False
+                    reason_code = "delegated_to_switching_joint_voltage_split"
+                    reason_text = "户外高压操作冲击的干/湿/联合电压拆分由联合电压规则统一承载，湿态补充分裂规则不再重复生效。"
             else:
                 if not isinstance(base_labels, list) or not isinstance(fracture_labels, list):
                     continue
@@ -2088,36 +2174,72 @@ def _evaluate_domain_rule_decisions(
                     and split_enabled
                     and ("户外产品" in query or "户外" in query)
                 ):
-                    split_outputs = [
-                        {
-                            "test_item": "工频耐受电压试验",
-                            "inherits_from": "工频耐受电压试验",
-                            "parameter_overrides": {
-                                "试验部位": "相间、对地",
-                                "试验状态": "干",
-                                "正常次数": "9次",
+                    if rated_voltage_kv is not None and rated_voltage_kv > 252:
+                        split_outputs = [
+                            {
+                                "test_item": "工频耐受电压试验(相间及对地)",
+                                "inherits_from": "工频耐受电压试验",
+                                "parameter_overrides": {
+                                    "试验部位": "相间及对地",
+                                    "试验状态": "干",
+                                    "正常次数": "9次",
+                                },
+                            }
+                        ]
+                        reason_text = "断口工频值严格大于本体值且命中户外条件，但额定电压高于252kV时不再设置湿态原项，断口侧由联合电压规则承载，仅保留相间及对地干态项。"
+                    elif rated_voltage_kv is not None and rated_voltage_kv > 40.5:
+                        split_outputs = [
+                            {
+                                "test_item": "工频耐受电压试验(相间及对地)",
+                                "inherits_from": "工频耐受电压试验",
+                                "parameter_overrides": {
+                                    "试验部位": "相间及对地",
+                                    "试验状态": "干",
+                                    "正常次数": "9次",
+                                },
                             },
-                        },
-                        {
-                            "test_item": "工频耐受电压试验(相间及对地)",
-                            "inherits_from": "工频耐受电压试验",
-                            "parameter_overrides": {
-                                "试验部位": "相间及对地",
-                                "试验状态": "湿",
-                                "正常次数": "9次",
+                            {
+                                "test_item": "工频耐受电压试验",
+                                "inherits_from": "工频耐受电压试验",
+                                "parameter_overrides": {
+                                    "试验部位": "相间及对地",
+                                    "试验状态": "湿",
+                                    "正常次数": "9次",
+                                },
                             },
-                        },
-                        {
-                            "test_item": "工频耐受电压试验(断口)",
-                            "inherits_from": "工频耐受电压试验",
-                            "parameter_overrides": {
-                                "试验部位": "开关断口",
-                                "试验状态": "干",
-                                "正常次数": "6次",
+                        ]
+                        reason_text = "断口工频值严格大于本体值且命中户外条件，在40.5kV以上且不高于252kV时，工频拆分为相间及对地(干)和原项承载的相间及对地(湿)，断口侧由联合电压规则承载。"
+                    else:
+                        split_outputs = [
+                            {
+                                "test_item": "工频耐受电压试验(相间及对地)",
+                                "inherits_from": "工频耐受电压试验",
+                                "parameter_overrides": {
+                                    "试验部位": "相间及对地",
+                                    "试验状态": "干",
+                                    "正常次数": "9次",
+                                },
                             },
-                        },
-                    ]
-                    reason_text = "断口工频值严格大于本体值且命中户外条件，工频耐受电压试验拆分为原项目(干)、相间及对地(湿)、断口(干)。"
+                            {
+                                "test_item": "工频耐受电压试验",
+                                "inherits_from": "工频耐受电压试验",
+                                "parameter_overrides": {
+                                    "试验部位": "相间及对地",
+                                    "试验状态": "湿",
+                                    "正常次数": "9次",
+                                },
+                            },
+                            {
+                                "test_item": "工频耐受电压试验(断口)",
+                                "inherits_from": "工频耐受电压试验",
+                                "parameter_overrides": {
+                                    "试验部位": "开关断口",
+                                    "试验状态": "干",
+                                    "正常次数": "6次",
+                                },
+                            },
+                        ]
+                        reason_text = "断口工频值严格大于本体值且命中户外条件，工频耐受电压试验拆分为相间及对地(干)、原项承载的相间及对地(湿)、断口(干)。"
 
             decisions[rule_id] = {
                 "rule_id": rule_id,
@@ -2132,7 +2254,7 @@ def _evaluate_domain_rule_decisions(
                 },
                 "decision": "split" if split_enabled else "single",
                 "enabled": split_enabled,
-                "remove_original": bool(raw_rule.get("remove_original", True)),
+                "remove_original": remove_original,
                 "reason_code": reason_code,
                 "reason_text": reason_text,
                 "single_output": single_output,
@@ -3654,49 +3776,49 @@ def _apply_domain_rule_decisions_to_project_context(
         calc_rule="作为状态检查的工频耐受电压试验正常次数固定为1次。",
     )
 
-    _set_if_present(
+    _set_if_value_missing(
         "工频耐受电压试验",
         "试验状态",
         "干",
         calc_rule="未命中户外干/湿拆分时，工频耐受电压试验默认按干态输出。",
     )
-    _set_if_present(
+    _set_if_value_missing(
         "工频耐受电压试验(断口)",
         "试验状态",
         "干",
         calc_rule="断口工频耐受电压试验按干态输出。",
     )
-    _set_if_present(
+    _set_if_value_missing(
         "工频耐受电压试验#干",
         "试验状态",
         "干",
         calc_rule="高压户外工频拆分后，内部干态分支按干态输出。",
     )
-    _set_if_present(
+    _set_if_value_missing(
         "工频耐受电压试验#湿",
         "试验状态",
         "湿",
         calc_rule="高压户外工频拆分后，内部湿态分支按湿态输出。",
     )
-    _set_if_present(
+    _set_if_value_missing(
         "工频耐受电压试验(干)",
         "试验状态",
         "干",
         calc_rule="户外状态拆分后，工频耐受电压试验(干)按干态输出。",
     )
-    _set_if_present(
+    _set_if_value_missing(
         "工频耐受电压试验(湿)",
         "试验状态",
         "湿",
         calc_rule="户外状态拆分后，工频耐受电压试验(湿)按湿态输出。",
     )
-    _set_if_present(
+    _set_if_value_missing(
         "工频耐受电压试验(相间及对地)",
         "试验状态",
         "干",
         calc_rule="未命中特殊拆分规则时，相间及对地工频耐受电压试验默认按干态输出。",
     )
-    _set_if_present(
+    _set_if_value_missing(
         "工频耐受电压试验(联合电压)",
         "试验状态",
         "干",
@@ -3821,6 +3943,7 @@ def _apply_domain_rule_decisions_to_project_context(
     _set_insulation_normal_count(
         (
             "操作冲击耐受电压试验",
+            "操作冲击耐受电压试验(干)",
             "操作冲击耐受电压试验(湿)",
             "操作冲击耐受电压试验(联合电压)",
         ),
@@ -3960,7 +4083,13 @@ def _build_final_test_item_scope(
                 removed_items.append(secondary_test_item)
                 hard_removed_items.add(secondary_test_item)
         if rule_kind == "split" and decision.get("enabled"):
-            if bool(decision.get("remove_original", True)):
+            split_outputs = decision.get("split_output", []) or []
+            original_reused_as_split_output = any(
+                isinstance(split_output, dict)
+                and str(split_output.get("test_item", "") or "").strip() == test_item
+                for split_output in split_outputs
+            )
+            if bool(decision.get("remove_original", True)) and not original_reused_as_split_output:
                 removed_items.append(test_item)
                 hard_removed_items.add(test_item)
     # Guard against stale project_param_map entries leaking into the final whitelist.
@@ -4063,8 +4192,8 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "雷电冲击耐受电压试验(联合电压)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
         "操作冲击耐受电压试验(联合电压)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
         "操作冲击耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
-        "操作冲击耐受电压试验(湿)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
         "操作冲击耐受电压试验(干)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
+        "操作冲击耐受电压试验(湿)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
         "局部放电试验":{"辅助和控制设备的电阻","SF6气体的最低功能压力(20℃表压)","回路电阻(μΩ)","回路电阻"},
         "前后回路电阻测量试验":{"回路电阻","辅助和控制设备的电阻"},
         "连续电流试验":{"是否所配元件","SF6气体的最低功能压力(20℃表压)","材料绝热等级"},
@@ -4955,6 +5084,54 @@ def _compact_value_for_log(value: Any) -> Any:
     return value
 
 
+def _is_insulation_relevant_test_item(value: Any) -> bool:
+    text = str(value or "").strip()
+    if not text:
+        return False
+    return any(
+        token in text
+        for token in (
+            "工频耐受电压试验",
+            "雷电冲击耐受电压试验",
+            "操作冲击耐受电压试验",
+            "局部放电试验",
+            "控制和辅助回路的绝缘试验",
+        )
+    )
+
+
+def _extract_insulation_relevant_items_for_log(value: Any) -> Any:
+    if isinstance(value, dict):
+        if isinstance(value.get("preview"), list):
+            filtered_preview = [
+                _compact_value_for_log(item)
+                for item in value.get("preview", [])
+                if _is_insulation_relevant_test_item(item)
+            ]
+            if filtered_preview:
+                summarized_value = {
+                    str(key): _compact_value_for_log(item)
+                    for key, item in value.items()
+                    if key != "preview"
+                }
+                summarized_value["preview"] = filtered_preview
+                return summarized_value
+        filtered = {
+            str(key): _compact_value_for_log(item)
+            for key, item in value.items()
+            if _is_insulation_relevant_test_item(key)
+        }
+        return filtered or None
+    if isinstance(value, (list, tuple, set)):
+        filtered = [
+            _compact_value_for_log(item)
+            for item in value
+            if _is_insulation_relevant_test_item(item)
+        ]
+        return filtered or None
+    return None
+
+
 def _should_log_electrical_stage(stage: str) -> bool:
     return True
 
@@ -5018,6 +5195,20 @@ def _summarize_trace_payload(stage: str, payload: dict[str, Any]) -> dict[str, A
             project_param_map if isinstance(project_param_map, dict) else {},
             project_param_value_map if isinstance(project_param_value_map, dict) else {},
         )
+    if isinstance(project_param_map, dict):
+        insulation_project_param_map = _extract_insulation_relevant_items_for_log(
+            project_param_map
+        )
+        if insulation_project_param_map:
+            summarized["project_param_map_insulation_items"] = insulation_project_param_map
+    if isinstance(project_param_value_map, dict):
+        insulation_project_param_value_map = _extract_insulation_relevant_items_for_log(
+            project_param_value_map
+        )
+        if insulation_project_param_value_map:
+            summarized["project_param_value_map_insulation_items"] = (
+                insulation_project_param_value_map
+            )
 
     for key, value in payload.items():
         if key in {
@@ -5057,6 +5248,17 @@ def _summarize_trace_payload(stage: str, payload: dict[str, Any]) -> dict[str, A
                 summarized[key] = value
             continue
         summarized[key] = _compact_value_for_log(value)
+        if key in {
+            "allowed_final_test_items",
+            "allowed_final_test_items_raw",
+            "removed_test_items",
+            "removed_test_items_raw",
+            "project_param_map_keys",
+            "project_param_value_map_keys",
+        }:
+            insulation_relevant_items = _extract_insulation_relevant_items_for_log(value)
+            if insulation_relevant_items:
+                summarized[f"{key}_insulation_items"] = insulation_relevant_items
 
     return summarized
 
