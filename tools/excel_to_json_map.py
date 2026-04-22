@@ -12,6 +12,21 @@ def str_format(value:None):
     return str(value).strip()
 
 
+def format_dict(data):
+    result = []
+
+    for level1, level2_dict in data.items():
+        # 一级标题
+        result.append(f"- {level1}")
+
+        for level2, desc in level2_dict.items():
+            # 如果有描述就加，没有就只写名字
+            if desc:
+                result.append(f"  - {level2}  {desc}")
+            else:
+                result.append(f"  - {level2}")
+
+    return "\n".join(result)
 
 def parse_excel_to_json(excel_path, sheet_name=0, required_cols=None, allowed_categories=None):
     df = pd.read_excel(excel_path, sheet_name=sheet_name, dtype=str)
@@ -30,16 +45,26 @@ def parse_excel_to_json(excel_path, sheet_name=0, required_cols=None, allowed_ca
         test = str_format(row['试验'])
         actual = str_format(row['实际试验名称'])
         proj = str_format(row['项目试验名称'])
-        note = row['note']
+        # note = row['note']
         test_name = actual if actual else proj
-        key = (test, subcat, test_name,note)
+        key = (test, subcat, test_name)
         groups[key].append(row)
 
     tests_by_path = {}
     tests_by_name = defaultdict(list)
     add_test_items = []
 
-    for (test, subcat, test_name,note), rows in groups.items():
+    for (test, subcat, test_name), rows in groups.items():
+        # ===== 合并 note =====
+        notes = []
+        for row in rows:
+            note_val = str_format(row['note'])
+            if note_val:
+                notes.append(note_val)
+        # 去重并合并，用分号分隔
+        unique_notes = list(dict.fromkeys(notes))  # 保持顺序去重
+        merged_note = "; ".join(unique_notes) if unique_notes else ""
+
         # 构建 path_parts: 使用统一的第一个部分
         if test == "型式试验":
             path_parts = [test, subcat, test_name]
@@ -60,12 +85,14 @@ def parse_excel_to_json(excel_path, sheet_name=0, required_cols=None, allowed_ca
         aliases_set = set()
         acceptance_criteria = ""
         confidence = 1.0
+        has_required_params = False  # 新增：标记是否有需要输出的参数
 
 
         for row in rows:
             # 需要输出的参数 - 始终为每个参数生成完整的字段
             need = str(row['是否需要输出在试验参数中']).strip()
             if need in ('是', 'true', '1', 'True'):
+                has_required_params = True  # 标记有需要输出的参数
                 value_text = row['取值范围']
                 value_source = row['来源']
                 param = {
@@ -107,6 +134,10 @@ def parse_excel_to_json(excel_path, sheet_name=0, required_cols=None, allowed_ca
         remove_parameters = list(remove_params_set)
         remove_rules = list(remove_rules_set)
 
+        # 新增：如果没有需要输出的参数，跳过该测试项
+        if not has_required_params:
+            continue
+
 
         # ---------- 1. tests_by_path ----------
         test_obj_path = {
@@ -116,7 +147,7 @@ def parse_excel_to_json(excel_path, sheet_name=0, required_cols=None, allowed_ca
             "path_parts": path_parts,
             "path_key": path_key,
             "skip": False,
-            "note": note,
+            "note": merged_note,
             "parameters": parameters,
             "remove_parameters": remove_parameters,
             "remove_rules": remove_rules
@@ -128,7 +159,7 @@ def parse_excel_to_json(excel_path, sheet_name=0, required_cols=None, allowed_ca
             "path_parts": path_parts,
             "path_key": path_key_2,
             "skip": False,
-            "note": note,
+            "note": merged_note,
             "parameters": parameters,
             "remove_parameters": remove_parameters,
             "remove_rules": remove_rules
@@ -165,7 +196,7 @@ def parse_excel_to_json(excel_path, sheet_name=0, required_cols=None, allowed_ca
             "report_type": subcat,
             "aliases": list(aliases_set),
             "acceptance_criteria": acceptance_criteria,
-            "note": note,
+            "note": merged_note,
             "confidence": confidence,
             "required_reports": required_reports,
             "parameters": parameters,
@@ -174,27 +205,47 @@ def parse_excel_to_json(excel_path, sheet_name=0, required_cols=None, allowed_ca
         add_test_items.append(add_item_obj)
 
     # ===== 打印每个试验包含的特性名称 =====
+    # 对应的提示词
+    chu_fa_tiao_jian = {"短路性能型式试验":{},"绝缘性能型式试验":{},"开合性能型式试验":{},"温升性能型式试验":{}}
+
     test_params = {}
-    for (test, subcat, test_name,note), rows in groups.items():
-        if test_name not in test_params:
-            test_params[test_name] = []
+    for (test, subcat, test_name), rows in groups.items():
+        # 检查该测试项是否有需要输出的参数
+        has_required_params_for_test = False
+        param_names_for_test = []
+
         for row in rows:
             need = str(row['是否需要输出在试验参数中']).strip()
             if need in ('是', 'true', '1', 'True'):
+                has_required_params_for_test = True
                 param_name = row['特性名称']
-                if param_name and param_name not in test_params[test_name]:
-                    test_params[test_name].append(param_name)
+                if param_name and param_name not in param_names_for_test:
+                    param_names_for_test.append(param_name)
+
+                chu_fa_tiao_jian[row["型式试验的小类"]][row["实际试验名称"]]=row["触发条件"]
+
+        # 只有有需要输出的参数时，才添加到test_params
+        if has_required_params_for_test and param_names_for_test:
+            test_params[test_name] = param_names_for_test
 
     test_item_param_requirements = "test_item_param_requirements = "
     test_items = "test_items = "
+
+
     for test_name, param_list in test_params.items():
         if param_list:
             param_str = '|'.join(param_list)
             test_item_param_requirements += f"{test_name}:{param_str}; "
             test_items += f"{test_name}, "
 
+
     print(test_items)
     print(test_item_param_requirements)
+
+    print("\n")
+    print("试验触发条件提示词")
+    print("\n")
+    print(format_dict(chu_fa_tiao_jian))
 
     return {
         "tests_by_path": tests_by_path,
@@ -202,9 +253,21 @@ def parse_excel_to_json(excel_path, sheet_name=0, required_cols=None, allowed_ca
         "add_test_items": add_test_items
     }
 
-import time
+
+def pare_english(excel_path, sheet_name="参数中英文最终版"):
+    df = pd.read_excel(excel_path, sheet_name=sheet_name, dtype=str)
+    df = df.fillna('')
+    param_map = []
+    for _, row in df.iterrows():
+        cn_str = str_format(row['特性名称'])
+        en_str = str_format(row['特性英文名称'])
+        param_map.append(f"{cn_str}:{str(en_str)}")
+    text = ";".join(param_map)
+    print("param_map = {}".format(text))
+
 
 if __name__ == "__main__":
+    # 需要检查 , '型式试验的小类', '实际试验名称', '项目试验名称', 试验 这些列不能为空
     # 定义期望的列名（可根据实际 Excel 调整）
     required_cols = [
         '试验', '型式试验的小类', '实际试验名称', '项目试验名称',
@@ -227,28 +290,34 @@ if __name__ == "__main__":
 
     input_file = "../../副本项目-特征逻辑映射表-完整版_20260324_1508.xlsx"
 
-    # 处理 GBT
-    output_file_gb = f"annotation_memory.iec_gy_{time_str}.json"
-    sheet_name_gb = "IEC"
-    result_gb = parse_excel_to_json(input_file, sheet_name=sheet_name_gb, required_cols=required_cols, allowed_categories=allowed_categories)
+    """
+    读取中英文
+    """
+    pare_english(excel_path=input_file,sheet_name="参数中英文最终版")
 
-    with open(output_file_gb, 'w', encoding='utf-8') as f:
-        json.dump(result_gb, f, ensure_ascii=False, indent=2)
+    # # 处理 GBT
+    # output_file_gb = f"annotation_memory.gb_gy_{time_str}.json"
+    # sheet_name_gb = "GBT"
+    # result_gb = parse_excel_to_json(excel_path=input_file, sheet_name=sheet_name_gb, required_cols=required_cols, allowed_categories=allowed_categories)
+    #
+    # with open(output_file_gb, 'w', encoding='utf-8') as f:
+    #     json.dump(result_gb, f, ensure_ascii=False, indent=2)
+    #
+    # print(f"转换完成，结果已保存至 {output_file_gb}")
 
-    print(f"转换完成，结果已保存至 {output_file_gb}")
 
-    # # 处理 DLT
-    # output_file_dlt = "annotation_memory.dlt_gy.json"
-    # sheet_name_dlt = "DLT"
-    # result_dlt = parse_excel_to_json(input_file, sheet_name=sheet_name_dlt, required_cols=required_cols, allowed_categories=allowed_categories)
-    #
-    # with open(output_file_dlt, 'w', encoding='utf-8') as f:
-    #     json.dump(result_dlt, f, ensure_ascii=False, indent=2)
-    #
-    # print(f"转换完成，结果已保存至 {output_file_dlt}")
-    #
+    # 处理 DLT
+    output_file_dlt = f"annotation_memory.dlt_gy_{time_str}.json"
+    sheet_name_dlt = "DLT"
+    result_dlt = parse_excel_to_json(input_file, sheet_name=sheet_name_dlt, required_cols=required_cols, allowed_categories=allowed_categories)
+
+    with open(output_file_dlt, 'w', encoding='utf-8') as f:
+        json.dump(result_dlt, f, ensure_ascii=False, indent=2)
+
+    print(f"转换完成，结果已保存至 {output_file_dlt}")
+
     # # 处理 IEC
-    # output_file_iec = "annotation_memory.iec_gy.json"
+    # output_file_iec = f"annotation_memory.iec_gy_{time_str}.json"
     # sheet_name_iec = "IEC"
     # result_iec = parse_excel_to_json(input_file, sheet_name=sheet_name_iec, required_cols=required_cols, allowed_categories=allowed_categories)
     #
