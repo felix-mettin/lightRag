@@ -4,6 +4,7 @@ from contextvars import ContextVar
 from functools import partial
 from pathlib import Path
 import os
+import math
 
 import asyncio
 import html
@@ -130,6 +131,21 @@ def _normalize_operate_standard_type(stand_type: str | None) -> str:
 
 def _normalize_text_key(value: str) -> str:
     return re.sub(r"\s+", "", (value or "").strip())
+
+
+def _is_power_frequency_test_name(test_name: str | None) -> bool:
+    name = str(test_name or "").strip()
+    return name.startswith("工频耐受电压试验") or name == "作为状态检查的工频耐受电压试验"
+
+
+def _uses_normal_count_label(test_name: str | None) -> bool:
+    name = str(test_name or "").strip()
+    return (
+        _is_power_frequency_test_name(name)
+        or name.startswith("雷电冲击耐受电压试验")
+        or name.startswith("操作冲击耐受电压试验")
+        or name == "作为状态检查的雷电冲击耐受电压试验"
+    )
 
 
 def _dedupe_preserve_order(values: list[str] | None) -> list[str]:
@@ -700,15 +716,12 @@ def _sanitize_value_text(value_text: str) -> str:
             if marker in cleaned:
                 marker_hit = True
                 cleaned = cleaned.split(marker, 1)[1].strip()
-        cleaned = re.sub(r"^[：:，,。.、\-\s]+", "", cleaned)
+        cleaned = re.sub(r"^[：:。,.、\-\s]+", "", cleaned)
         if cleaned:
             cleaned_segments.append(cleaned)
             if marker_hit:
                 corrected_segments.append(cleaned)
-
-    if corrected_segments:
-        segments = corrected_segments
-    elif cleaned_segments:
+    if cleaned_segments:
         segments = cleaned_segments
 
     preferred_segments = [
@@ -717,7 +730,6 @@ def _sanitize_value_text(value_text: str) -> str:
     if preferred_segments:
         text = preferred_segments[0]
         segments = [text]
-
     table_segments = [
         seg
         for seg in segments
@@ -1949,10 +1961,48 @@ def _evaluate_domain_rule_decisions(
                     rule_id == expected_rule_id
                     and split_enabled
                     and pf_fracture_split_active
+                    and rated_voltage_kv is not None
+                    and rated_voltage_kv <= 40.5
                 ):
                     split_enabled = False
                     reason_code = "delegated_to_power_frequency_split"
                     reason_text = "户外命名拆分被工频断口拆分接管，最终由工频断口拆分直接产出三条工频项目。"
+                if rule_id == expected_rule_id and split_enabled:
+                    if rated_voltage_kv is not None and rated_voltage_kv > 252:
+                        split_outputs = [
+                            {
+                                "test_item": "工频耐受电压试验#干",
+                                "inherits_from": "工频耐受电压试验",
+                                "parameter_overrides": {
+                                    "试验部位": "相间及对地",
+                                    "试验状态": "干",
+                                    "正常次数": "9次",
+                                },
+                            }
+                        ]
+                        reason_text = "高压户外工频试验保留联合电压，同时将相间及对地结果收敛为干态输出。"
+                    elif rated_voltage_kv is not None and rated_voltage_kv > 40.5:
+                        split_outputs = [
+                            {
+                                "test_item": "工频耐受电压试验#干",
+                                "inherits_from": "工频耐受电压试验",
+                                "parameter_overrides": {
+                                    "试验部位": "相间及对地",
+                                    "试验状态": "干",
+                                    "正常次数": "9次",
+                                },
+                            },
+                            {
+                                "test_item": "工频耐受电压试验#湿",
+                                "inherits_from": "工频耐受电压试验",
+                                "parameter_overrides": {
+                                    "试验部位": "相间及对地",
+                                    "试验状态": "湿",
+                                    "正常次数": "9次",
+                                },
+                            },
+                        ]
+                        reason_text = "高压户外工频试验保留联合电压，同时将相间及对地拆分为干态和湿态两条输出。"
             else:
                 if not isinstance(base_labels, list) or not isinstance(fracture_labels, list):
                     continue
@@ -2014,7 +2064,7 @@ def _evaluate_domain_rule_decisions(
                             "parameter_overrides": {
                                 "试验部位": "相间、对地",
                                 "试验状态": "干",
-                                "试验次数": "9次",
+                                "正常次数": "9次",
                             },
                         },
                         {
@@ -2023,7 +2073,7 @@ def _evaluate_domain_rule_decisions(
                             "parameter_overrides": {
                                 "试验部位": "相间及对地",
                                 "试验状态": "湿",
-                                "试验次数": "9次",
+                                "正常次数": "9次",
                             },
                         },
                         {
@@ -2032,7 +2082,7 @@ def _evaluate_domain_rule_decisions(
                             "parameter_overrides": {
                                 "试验部位": "开关断口",
                                 "试验状态": "干",
-                                "试验次数": "6次",
+                                "正常次数": "6次",
                             },
                         },
                     ]
@@ -2182,6 +2232,61 @@ def _evaluate_domain_rule_decisions(
                     "model_prefix": model_prefix,
                     "explicit_solid_sealed_pole": explicit_solid_sealed_pole,
                 },
+            }
+            continue
+
+        if rule_kind == "pair_merge":
+            input_cfg = raw_rule.get("inputs", {}) or {}
+            base_current_labels = [
+                str(item).strip()
+                for item in (input_cfg.get("base_current_labels", []) or [])
+                if str(item).strip()
+            ]
+            peak_current_labels = [
+                str(item).strip()
+                for item in (input_cfg.get("peak_current_labels", []) or [])
+                if str(item).strip()
+            ]
+            threshold = input_cfg.get("ratio_threshold", 2.6)
+            base_current_ka = _extract_named_current_ka(query, base_current_labels)
+            peak_current_ka = _extract_named_current_ka(query, peak_current_labels)
+            merge_enabled = bool(
+                base_current_ka is not None
+                and peak_current_ka is not None
+                and float(base_current_ka) != 0
+                and float(peak_current_ka) / float(base_current_ka) < float(threshold)
+            )
+            if merge_enabled:
+                reason_code = "merged"
+                reason_text = (
+                    f"峰值耐受电流/短时耐受电流={peak_current_ka}/{base_current_ka}"
+                    f"<{threshold}，合并输出短时耐受电流和峰值耐受电流试验。"
+                )
+            elif base_current_ka is None or peak_current_ka is None:
+                reason_code = "missing_inputs"
+                reason_text = "缺少短时耐受电流或峰值耐受电流，保持分开输出。"
+            else:
+                reason_code = "separate"
+                reason_text = (
+                    f"峰值耐受电流/短时耐受电流={peak_current_ka}/{base_current_ka}"
+                    f">={threshold}，保持分开输出。"
+                )
+            decisions[rule_id] = {
+                "rule_id": rule_id,
+                "domain": raw_rule.get("domain", ""),
+                "test_item": str(raw_rule.get("test_item", "") or "").strip(),
+                "secondary_test_item": str(raw_rule.get("secondary_test_item", "") or "").strip(),
+                "kind": "pair_merge",
+                "decision": "merge" if merge_enabled else "separate",
+                "enabled": merge_enabled,
+                "reason_code": reason_code,
+                "reason_text": reason_text,
+                "inputs": {
+                    "base_current_ka": base_current_ka,
+                    "peak_current_ka": peak_current_ka,
+                    "ratio_threshold": threshold,
+                },
+                "merged_output": raw_rule.get("merged_output", {}) or {},
             }
             continue
 
@@ -2363,6 +2468,132 @@ def _apply_domain_rule_decisions_to_project_context(
                     return sum(float(part) for part in parts)
         return None
 
+    def _extract_named_joint_voltage_parts_local(
+        query_text: str, labels: list[str]
+    ) -> tuple[float, float | None] | None:
+        text = str(query_text or "").strip()
+        if not text:
+            return None
+        normalized = text.replace("（", "(").replace("）", ")")
+        for label in labels:
+            pattern = (
+                rf"{re.escape(label)}\s*(?:[:：=]\s*)?"
+                rf"([0-9]+(?:\.[0-9]+)?)\s*(?:\(\s*\+\s*([0-9]+(?:\.[0-9]+)?)\s*\))?\s*(?:kV)?"
+            )
+            match = re.search(pattern, normalized, flags=re.IGNORECASE)
+            if not match:
+                continue
+            primary_value = float(match.group(1))
+            auxiliary_value = (
+                float(match.group(2)) if match.group(2) is not None else None
+            )
+            return primary_value, auxiliary_value
+        return None
+
+    def _extract_named_scalar_local(query_text: str, labels: list[str]) -> float | None:
+        text = str(query_text or "").strip()
+        if not text:
+            return None
+        normalized = text.replace("（", "(").replace("）", ")")
+        for label in labels:
+            pattern = rf"{re.escape(label)}\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)"
+            match = re.search(pattern, normalized, flags=re.IGNORECASE)
+            if match:
+                return float(match.group(1))
+        return None
+
+    def _detect_capacitive_test_phase_local(
+        query_text: str,
+        rated_voltage: float | None,
+    ) -> tuple[str, str]:
+        text = str(query_text or "").strip()
+        normalized = text.replace("（", "(").replace("）", ")")
+        explicit_match = re.search(
+            r"(?:试验相数|试验方式)\s*(?:[:：=]\s*)?(单相|三相)",
+            normalized,
+            flags=re.IGNORECASE,
+        )
+        if explicit_match:
+            phase = explicit_match.group(1)
+            return phase, f"用户已明确给出试验相数为{phase}，直接采用。"
+
+        if re.search(r"三相\s*断路器|三相\s*试验", normalized):
+            return "三相", "问题中明确提到三相断路器/三相试验，按三相计算。"
+        if re.search(r"单相\s*断路器|单相\s*试验", normalized):
+            return "单相", "问题中明确提到单相断路器/单相试验，按单相计算。"
+
+        single_count = len(re.findall(r"单相", normalized))
+        three_count = len(re.findall(r"三相", normalized))
+        if single_count > 0 and three_count == 0:
+            return "单相", "问题中只出现单相信息，按单相计算。"
+        if three_count > 0 and single_count == 0:
+            return "三相", "问题中只出现三相信息，按三相计算。"
+
+        if rated_voltage is not None and rated_voltage <= 40.5:
+            return "三相", f"未明确给出试验相数，额定电压 {rated_voltage} kV 不高于40.5 kV，默认按三相计算。"
+        if rated_voltage is not None:
+            return "单相", f"未明确给出试验相数，额定电压 {rated_voltage} kV 高于40.5 kV，默认按单相计算。"
+        return "单相", "未明确给出试验相数且无法识别额定电压，默认按单相计算。"
+
+    def _resolve_capacitive_nonuniform_coefficient_local(
+        query_text: str,
+    ) -> tuple[float, str, str]:
+        explicit_value = _extract_named_scalar_local(query_text, ["不均匀系数"])
+        if explicit_value is not None:
+            return (
+                explicit_value,
+                str(explicit_value).rstrip("0").rstrip("."),
+                "用户已明确提供不均匀系数，直接采用。",
+            )
+
+        text = str(query_text or "").strip()
+        normalized = text.replace("（", "(").replace("）", ")")
+        break_count_match = re.search(
+            r"断口数量\s*(?:[:：=]\s*)?([0-9]+)",
+            normalized,
+            flags=re.IGNORECASE,
+        )
+        if break_count_match:
+            break_count = int(break_count_match.group(1))
+            if break_count > 1:
+                return 1.05, "1.05", f"问题中给出断口数量为 {break_count}，按多断口默认不均匀系数 1.05 计算。"
+            return 1.0, "1", f"问题中给出断口数量为 {break_count}，按单断口默认不均匀系数 1 计算。"
+
+        if any(token in normalized for token in ("多断口", "多端口")):
+            return 1.05, "1.05", "问题中命中多断口/多端口描述，默认不均匀系数取 1.05。"
+        if any(token in normalized for token in ("单断口", "单端口")):
+            return 1.0, "1", "问题中命中单断口/单端口描述，默认不均匀系数取 1。"
+        return 1.0, "1", "未明确给出不均匀系数且未识别出多断口信息，默认按单断口取 1。"
+
+    def _resolve_capacitive_test_voltage_local(
+        query_text: str,
+        rated_voltage: float | None,
+    ) -> tuple[str | None, str, str, str]:
+        phase_value, phase_rule = _detect_capacitive_test_phase_local(
+            query_text, rated_voltage
+        )
+        nonuniform_value, nonuniform_text, nonuniform_rule = (
+            _resolve_capacitive_nonuniform_coefficient_local(query_text)
+        )
+        if rated_voltage is None:
+            return None, phase_value, nonuniform_text, "未识别到额定电压，无法计算容性电流开断试验试验电压。"
+        if phase_value == "三相":
+            return (
+                _format_voltage_value(rated_voltage),
+                phase_value,
+                nonuniform_text,
+                f"{phase_rule} 三相断路器的 LC/CC 试验电压直接取额定电压 {_format_voltage_value(rated_voltage)}。",
+            )
+
+        kc_value = 1.2
+        computed_voltage = kc_value * (rated_voltage / math.sqrt(3.0)) * nonuniform_value
+        return (
+            _format_voltage_value(computed_voltage),
+            phase_value,
+            nonuniform_text,
+            f"{phase_rule} {nonuniform_rule} 单相试验电压按 kc × (额定电压/√3) × 不均匀系数 计算，其中 kc={kc_value}，即 {kc_value} × ({rated_voltage}/√3) × {nonuniform_text} = {_format_voltage_value(computed_voltage)}。",
+        )
+
     def _preferred_capacitive_current_a_local(
         kind: str, rated_voltage: float | None
     ) -> float | None:
@@ -2448,6 +2679,18 @@ def _apply_domain_rule_decisions_to_project_context(
         query_text,
         ["额定雷电冲击耐受电压(断口)"],
     )
+    pf_joint_voltage_parts = _extract_named_joint_voltage_parts_local(
+        query_text,
+        ["额定短时工频耐受电压(断口)", "额定工频耐受电压(断口)"],
+    )
+    li_joint_voltage_parts = _extract_named_joint_voltage_parts_local(
+        query_text,
+        ["额定雷电冲击耐受电压(断口)"],
+    )
+    si_joint_voltage_parts = _extract_named_joint_voltage_parts_local(
+        query_text,
+        ["额定操作冲击耐受电压(断口)"],
+    )
     bc_current_a = None
     bc_test_category = ""
     for label in (
@@ -2464,12 +2707,22 @@ def _apply_domain_rule_decisions_to_project_context(
             break
     c_grade = None
     c_grade_match = re.search(
-        r"(?:容性电流开合时重击穿等级|开合容性电流能力的级别)\s*(?:[:：=]\s*)?(C[12])",
+        r"(?:容性电流开合时重击穿等级|开合容性电流能力的级别|重击穿等级|能力级别|试验级别)\s*(?:[:：=]|为|是)?\s*(C[12])",
         query_text,
         flags=re.IGNORECASE,
     )
     if c_grade_match:
         c_grade = c_grade_match.group(1).upper()
+    capacitive_grade_value = c_grade or "C2"
+    capacitive_grade_rule = (
+        "用户已提供开合容性电流能力级别信息，直接采用。"
+        if c_grade
+        else "未提供开合容性电流能力级别时默认按C2处理。"
+    )
+    capacitive_trial_count_text = "48次" if capacitive_grade_value == "C2" else "24次"
+    capacitive_trial_count_rule = (
+        f"开合容性电流能力级别判定为{capacitive_grade_value}，容性电流开断试验次数取{capacitive_trial_count_text}。"
+    )
     if c_grade == "C1":
         updated_param_map.pop("T60(预备试验)", None)
         updated_value_map.pop("T60(预备试验)", None)
@@ -2492,7 +2745,21 @@ def _apply_domain_rule_decisions_to_project_context(
         query_text,
         flags=re.IGNORECASE,
     )
-    first_pole_kpp = float(first_pole_match.group(1)) if first_pole_match else 1.5
+    first_pole_kpp = None
+    first_pole_kpp_rule = ""
+    if first_pole_match:
+        first_pole_kpp = float(first_pole_match.group(1))
+        first_pole_kpp_rule = "用户已提供首开极系数，问答阶段直接采用该值。"
+    elif rated_voltage_kv is not None and rated_voltage_kv <= 40.5:
+        first_pole_kpp = 1.5
+        first_pole_kpp_rule = (
+            f"额定电压 {rated_voltage_kv} kV 不高于 40.5 kV，首开极系数默认取 1.5。"
+        )
+    elif rated_voltage_kv is not None and rated_voltage_kv >= 72.5:
+        first_pole_kpp = 1.3
+        first_pole_kpp_rule = (
+            f"额定电压 {rated_voltage_kv} kV 不低于 72.5 kV，首开极系数默认取 1.3。"
+        )
     is_three_phase_default = rated_voltage_kv is not None and rated_voltage_kv <= 40.5
     dielectric_value = (
         "充气/充油"
@@ -2571,6 +2838,47 @@ def _apply_domain_rule_decisions_to_project_context(
             else:
                 updated_param_map.pop(test_item, None)
                 updated_value_map.pop(test_item, None)
+            continue
+
+        if rule_kind == "pair_merge":
+            if not decision.get("enabled"):
+                continue
+            secondary_test_item = str(decision.get("secondary_test_item", "") or "").strip()
+            merged_output = decision.get("merged_output", {}) or {}
+            merged_test_name = str(merged_output.get("test_item", "") or "").strip()
+            if not test_item or not secondary_test_item or not merged_test_name:
+                continue
+            primary_params = list(updated_param_map.get(test_item, []) or [])
+            secondary_params = list(updated_param_map.get(secondary_test_item, []) or [])
+            primary_values = deepcopy(updated_value_map.get(test_item, {}) or {})
+            secondary_values = deepcopy(updated_value_map.get(secondary_test_item, {}) or {})
+            if not primary_params and not secondary_params:
+                continue
+            merged_params = _get_config_required_params(merged_test_name) or list(
+                dict.fromkeys(primary_params + secondary_params)
+            )
+            merged_values = deepcopy(primary_values)
+            for param_name, param_value in secondary_values.items():
+                merged_values.setdefault(str(param_name), deepcopy(param_value))
+            updated_param_map.pop(test_item, None)
+            updated_param_map.pop(secondary_test_item, None)
+            updated_value_map.pop(test_item, None)
+            updated_value_map.pop(secondary_test_item, None)
+            updated_param_map[merged_test_name] = merged_params
+            updated_value_map[merged_test_name] = merged_values
+            for param_name, value_text in (
+                merged_output.get("parameter_overrides", {}) or {}
+            ).items():
+                _set_param(
+                    merged_test_name,
+                    str(param_name),
+                    str(value_text),
+                    value_source="rule",
+                    value_type="text",
+                    constraints=str(value_text),
+                    calc_rule=str(decision.get("reason_text", "") or ""),
+                    resolution_mode="graph_final",
+                )
             continue
 
         if rule_kind == "count" and test_item == "局部放电试验":
@@ -2681,10 +2989,11 @@ def _apply_domain_rule_decisions_to_project_context(
                 for param_name, value_text in (
                     split_output.get("parameter_overrides", {}) or {}
                 ).items():
-                    value_source = "formula" if param_name == "试验次数" else "rule"
+                    is_count_override = str(param_name) in {"试验次数", "正常次数"}
+                    value_source = "formula" if is_count_override else "rule"
                     calc_rule = (
                         str(decision.get("reason_text", "") or value_text)
-                        if param_name == "试验次数"
+                        if is_count_override
                         else ""
                     )
                     _set_param(
@@ -2718,6 +3027,8 @@ def _apply_domain_rule_decisions_to_project_context(
         )
         pf_voltage_targets = {
             "工频耐受电压试验": pf_value_text,
+            "工频耐受电压试验#干": pf_value_text,
+            "工频耐受电压试验#湿": pf_value_text,
             "工频耐受电压试验(干)": pf_value_text,
             "工频耐受电压试验(湿)": pf_value_text,
             "工频耐受电压试验(断口)": pf_fracture_value_text,
@@ -2782,6 +3093,87 @@ def _apply_domain_rule_decisions_to_project_context(
                 constraints=target_value_text,
                 calc_rule=calc_rule,
                 resolution_mode="graph_final",
+            )
+
+    if pf_joint_voltage_parts is not None and "工频耐受电压试验(联合电压)" in updated_param_map:
+        pf_joint_primary_kv, pf_joint_auxiliary_kv = pf_joint_voltage_parts
+        pf_joint_primary_text = _format_voltage_value(pf_joint_primary_kv)
+        _set_if_present(
+            "工频耐受电压试验(联合电压)",
+            "交流电压",
+            pf_joint_primary_text,
+            calc_rule=(
+                "工频联合电压试验的交流电压取额定短时工频耐受电压(断口)中的主值，"
+                f"即 {pf_joint_primary_text}。"
+            ),
+        )
+        if pf_joint_auxiliary_kv is not None:
+            pf_joint_auxiliary_text = _format_voltage_value(pf_joint_auxiliary_kv)
+            _set_if_present(
+                "工频耐受电压试验(联合电压)",
+                "交流电压(辅)",
+                pf_joint_auxiliary_text,
+                calc_rule=(
+                    "工频联合电压试验的交流电压(辅)取额定短时工频耐受电压(断口)中括号内的辅值，"
+                    f"即 {pf_joint_auxiliary_text}。"
+                ),
+            )
+
+    if li_joint_voltage_parts is not None and "雷电冲击耐受电压试验(联合电压)" in updated_param_map:
+        li_joint_primary_kv, li_joint_auxiliary_kv = li_joint_voltage_parts
+        li_joint_primary_text = _format_voltage_value(li_joint_primary_kv)
+        _set_if_present(
+            "雷电冲击耐受电压试验(联合电压)",
+            "雷电冲击干耐受电压",
+            li_joint_primary_text,
+            calc_rule=(
+                "雷电联合电压试验的雷电冲击干耐受电压取额定雷电冲击耐受电压(断口)中的主值，"
+                f"即 {li_joint_primary_text}。"
+            ),
+        )
+        if li_joint_auxiliary_kv is not None:
+            li_joint_auxiliary_text = _format_voltage_value(li_joint_auxiliary_kv)
+            _set_if_present(
+                "雷电冲击耐受电压试验(联合电压)",
+                "交流电压",
+                li_joint_auxiliary_text,
+                calc_rule=(
+                    "雷电联合电压试验的交流电压取额定雷电冲击耐受电压(断口)中括号内的辅值，"
+                    f"即 {li_joint_auxiliary_text}。"
+                ),
+            )
+
+    if si_joint_voltage_parts is not None and "操作冲击耐受电压试验(联合电压)" in updated_param_map:
+        si_joint_primary_kv, si_joint_auxiliary_kv = si_joint_voltage_parts
+        si_joint_primary_text = _format_voltage_value(si_joint_primary_kv)
+        _set_if_present(
+            "操作冲击耐受电压试验(联合电压)",
+            "操作冲击电压",
+            si_joint_primary_text,
+            calc_rule=(
+                "操作联合电压试验的操作冲击电压取额定操作冲击耐受电压(断口)中的主值，"
+                f"即 {si_joint_primary_text}。"
+            ),
+        )
+        _set_if_present(
+            "操作冲击耐受电压试验(联合电压)",
+            "操作冲击耐受电压",
+            si_joint_primary_text,
+            calc_rule=(
+                "操作联合电压试验的操作冲击耐受电压取额定操作冲击耐受电压(断口)中的主值，"
+                f"即 {si_joint_primary_text}。"
+            ),
+        )
+        if si_joint_auxiliary_kv is not None:
+            si_joint_auxiliary_text = _format_voltage_value(si_joint_auxiliary_kv)
+            _set_if_present(
+                "操作冲击耐受电压试验(联合电压)",
+                "交流电压",
+                si_joint_auxiliary_text,
+                calc_rule=(
+                    "操作联合电压试验的交流电压取额定操作冲击耐受电压(断口)中括号内的辅值，"
+                    f"即 {si_joint_auxiliary_text}。"
+                ),
             )
 
     if bc_current_a is not None:
@@ -2885,6 +3277,8 @@ def _apply_domain_rule_decisions_to_project_context(
     if is_three_phase_default:
         for test_name in (
             "工频耐受电压试验",
+            "工频耐受电压试验#干",
+            "工频耐受电压试验#湿",
             "工频耐受电压试验(干)",
             "工频耐受电压试验(湿)",
             "工频耐受电压试验(断口)",
@@ -2936,15 +3330,9 @@ def _apply_domain_rule_decisions_to_project_context(
             )
             _set_if_present(
                 test_name,
-                "试验电压",
-                rated_voltage_text,
-                calc_rule=f"40.5kV及以下三相试验时，试验电压取额定电压 {rated_voltage_kv} kV。",
-            )
-            _set_if_present(
-                test_name,
                 "开合容性电流能力的级别",
-                c_grade or "C2",
-                calc_rule="用户已提供开合容性电流能力级别信息，直接采用。" if c_grade else "未提供开合容性电流能力级别时默认按C2处理。",
+                capacitive_grade_value,
+                calc_rule=capacitive_grade_rule,
             )
             _set_if_value_missing(
                 test_name,
@@ -2956,10 +3344,83 @@ def _apply_domain_rule_decisions_to_project_context(
             _set_if_value_missing(
                 test_name,
                 "试验次数",
-                "24次",
+                capacitive_trial_count_text,
                 value_source="standard",
-                calc_rule="容性电流开断试验默认按24次执行。",
+                calc_rule=capacitive_trial_count_rule,
             )
+
+    capacitive_test_voltage_text = None
+    capacitive_phase_value = ""
+    capacitive_nonuniform_text = ""
+    capacitive_voltage_rule = ""
+    if rated_voltage_kv is not None:
+        (
+            capacitive_test_voltage_text,
+            capacitive_phase_value,
+            capacitive_nonuniform_text,
+            capacitive_voltage_rule,
+        ) = _resolve_capacitive_test_voltage_local(query_text, rated_voltage_kv)
+
+    if capacitive_test_voltage_text:
+        for test_name in (
+            "容性电流开断试验(LC1)",
+            "容性电流开断试验(LC1)#1",
+            "容性电流开断试验(LC1)#2",
+            "容性电流开断试验(LC2)",
+            "容性电流开断试验(LC2)#1",
+            "容性电流开断试验(LC2)#2",
+            "容性电流开断试验(CC1)",
+            "容性电流开断试验(CC1)#1",
+            "容性电流开断试验(CC1)#2",
+            "容性电流开断试验(CC2)",
+            "容性电流开断试验(CC2)#1",
+            "容性电流开断试验(CC2)#2",
+        ):
+            _set_if_present(
+                test_name,
+                "试验电压",
+                capacitive_test_voltage_text,
+                calc_rule=capacitive_voltage_rule,
+            )
+            _set_if_present(
+                test_name,
+                "试验相数",
+                capacitive_phase_value,
+                calc_rule="容性电流开断试验的试验相数按问题描述和额定电压默认规则判定。",
+            )
+            _set_if_present(
+                test_name,
+                "不均匀系数",
+                capacitive_nonuniform_text,
+                calc_rule="容性电流开断试验的不均匀系数优先取用户输入，否则按单断口=1、多断口=1.05 默认。",
+            )
+
+    for test_name in (
+        "容性电流开断试验(LC1)",
+        "容性电流开断试验(LC1)#1",
+        "容性电流开断试验(LC1)#2",
+        "容性电流开断试验(LC2)",
+        "容性电流开断试验(LC2)#1",
+        "容性电流开断试验(LC2)#2",
+        "容性电流开断试验(CC1)",
+        "容性电流开断试验(CC1)#1",
+        "容性电流开断试验(CC1)#2",
+        "容性电流开断试验(CC2)",
+        "容性电流开断试验(CC2)#1",
+        "容性电流开断试验(CC2)#2",
+    ):
+        _set_if_present(
+            test_name,
+            "开合容性电流能力的级别",
+            capacitive_grade_value,
+            calc_rule=capacitive_grade_rule,
+        )
+        _set_if_present(
+            test_name,
+            "试验次数",
+            capacitive_trial_count_text,
+            calc_rule=capacitive_trial_count_rule,
+        )
     if rated_voltage_kv is not None and "T60(预备试验)" in updated_param_map:
         t60_voltage_kv = round(rated_voltage_kv / 2, 2)
         _set_param(
@@ -3027,7 +3488,13 @@ def _apply_domain_rule_decisions_to_project_context(
             )
         _set_if_present(test_name, "试验相数", "三相", calc_rule="40.5kV及以下默认三相。")
         _set_if_present(test_name, "断路器等级", "S1", calc_rule="未提供断路器等级时默认按S1处理。")
-        _set_if_present(test_name, "首开极系数kpp", str(first_pole_kpp).rstrip("0").rstrip("."), calc_rule="用户已提供首开极系数，问答阶段直接采用该值。")
+        if first_pole_kpp is not None:
+            _set_if_present(
+                test_name,
+                "首开极系数kpp",
+                str(first_pole_kpp).rstrip("0").rstrip("."),
+                calc_rule=first_pole_kpp_rule,
+            )
         _set_if_present(test_name, "额定频率", f"{str(rated_frequency_hz).rstrip('0').rstrip('.')} Hz", calc_rule="用户已明确提供额定频率，问答阶段直接采用该值。")
 
     if rated_voltage_kv is not None:
@@ -3080,6 +3547,8 @@ def _apply_domain_rule_decisions_to_project_context(
 
     for test_name in (
         "工频耐受电压试验",
+        "工频耐受电压试验#干",
+        "工频耐受电压试验#湿",
         "工频耐受电压试验(干)",
         "工频耐受电压试验(湿)",
         "工频耐受电压试验(断口)",
@@ -3128,6 +3597,18 @@ def _apply_domain_rule_decisions_to_project_context(
         calc_rule="断口工频耐受电压试验按干态输出。",
     )
     _set_if_present(
+        "工频耐受电压试验#干",
+        "试验状态",
+        "干",
+        calc_rule="高压户外工频拆分后，内部干态分支按干态输出。",
+    )
+    _set_if_present(
+        "工频耐受电压试验#湿",
+        "试验状态",
+        "湿",
+        calc_rule="高压户外工频拆分后，内部湿态分支按湿态输出。",
+    )
+    _set_if_present(
         "工频耐受电压试验(干)",
         "试验状态",
         "干",
@@ -3164,12 +3645,118 @@ def _apply_domain_rule_decisions_to_project_context(
         calc_rule="操作冲击联合电压试验固定按干态输出。",
     )
 
-    _set_if_present("工频耐受电压试验", "试验次数", "9次", calc_rule="未拆分工频耐受电压试验按9次。")
-    _set_if_present("雷电冲击耐受电压试验", "试验次数", "270次", calc_rule="未拆分雷电冲击耐受电压试验按270次。")
-    _set_if_present("工频耐受电压试验(断口)", "试验次数", "6次", calc_rule="拆分后断口工频耐受电压试验按6次。")
-    _set_if_present("工频耐受电压试验(相间及对地)", "试验次数", "9次", calc_rule="拆分后相间及对地工频耐受电压试验按9次。")
-    _set_if_present("雷电冲击耐受电压试验(断口)", "试验次数", "180次", calc_rule="拆分后断口雷电冲击耐受电压试验按180次。")
-    _set_if_present("雷电冲击耐受电压试验(相间及对地)", "试验次数", "270次", calc_rule="拆分后相间及对地雷电冲击耐受电压试验按270次。")
+    _set_if_present(
+        "工频耐受电压试验(联合电压)",
+        "试验部位",
+        "断口",
+        calc_rule="工频联合电压试验的试验部位固定为断口。",
+    )
+    _set_if_present(
+        "工频耐受电压试验#干",
+        "试验部位",
+        "相间及对地",
+        calc_rule="高压户外工频拆分后，内部干态分支的试验部位固定为相间及对地。",
+    )
+    _set_if_present(
+        "工频耐受电压试验#湿",
+        "试验部位",
+        "相间及对地",
+        calc_rule="高压户外工频拆分后，内部湿态分支的试验部位固定为相间及对地。",
+    )
+    _set_if_present(
+        "雷电冲击耐受电压试验(联合电压)",
+        "试验部位",
+        "断口",
+        calc_rule="雷电联合电压试验的试验部位固定为断口。",
+    )
+    _set_if_present(
+        "操作冲击耐受电压试验(联合电压)",
+        "试验部位",
+        "断口",
+        calc_rule="操作联合电压试验的试验部位固定为断口。",
+    )
+
+    def _resolve_insulation_phase_local(
+        query_text: str,
+        rated_voltage: float | None,
+    ) -> tuple[int, str, str]:
+        normalized = str(query_text or "").replace("（", "(").replace("）", ")")
+        if "三相共箱" in normalized:
+            return 3, "三相", "问题中明确包含三相共箱，按三相试验计算。"
+        if "三相分箱" in normalized:
+            return 1, "单相", "问题中明确包含三相分箱，按单相试验计算。"
+
+        phase_text, phase_rule = _detect_capacitive_test_phase_local(query_text, rated_voltage)
+        phase_count = 3 if phase_text == "三相" else 1
+        return phase_count, phase_text, phase_rule
+
+    def _is_fracture_insulation_test(test_name: str) -> bool:
+        return test_name in {
+            "工频耐受电压试验(断口)",
+            "工频耐受电压试验(联合电压)",
+            "雷电冲击耐受电压试验(断口)",
+            "雷电冲击耐受电压试验(联合电压)",
+            "操作冲击耐受电压试验(联合电压)",
+        }
+
+    def _set_insulation_normal_count(
+        test_names: tuple[str, ...],
+        *,
+        impulse_factor: int,
+        family_label: str,
+    ) -> None:
+        phase_count, phase_text, phase_rule = _resolve_insulation_phase_local(
+            query_text, rated_voltage_kv
+        )
+        for test_name in test_names:
+            phase_multiplier = 2 if _is_fracture_insulation_test(test_name) else 3
+            normal_count = phase_multiplier * phase_count * impulse_factor
+            if impulse_factor == 1:
+                count_rule = (
+                    f"{family_label}{test_name}的正常次数按{phase_multiplier}*试验相数计算；"
+                    f"当前试验相数为{phase_text}，因此正常次数为{normal_count}次。"
+                )
+            else:
+                count_rule = (
+                    f"{family_label}{test_name}的正常次数按{phase_multiplier}*试验相数*2*15计算；"
+                    f"当前试验相数为{phase_text}，因此正常次数为{normal_count}次。"
+                )
+            _set_if_present(test_name, "试验相数", phase_text, calc_rule=phase_rule)
+            _set_if_present(test_name, "正常次数", f"{normal_count}次", calc_rule=count_rule)
+
+    _set_insulation_normal_count(
+        (
+            "工频耐受电压试验",
+            "工频耐受电压试验#干",
+            "工频耐受电压试验#湿",
+            "工频耐受电压试验(干)",
+            "工频耐受电压试验(湿)",
+            "工频耐受电压试验(断口)",
+            "工频耐受电压试验(相间及对地)",
+            "工频耐受电压试验(联合电压)",
+        ),
+        impulse_factor=1,
+        family_label="工频耐受电压试验族",
+    )
+    _set_insulation_normal_count(
+        (
+            "雷电冲击耐受电压试验",
+            "雷电冲击耐受电压试验(断口)",
+            "雷电冲击耐受电压试验(相间及对地)",
+            "雷电冲击耐受电压试验(联合电压)",
+        ),
+        impulse_factor=30,
+        family_label="雷电冲击耐受电压试验族",
+    )
+    _set_insulation_normal_count(
+        (
+            "操作冲击耐受电压试验",
+            "操作冲击耐受电压试验(湿)",
+            "操作冲击耐受电压试验(联合电压)",
+        ),
+        impulse_factor=30,
+        family_label="操作冲击耐受电压试验族",
+    )
 
     if "空载特性测量" in updated_param_map and "空载特性测量#1" not in updated_param_map:
         source_params = list(updated_param_map.get("空载特性测量", []) or [])
@@ -3240,6 +3827,23 @@ def _build_resolved_rule_overrides(
             resolved[test_item]["count_reason"] = decision.get("reason_text", "")
             continue
 
+        if rule_kind == "pair_merge":
+            secondary_test_item = str(decision.get("secondary_test_item", "") or "").strip()
+            if decision.get("enabled"):
+                resolved[test_item] = {
+                    "decision": "merge",
+                    "secondary_test_item": secondary_test_item,
+                    "merged_output": decision.get("merged_output", {}),
+                    "reason_text": decision.get("reason_text", ""),
+                }
+            else:
+                resolved[test_item] = {
+                    "decision": "separate",
+                    "secondary_test_item": secondary_test_item,
+                    "reason_text": decision.get("reason_text", ""),
+                }
+            continue
+
         if rule_kind == "split":
             if decision.get("enabled"):
                 remove_original = bool(decision.get("remove_original", True))
@@ -3278,6 +3882,13 @@ def _build_final_test_item_scope(
         if rule_kind == "applicability" and not decision.get("enabled"):
             removed_items.append(test_item)
             hard_removed_items.add(test_item)
+        if rule_kind == "pair_merge" and decision.get("enabled"):
+            removed_items.append(test_item)
+            hard_removed_items.add(test_item)
+            secondary_test_item = str(decision.get("secondary_test_item", "") or "").strip()
+            if secondary_test_item:
+                removed_items.append(secondary_test_item)
+                hard_removed_items.add(secondary_test_item)
         if rule_kind == "split" and decision.get("enabled"):
             if bool(decision.get("remove_original", True)):
                 removed_items.append(test_item)
@@ -3294,6 +3905,15 @@ def _build_final_test_item_scope(
         for item in dict.fromkeys(item for item in removed_items if item)
         if item not in allowed_deduped
     ]
+    if (
+        "短路开断试验(T60)" in allowed_deduped
+        and "T60(预备试验)" in allowed_deduped
+    ):
+        allowed_deduped = [
+            item for item in allowed_deduped if item != "T60(预备试验)"
+        ]
+        if "T60(预备试验)" not in removed_deduped:
+            removed_deduped.append("T60(预备试验)")
     return allowed_deduped, removed_deduped
 
 
@@ -3352,67 +3972,109 @@ def _should_bypass_query_cache(global_config: dict[str, Any] | None) -> bool:
 
 
 def _get_display_param_suppressions() -> dict[str, set[str]]:
-    return {}
-    # return {
-    #     "前后回路电阻测量试验": {"回路电阻", "辅助和控制设备的电阻"},
-    #     "辅助和控制回路温升试验": {"试验时间"},
-    #     "连续电流试验": {
-    #         "频率",
-    #         "是否所配元件",
-    #         "SF6气体的最低功能压力(20℃表压)",
-    #         "材料绝热等级",
-    #     },
-    #     "容性电流开断试验(BC1)": {
-    #         "SF6气体的最低功能压力(20℃表压)",
-    #         "SF6气体的额定压力(20℃表压)",
-    #         "外壳是否带电",
-    #         "不均匀系数",
-    #     },
-    #     "容性电流开断试验(BC2)": {
-    #         "SF6气体的最低功能压力(20℃表压)",
-    #         "SF6气体的额定压力(20℃表压)",
-    #         "外壳是否带电",
-    #         "不均匀系数",
-    #     },
-    #     "容性电流开断试验(LC1)": {
-    #         "SF6气体的最低功能压力(20℃表压)",
-    #         "SF6气体的额定压力(20℃表压)",
-    #         "外壳是否带电",
-    #         "不均匀系数",
-    #     },
-    #     "容性电流开断试验(LC2)": {
-    #         "SF6气体的最低功能压力(20℃表压)",
-    #         "SF6气体的额定压力(20℃表压)",
-    #         "外壳是否带电",
-    #         "不均匀系数",
-    #     },
-    #     "容性电流开断试验(CC1)": {
-    #         "SF6气体的最低功能压力(20℃表压)",
-    #         "SF6气体的额定压力(20℃表压)",
-    #         "外壳是否带电",
-    #         "不均匀系数",
-    #     },
-    #     "容性电流开断试验(CC2)": {
-    #         "SF6气体的最低功能压力(20℃表压)",
-    #         "SF6气体的额定压力(20℃表压)",
-    #         "外壳是否带电",
-    #         "不均匀系数",
-    #     },
-    #     "短时耐受电流试验": {"回路电阻"},
-    #     "峰值耐受电流试验": {"回路电阻"},
-    #     "短路开断试验(T10)": {"不均匀系数", "外壳是否带电", "失败次数"},
-    #     "短路开断试验(T30)": {"不均匀系数", "外壳是否带电", "失败次数"},
-    #     "短路开断试验(T60)": {"不均匀系数", "外壳是否带电", "失败次数"},
-    #     "短路开断试验(T100s)": {"不均匀系数", "外壳是否带电"},
-    #     "短路开断试验(T100a)": {"不均匀系数", "外壳是否带电"},
-    #     "异相接地故障试验": {"不均匀系数", "外壳是否带电"},
-    #     "单相接地故障试验": {"不均匀系数", "外壳是否带电"},
-    #     "近区故障试验(L90)": {"外壳是否带电"},
-    #     "近区故障试验(L75)": {"外壳是否带电"},
-    #     "近区故障试验(L60)": {"外壳是否带电"},
-    #     "失步关合和开断试验(OP1)": {"不均匀系数", "外壳是否带电"},
-    #     "失步关合和开断试验(OP2)": {"不均匀系数", "外壳是否带电"},
-    # }
+    # return {} 
+    return {
+        "前后回路电阻测量试验": {"回路电阻", "辅助和控制设备的电阻"},
+        "工频耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
+        "工频耐受电压试验(干)":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
+        "工频耐受电压试验(湿)":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
+        "工频耐受电压试验(断口)":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
+        "工频耐受电压试验(相间及对地)":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
+        "工频耐受电压试验(联合电压)":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
+        "雷电冲击耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","额定直流电压(±)","放电次数"},
+        "雷电冲击耐受电压试验(断口)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)"},
+        "雷电冲击耐受电压试验(相间及对地)": {"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)"},
+        "雷电冲击耐受电压试验(联合电压)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)"},
+        "操作冲击耐受电压试验(联合电压)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)"},
+        "操作冲击耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)"},
+        "操作冲击耐受电压试验(湿)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)"},
+        "操作冲击耐受电压试验(干)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)"},
+        "局部放电试验":{"辅助和控制设备的电阻","SF6气体的最低功能压力(20℃表压)","回路电阻(μΩ)","回路电阻"},
+        "前后回路电阻测量试验":{"回路电阻","辅助和控制设备的电阻"},
+        "连续电流试验":{"是否所配元件","SF6气体的最低功能压力(20℃表压)","材料绝热等级"},
+        "T60(预备试验)":{"额定电压","SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
+        "作为状态检查的工频耐受电压试验":{"额定电压","介质性质","SF6气体的最低功能压力(20℃表压)","放电次数"},
+        "短时耐受电流和峰值耐受电流试验":{"额定电压","回路电阻","回路电阻(μΩ)"},
+        "电寿命(合分)":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电","金短时间","故障类型"},
+        "电寿命(单分)":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电","金短时间","故障类型"},
+        "电寿命(循环)":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电","金短时间","故障类型"},
+        "温升试验":{"SF6气体的最低功能压力(20℃表压)","是否所配元件","材料绝热等级"},
+        "近区故障试验(L75)":{"线路侧波阻抗","SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
+        "近区故障试验(L90)":{"线路侧波阻抗","SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
+        "辅助和控制回路温升试验": {"辅助设备和控制设备的额定电源电压","辅助设备和控制设备的额定电流","材料绝热等级"},
+        "容性电流开断试验(BC1)": {
+            "SF6气体的最低功能压力(20℃表压)",
+            "SF6气体的额定压力(20℃表压)",
+            "外壳是否带电",
+            "关合涌流",
+            "关合涌流的频率",
+        },
+        "容性电流开断试验(BC2)": {
+            "SF6气体的最低功能压力(20℃表压)",
+            "SF6气体的额定压力(20℃表压)",
+            "外壳是否带电",
+        },
+        "容性电流开断试验(LC1)": {
+            "SF6气体的最低功能压力(20℃表压)",
+            "SF6气体的额定压力(20℃表压)",
+            "外壳是否带电",
+        },
+        "容性电流开断试验(LC2)": {
+            "SF6气体的最低功能压力(20℃表压)",
+            "SF6气体的额定压力(20℃表压)",
+            "外壳是否带电",
+      },
+        "容性电流开断试验(CC1)": {
+            "SF6气体的最低功能压力(20℃表压)",
+            "SF6气体的额定压力(20℃表压)",
+            "外壳是否带电",
+        },
+        "容性电流开断试验(CC2)": {
+            "SF6气体的最低功能压力(20℃表压)",
+            "SF6气体的额定压力(20℃表压)",
+            "外壳是否带电",
+        },
+        "T100s（a）":{"外壳是否带电","SF6气体的最低功能压力(20℃表压)"},
+        "T100s（b）":{"金短时间","外壳是否带电","SF6气体的最低功能压力(20℃表压)"},
+        "T100s":{"SF6气体的最低功能压力(20℃表压)"},
+        "电寿命试验":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电","金短时间","故障类型","SF6气体的额定压力(20℃表压)"},
+        "OP2关合":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
+        "T60(预备试验)":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
+        "短时耐受电流试验": {"回路电阻","回路电阻(μΩ)"},
+        "峰值耐受电流试验": {"回路电阻","回路电阻(μΩ)"},
+        "状态检查试验(T10)":{"外壳是否带电"},
+        "作为状态检查的工频耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","放电次数"},
+        "作为状态检查的雷电冲击耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","放电次数"},
+        "L60":{"线路侧波阻抗","外壳是否带电"},
+        "T100s(60Hz)":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电","故障类型"},
+        "T60(60Hz)":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
+        "L90(60Hz)":{"线路侧波阻抗","SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
+        "L75(60Hz)":{"线路侧波阻抗","SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
+        "L60(60Hz)":{"线路侧波阻抗","SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
+        "T100a(60Hz)":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电","故障类型"},
+        "CC1(60Hz)":{"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电"},
+        "CC2(60Hz)":{"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电"},
+        "BC1(60Hz)":{"关合涌流","关合涌流的频率","SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电"},
+        "BC2(60Hz)":{"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电"},
+        "LC1(60Hz)":{"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电"},
+        "LC2(60Hz)":{"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电"},
+        "T100s(a)(60Hz)":{"外壳是否带电","SF6气体的最低功能压力(20℃表压)"},
+        "T100s(b)(60Hz)": {
+        "金短时间",
+        "外壳是否带电",
+        "SF6气体的最低功能压力(20℃表压)"},
+        "短路开断试验(T10)": {"外壳是否带电", "失败次数","SF6气体的最低功能压力(20℃表压)"},
+        "短路开断试验(T30)": {"外壳是否带电", "失败次数","SF6气体的最低功能压力(20℃表压)"},
+        "短路开断试验(T60)": {"外壳是否带电", "失败次数","SF6气体的最低功能压力(20℃表压)"},
+        "短路开断试验(T100s)": {"外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","失败次数"},
+        "短路开断试验(T100A)": {"外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","失败次数"},
+        "异相接地故障试验": {"SF6气体的最低功能压力(20℃表压)"},
+        "单相接地故障试验": {"SF6气体的最低功能压力(20℃表压)"},
+        "近区故障试验(L60)": {"外壳是否带电"},
+        "失步关合和开断试验(OP1)": {"外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","发电机额定容量"},
+        "失步关合和开断试验(OP2)": {"外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","直流分量(试验)","发电机额定容量"},
+        "控制和辅助回路的绝缘试验": {"额定直流电压(±)"},
+    }
 
 
 def _get_report_scope_test_whitelist() -> dict[str, set[str]]:
@@ -3460,6 +4122,7 @@ def _get_report_scope_test_whitelist() -> dict[str, set[str]]:
         "短路性能型式试验": {
             "短时耐受电流试验",
             "峰值耐受电流试验",
+            "短时耐受电流和峰值耐受电流试验",
             "空载特性测量",
             "空载特性测量#1",
             "空载特性测量#2",
@@ -3487,6 +4150,8 @@ def _get_report_scope_test_whitelist() -> dict[str, set[str]]:
             "T100S(60HZ)",
             "T100s（a）",
             "T100s（b）",
+            "T100s(a)(60Hz)",
+            "T100s(b)(60Hz)",
             "T60(60HZ)",
             "三相共机构验证",
             "状态检查试验（T10）",
@@ -3799,7 +4464,12 @@ def _postprocess_electrical_markdown_response(
         param_values = value_map.get(canonical_name, {}) if isinstance(value_map, dict) else {}
         if not isinstance(param_values, dict):
             return ""
-        for count_name in ("试验次数", "正常次数"):
+        count_fields = (
+            ("正常次数", "试验次数")
+            if _uses_normal_count_label(canonical_name)
+            else ("试验次数", "正常次数")
+        )
+        for count_name in count_fields:
             entry = param_values.get(count_name, {})
             if not isinstance(entry, dict):
                 continue
@@ -3925,15 +4595,16 @@ def _postprocess_electrical_markdown_response(
         seen_items: set[str] = set()
         for line in lines:
             stripped = line.strip()
-            if stripped.startswith("- ") and "试验次数：" in stripped:
-                item = stripped[2:].split("试验次数：", 1)[0].strip()
+            if stripped.startswith("- ") and ("试验次数：" in stripped or "正常次数：" in stripped):
+                count_label = "正常次数：" if "正常次数：" in stripped else "试验次数："
+                item = stripped[2:].split(count_label, 1)[0].strip()
                 canonical_name = _canonical_test_name(item)
                 display_name = _display_test_name(item)
                 if canonical_name in allowed_set or (
                     display_name in allowed_display_set and display_name not in removed_display_set
                 ):
                     filtered.append(line)
-                    total_items.append((display_name, stripped.split("试验次数：", 1)[1].strip()))
+                    total_items.append((display_name, stripped.split(count_label, 1)[1].strip()))
                     seen_items.add(canonical_name or item)
                 continue
             if stripped.startswith("- 绝缘性能型式试验总次数："):
@@ -3948,22 +4619,19 @@ def _postprocess_electrical_markdown_response(
             if not count_text:
                 continue
             _trim_trailing_blank_lines(filtered)
-            filtered.append(f"- {display_name}试验次数：{count_text}")
+            count_label = "正常次数" if _uses_normal_count_label(canonical_name) else "试验次数"
+            filtered.append(f"- {display_name}{count_label}：{count_text}")
             total_items.append((display_name, count_text))
 
         if total_items:
             total = 0
-            parts: list[str] = []
             for _item, count_text in total_items:
                 count_match = re.search(r"([0-9]+)", count_text)
                 if not count_match:
                     continue
                 count = int(count_match.group(1))
                 total += count
-                parts.append(str(count))
-            filtered.append(
-                f"- 绝缘性能型式试验总次数：{total}；calculation：{' + '.join(parts)} = {total}"
-            )
+            filtered.append(f"- 绝缘性能型式试验总次数：{total}")
         elif total_line:
             filtered.append(total_line)
         return filtered
@@ -6185,25 +6853,12 @@ def _build_controlled_nodes_edges(
             for req in required_reports:
                 if not isinstance(req, dict):
                     continue
-                req_name = report_aliases.get(req.get("report_type", ""), req.get("report_type", ""))
-                req_key = _normalize_text_key(req_name)
-                if req_key:
-                    report_keys.append(req_key)
-        report_keys.extend([value for value in payload_report_names if value])
-        # Include category-level and root report scopes to improve path-key hit rate
-        # for mixed annotation sources (e.g., report_type uses "型式试验" while payload
-        # carries category-level report names).
-        if category_key:
-            report_keys.append(category_key)
-        report_keys.append(_normalize_text_key("型式试验"))
-        report_keys = list(dict.fromkeys(report_keys))
-
-        if category_key:
-            for report_key in report_keys:
-                path_key = _build_override_path_key([report_key, category_key, test_key])
-                matched = tree_tests_by_path.get(path_key)
-                if matched:
-                    return matched
+                report_name = report_aliases.get(
+                    req.get("report_type", ""), req.get("report_type", "")
+                )
+                report_key = _normalize_text_key(str(report_name or ""))
+                if report_key:
+                    report_keys.append(report_key)
 
         candidates = tree_tests_by_name.get(test_key, [])
         if not isinstance(candidates, list) or not candidates:
@@ -6521,7 +7176,9 @@ def _build_controlled_nodes_edges(
                 required_name_by_key[req_key] = str(req_name)
         # Force canonical display name for test_count family.
         if "test_count" in required_name_by_key:
-            required_name_by_key["test_count"] = "试验次数"
+            required_name_by_key["test_count"] = (
+                "正常次数" if _uses_normal_count_label(test_name) else "试验次数"
+            )
         extracted_params = item.get("parameters", []) or []
         if not isinstance(extracted_params, list):
             extracted_params = []
@@ -6677,7 +7334,7 @@ def _build_controlled_nodes_edges(
                 # Canonicalize parameter names to project-defined whitelist labels.
                 param_name = required_name_by_key[normalized_param_key]
             if normalized_param_key == "test_count":
-                param_name = "试验次数"
+                param_name = "正常次数" if _uses_normal_count_label(test_name) else "试验次数"
             if enforce_param_whitelist and not required_param_names:
                 logger.debug(
                     "Drop parameter because whitelist is enabled but no requirements found: test=%s param=%s",
@@ -11042,8 +11699,12 @@ async def _build_context_str(
             "insulation.iec.partial_discharge_applicability", {}
         )
     else:
-        pf_split_rule = domain_rule_decisions.get("insulation.gb.power_frequency_split", {})
-        li_split_rule = domain_rule_decisions.get("insulation.gb.lightning_impulse_split", {})
+        pf_split_rule = domain_rule_decisions.get("insulation.gb.power_frequency_split", {}) or domain_rule_decisions.get(
+            "insulation.gb.power_frequency_joint_voltage_split", {}
+        )
+        li_split_rule = domain_rule_decisions.get("insulation.gb.lightning_impulse_split", {}) or domain_rule_decisions.get(
+            "insulation.gb.lightning_impulse_joint_voltage_split", {}
+        )
         pd_app_rule = domain_rule_decisions.get(
             "insulation.gb.partial_discharge_applicability", {}
         )
@@ -11305,6 +11966,12 @@ async def _build_context_str(
             }
             if filtered_values:
                 display_project_param_value_map[str(test_name)] = filtered_values
+    if (
+        "短路开断试验(T60)" in display_project_param_map
+        and "T60(预备试验)" in display_project_param_map
+    ):
+        display_project_param_map.pop("T60(预备试验)", None)
+        display_project_param_value_map.pop("T60(预备试验)", None)
     resolved_rule_overrides = _build_resolved_rule_overrides(domain_rule_decisions)
     allowed_final_test_items, removed_test_items = _build_final_test_item_scope(
         project_param_map,

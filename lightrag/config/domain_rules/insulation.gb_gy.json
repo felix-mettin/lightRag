@@ -1,6 +1,53 @@
 {
   "rules": [
     {
+      "rule_id": "insulation.gb.power_frequency_split",
+      "domain": "insulation",
+      "kind": "split",
+      "standard": "gb",
+      "test_item": "工频耐受电压试验",
+      "status": "active",
+      "remove_original": false,
+      "inputs": {
+        "base_voltage_labels": [
+          "额定短时工频耐受电压",
+          "额定工频耐受电压"
+        ],
+        "fracture_voltage_labels": [
+          "额定短时工频耐受电压(断口)",
+          "额定工频耐受电压(断口)"
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "less_or_equal_numeric",
+            "label": "额定电压",
+            "value": 40.5,
+            "unit": "kV"
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "工频耐受电压试验",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "工频耐受电压试验",
+          "inherits_from": "工频耐受电压试验",
+          "parameter_overrides": {}
+        },
+        {
+          "test_item": "工频耐受电压试验(断口)",
+          "inherits_from": "工频耐受电压试验",
+          "parameter_overrides": {
+            "试验部位": "开关断口",
+            "试验状态": "干"
+          }
+        }
+      ]
+    },
+    {
       "rule_id": "insulation.gb.power_frequency_joint_voltage_split",
       "domain": "insulation",
       "kind": "split",
@@ -15,9 +62,9 @@
             "conditions": [
               {
                 "source": "query",
-                "type": "greater_numeric",
+                "type": "greater_or_equal_numeric",
                 "label": "额定电压",
-                "value": 40.5,
+                "value": 72.5,
                 "unit": "kV"
               }
             ]
@@ -48,61 +95,6 @@
       ]
     },
     {
-      "rule_id": "insulation.gb.power_frequency_split",
-      "domain": "insulation",
-      "kind": "split",
-      "standard": "gb",
-      "test_item": "工频耐受电压试验",
-      "status": "active",
-      "inputs": {
-        "base_voltage_labels": [
-          "额定短时工频耐受电压",
-          "额定工频耐受电压"
-        ],
-        "fracture_voltage_labels": [
-          "额定短时工频耐受电压(断口)",
-          "额定工频耐受电压(断口)"
-        ],
-        "require_when_all": [
-          {
-            "source": "query",
-            "type": "less_or_equal_numeric",
-            "label": "额定电压",
-            "value": 40.5,
-            "unit": "kV"
-          },
-          {
-            "source": "query",
-            "type": "contains",
-            "label": "断口"
-          }
-        ]
-      },
-      "single_output": {
-        "test_item": "工频耐受电压试验",
-        "parameter_overrides": {
-          "试验部位": "相间、对地及断口",
-          "试验次数": "9次"
-        }
-      },
-      "split_output": [
-        {
-          "test_item": "工频耐受电压试验(断口)",
-          "inherits_from": "工频耐受电压试验",
-          "parameter_overrides": {
-            "试验部位": "开关断口"
-          }
-        },
-        {
-          "test_item": "工频耐受电压试验(相间及对地)",
-          "inherits_from": "工频耐受电压试验",
-          "parameter_overrides": {
-            "试验部位": "相间及对地"
-          }
-        }
-      ]
-    },
-    {
       "rule_id": "insulation.gb.power_frequency_outdoor_state_split",
       "domain": "insulation",
       "kind": "split",
@@ -112,44 +104,30 @@
       "inputs": {
         "trigger_when_any": [
           {
-            "type": "all",
-            "conditions": [
-              {
-                "source": "query",
-                "type": "contains_any",
-                "labels": [
-                  "户外产品",
-                  "户外"
-                ]
-              },
-              {
-                "source": "query",
-                "type": "less_or_equal_numeric",
-                "label": "额定电压",
-                "value": 252,
-                "unit": "kV"
-              }
+            "source": "query",
+            "type": "contains_any",
+            "labels": [
+              "户外产品",
+              "户外"
             ]
           }
         ]
       },
       "single_output": {
         "test_item": "工频耐受电压试验",
-        "parameter_overrides": {
-          "试验状态": "干"
-        }
+        "parameter_overrides": {}
       },
       "split_output": [
         {
-          "test_item": "工频耐受电压试验(干)",
+          "test_item": "工频耐受电压试验#干",
           "inherits_from": "工频耐受电压试验",
           "parameter_overrides": {
             "试验状态": "干",
-            "试验部位": "相间、对地及断口"
+            "试验部位": "相间及对地"
           }
         },
         {
-          "test_item": "工频耐受电压试验(湿)",
+          "test_item": "工频耐受电压试验#湿",
           "inherits_from": "工频耐受电压试验",
           "parameter_overrides": {
             "试验状态": "湿",
@@ -159,12 +137,61 @@
       ]
     },
     {
+      "rule_id": "switching.gb.no_load_applicability",
+      "domain": "switching",
+      "kind": "applicability",
+      "standard": "gb",
+      "test_item": "空载特性测量",
+      "status": "active",
+      "allow_when_any": [
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "开合性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "less_numeric",
+              "label": "额定电压",
+              "value": 72.5,
+              "unit": "kV"
+            }
+          ]
+        },
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "开合性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "contains_any",
+              "labels": [
+                "发电机断路器",
+                "限流电抗器"
+              ]
+            }
+          ]
+        }
+      ],
+      "deny_when_no_match": true
+    },
+    {
       "rule_id": "insulation.gb.lightning_impulse_split",
       "domain": "insulation",
       "kind": "split",
       "standard": "gb",
-      "status": "active",
       "test_item": "雷电冲击耐受电压试验",
+      "status": "active",
+      "remove_original": false,
       "inputs": {
         "base_voltage_labels": [
           "额定雷电冲击耐受电压"
@@ -179,36 +206,28 @@
             "label": "额定电压",
             "value": 40.5,
             "unit": "kV"
-          },
-          {
-            "source": "query",
-            "type": "contains",
-            "label": "断口"
           }
         ]
       },
       "single_output": {
         "test_item": "雷电冲击耐受电压试验",
-        "parameter_overrides": {
-          "试验部位": "相间、对地及断口",
-          "试验次数": "270次"
-        }
+        "parameter_overrides": {}
       },
       "split_output": [
-        {
-          "test_item": "雷电冲击耐受电压试验(断口)",
-          "inherits_from": "雷电冲击耐受电压试验",
-          "parameter_overrides": {
-            "试验部位": "开关断口",
-            "试验次数": "180次"
-          }
-        },
         {
           "test_item": "雷电冲击耐受电压试验(相间及对地)",
           "inherits_from": "雷电冲击耐受电压试验",
           "parameter_overrides": {
             "试验部位": "相间及对地",
-            "试验次数": "270次"
+            "试验状态": "干"
+          }
+        },
+        {
+          "test_item": "雷电冲击耐受电压试验(断口)",
+          "inherits_from": "雷电冲击耐受电压试验",
+          "parameter_overrides": {
+            "试验部位": "开关断口",
+            "试验状态": "干"
           }
         }
       ]
@@ -228,9 +247,9 @@
             "conditions": [
               {
                 "source": "query",
-                "type": "greater_numeric",
+                "type": "greater_or_equal_numeric",
                 "label": "额定电压",
-                "value": 40.5,
+                "value": 72.5,
                 "unit": "kV"
               }
             ]
@@ -256,6 +275,35 @@
       ]
     },
     {
+      "rule_id": "short_circuit.gb.electrical_life_applicability",
+      "domain": "short_circuit",
+      "kind": "applicability",
+      "standard": "gb",
+      "test_item": "电寿命试验",
+      "status": "active",
+      "allow_when_any": [
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "短路性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "less_or_equal_numeric",
+              "label": "额定电压",
+              "value": 40.5,
+              "unit": "kV"
+            }
+          ]
+        }
+      ],
+      "deny_when_no_match": true
+    },
+    {
       "rule_id": "short_circuit.gb.electrical_life_split_30",
       "domain": "short_circuit",
       "kind": "split",
@@ -271,6 +319,13 @@
                 "source": "query",
                 "type": "contains",
                 "label": "短路性能型式试验"
+              },
+              {
+                "source": "query",
+                "type": "less_or_equal_numeric",
+                "label": "额定电压",
+                "value": 40.5,
+                "unit": "kV"
               },
               {
                 "source": "query",
@@ -331,6 +386,13 @@
               },
               {
                 "source": "query",
+                "type": "less_or_equal_numeric",
+                "label": "额定电压",
+                "value": 40.5,
+                "unit": "kV"
+              },
+              {
+                "source": "query",
                 "type": "regex_match",
                 "pattern": "电寿命(?:试验|等级)?(?:[^\\n]{0,20})?50次|50次(?:[^\\n]{0,20})?电寿命(?:试验|等级)?"
               }
@@ -385,6 +447,13 @@
                 "source": "query",
                 "type": "contains",
                 "label": "短路性能型式试验"
+              },
+              {
+                "source": "query",
+                "type": "less_or_equal_numeric",
+                "label": "额定电压",
+                "value": 40.5,
+                "unit": "kV"
               },
               {
                 "source": "query",
@@ -455,12 +524,15 @@
             },
             {
               "source": "query",
-              "type": "contains_any",
-              "labels": [
-                "失步额定值",
-                "额定失步开断电流",
-                "失步开断电流"
-              ]
+              "type": "less_numeric",
+              "label": "额定电压",
+              "value": 72.5,
+              "unit": "kV"
+            },
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "额定失步开断电流"
             }
           ]
         }
@@ -556,8 +628,28 @@
       "allow_when_any": [
         {
           "source": "query",
-          "type": "contains",
-          "label": "短路性能型式试验"
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "短路性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "less_or_equal_numeric",
+              "label": "额定电压",
+              "value": 40.5,
+              "unit": "kV"
+            },
+            {
+              "source": "query",
+              "type": "not_equals_numeric",
+              "label": "额定频率",
+              "value": 60.0,
+              "unit": "Hz"
+            }
+          ]
         }
       ],
       "deny_when_no_match": true
@@ -663,6 +755,24 @@
               "unit": ""
             }
           ]
+        },
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "短路性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "equals_numeric",
+              "label": "首开极系数kpp",
+              "value": 1.3,
+              "unit": ""
+            }
+          ]
         }
       ],
       "deny_when_no_match": true
@@ -736,9 +846,14 @@
             },
             {
               "source": "query",
-              "type": "greater_numeric",
+              "type": "regex_match",
+              "pattern": "断路器等级\\s*(?:(?:[:：=]|为|是)\\s*)?S2(?:级)?"
+            },
+            {
+              "source": "query",
+              "type": "greater_or_equal_numeric",
               "label": "额定电压",
-              "value": 40.5,
+              "value": 24.0,
               "unit": "kV"
             },
             {
@@ -747,14 +862,106 @@
               "label": "额定短路开断电流",
               "value": 12.5,
               "unit": "kA"
+            }
+          ]
+        },
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "短路性能型式试验"
             },
             {
               "source": "query",
-              "type": "contains_any",
-              "labels": [
-                "S2级",
-                "直接和架空线连接"
-              ]
+              "type": "regex_match",
+              "pattern": "断路器等级\\s*(?:(?:[:：=]|为|是)\\s*)?S2(?:级)?"
+            },
+            {
+              "source": "query",
+              "type": "greater_or_equal_numeric",
+              "label": "额定电压",
+              "value": 24.0,
+              "unit": "kV"
+            },
+            {
+              "source": "query",
+              "type": "greater_numeric",
+              "label": "短路开断电流",
+              "value": 12.5,
+              "unit": "kA"
+            }
+          ]
+        },
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "短路性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "断路器等级"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "S2级"
+            },
+            {
+              "source": "query",
+              "type": "greater_numeric",
+              "label": "额定电压",
+              "value": 72.5,
+              "unit": "kV"
+            },
+            {
+              "source": "query",
+              "type": "greater_numeric",
+              "label": "额定短路开断电流",
+              "value": 12.5,
+              "unit": "kA"
+            }
+          ]
+        },
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "短路性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "断路器等级"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "S2级"
+            },
+            {
+              "source": "query",
+              "type": "greater_numeric",
+              "label": "额定电压",
+              "value": 72.5,
+              "unit": "kV"
+            },
+            {
+              "source": "query",
+              "type": "greater_numeric",
+              "label": "短路开断电流",
+              "value": 12.5,
+              "unit": "kA"
             }
           ]
         }
@@ -780,25 +987,22 @@
             },
             {
               "source": "query",
+              "type": "regex_match",
+              "pattern": "断路器等级\\s*(?:(?:[:：=]|为|是)\\s*)?S2(?:级)?"
+            },
+            {
+              "source": "query",
+              "type": "greater_or_equal_numeric",
+              "label": "额定电压",
+              "value": 24.0,
+              "unit": "kV"
+            },
+            {
+              "source": "query",
               "type": "greater_numeric",
               "label": "额定短路开断电流",
               "value": 12.5,
               "unit": "kA"
-            },
-            {
-              "source": "query",
-              "type": "contains_any",
-              "labels": [
-                "S2级",
-                "直接和架空线连接"
-              ]
-            },
-            {
-              "source": "query",
-              "type": "greater_numeric",
-              "label": "额定电压",
-              "value": 40.5,
-              "unit": "kV"
             }
           ]
         },
@@ -813,23 +1017,90 @@
             },
             {
               "source": "query",
-              "type": "greater_numeric",
+              "type": "regex_match",
+              "pattern": "断路器等级\\s*(?:(?:[:：=]|为|是)\\s*)?S2(?:级)?"
+            },
+            {
+              "source": "query",
+              "type": "greater_or_equal_numeric",
               "label": "额定电压",
-              "value": 24,
+              "value": 24.0,
               "unit": "kV"
             },
             {
               "source": "query",
-              "type": "contains_any",
-              "labels": [
-                "S2级",
-                "直接和架空线连接"
-              ]
+              "type": "greater_numeric",
+              "label": "短路开断电流",
+              "value": 12.5,
+              "unit": "kA"
+            }
+          ]
+        },
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "短路性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "断路器等级"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "S2级"
+            },
+            {
+              "source": "query",
+              "type": "greater_numeric",
+              "label": "额定电压",
+              "value": 72.5,
+              "unit": "kV"
             },
             {
               "source": "query",
               "type": "greater_numeric",
               "label": "额定短路开断电流",
+              "value": 12.5,
+              "unit": "kA"
+            }
+          ]
+        },
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "短路性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "断路器等级"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "S2级"
+            },
+            {
+              "source": "query",
+              "type": "greater_numeric",
+              "label": "额定电压",
+              "value": 72.5,
+              "unit": "kV"
+            },
+            {
+              "source": "query",
+              "type": "greater_numeric",
+              "label": "短路开断电流",
               "value": 12.5,
               "unit": "kA"
             }
@@ -1083,76 +1354,15 @@
               "source": "query",
               "type": "contains_any",
               "labels": [
-                "额定电缆充电电流",
-                "电缆充电电流",
-                "电缆充电"
+                "额定电缆充电开断电流",
+                "电缆充电开断电流",
+                "额定电缆充电开合电流",
+                "电缆充电开合电流",
+                "额定短路关合电流",
+                "短路关合电流",
+                "额定关合电流",
+                "关合电流"
               ]
-            }
-          ]
-        },
-        {
-          "source": "query",
-          "type": "all",
-          "conditions": [
-            {
-              "source": "query",
-              "type": "contains",
-              "label": "开合性能型式试验"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定电缆充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电缆充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电缆充电"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定线路充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "线路充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "线路充电"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定电容器组电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电容器组电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定背对背电容器组开断电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "背对背电容器组开断电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电容器组开断电流"
             }
           ]
         }
@@ -1290,14 +1500,14 @@
         },
         "split_output": [
           {
-            "test_item": "容性电流开断试验(CC2-O)",
+            "test_item": "容性电流开断试验(CC2)#1",
             "inherits_from": "容性电流开断试验(CC2)",
             "parameter_overrides": {
               "操作顺序": "O"
             }
           },
           {
-            "test_item": "容性电流开断试验(CC2-CO)",
+            "test_item": "容性电流开断试验(CC2)#2",
             "inherits_from": "容性电流开断试验(CC2)",
             "parameter_overrides": {
               "操作顺序": "CO"
@@ -1332,14 +1542,14 @@
         },
         "split_output": [
           {
-            "test_item": "容性电流开断试验(LC2-O)",
+            "test_item": "容性电流开断试验(LC2)#1",
             "inherits_from": "容性电流开断试验(LC2)",
             "parameter_overrides": {
               "操作顺序": "O"
             }
           },
           {
-            "test_item": "容性电流开断试验(LC2-CO)",
+            "test_item": "容性电流开断试验(LC2)#2",
             "inherits_from": "容性电流开断试验(LC2)",
             "parameter_overrides": {
               "操作顺序": "CO"
@@ -1449,6 +1659,14 @@
         "parameter_overrides": {}
       },
       "split_output": [
+        {
+          "test_item": "操作冲击耐受电压试验",
+          "inherits_from": "操作冲击耐受电压试验",
+          "parameter_overrides": {
+            "试验状态": "干",
+            "试验部位": "相间及对地"
+          }
+        },
         {
           "test_item": "操作冲击耐受电压试验(湿)",
           "inherits_from": "操作冲击耐受电压试验",
@@ -1805,54 +2023,6 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.gb.no_load_applicability",
-      "domain": "switching",
-      "kind": "applicability",
-      "standard": "gb",
-      "test_item": "空载特性测量",
-      "status": "active",
-      "allow_when_any": [
-        {
-          "source": "query",
-          "type": "all",
-          "conditions": [
-            {
-              "source": "query",
-              "type": "contains",
-              "label": "开合性能型式试验"
-            },
-            {
-              "source": "query",
-              "type": "less_numeric",
-              "label": "额定电压",
-              "value": 72.5,
-              "unit": "kV"
-            }
-          ]
-        },
-        {
-          "source": "query",
-          "type": "all",
-          "conditions": [
-            {
-              "source": "query",
-              "type": "contains",
-              "label": "开合性能型式试验"
-            },
-            {
-              "source": "query",
-              "type": "contains_any",
-              "labels": [
-                "发电机断路器",
-                "限流电抗器"
-              ]
-            }
-          ]
-        }
-      ],
-      "deny_when_no_match": true
-    },
-    {
       "rule_id": "insulation.gb.loop_resistance_applicability",
       "domain": "insulation",
       "kind": "applicability",
@@ -1878,54 +2048,11 @@
       "allow_when_any": [
         {
           "source": "query",
-          "type": "all",
-          "conditions": [
-            {
-              "source": "query",
-              "type": "contains_any",
-              "labels": [
-                "绝缘性能型式试验",
-                "绝缘型式"
-              ]
-            },
-            {
-              "source": "query",
-              "type": "regex_match",
-              "pattern": "(?:元件中)?(?:含有|含|有|采用|配置)固封极柱"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "不含固封极柱"
-            }
-          ]
-        },
-        {
-          "source": "query",
-          "type": "all",
-          "conditions": [
-            {
-              "source": "query",
-              "type": "contains_any",
-              "labels": [
-                "绝缘性能型式试验",
-                "绝缘型式"
-              ]
-            },
-            {
-              "source": "query",
-              "type": "regex_extract_not_equals",
-              "label": "型号名称前缀",
-              "pattern": "(?:型号名称|型号)\\s*[：:=]\\s*([A-Za-z0-9]+)",
-              "value": "VF1"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定电流",
-              "value": 4000,
-              "unit": "A"
-            }
+          "type": "contains_any",
+          "labels": [
+            "GIS",
+            "外壳不带电",
+            "固封极柱"
           ]
         }
       ],
@@ -2107,7 +2234,7 @@
               "type": "equals_numeric",
               "label": "额定频率",
               "value": 60.0,
-              "unit": "HZ"
+              "unit": "Hz"
             }
           ]
         },
@@ -2177,8 +2304,10 @@
             },
             {
               "source": "query",
-              "type": "regex_match",
-              "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
+              "type": "equals_numeric",
+              "label": "额定频率",
+              "value": 60.0,
+              "unit": "Hz"
             }
           ]
         }
@@ -2376,6 +2505,11 @@
             },
             {
               "source": "query",
+              "type": "regex_match",
+              "pattern": "断路器等级\\s*(?:(?:[:：=]|为|是)\\s*)?S2(?:级)?"
+            },
+            {
+              "source": "query",
               "type": "greater_or_equal_numeric",
               "label": "额定电压",
               "value": 24.0,
@@ -2390,8 +2524,124 @@
             },
             {
               "source": "query",
+              "type": "equals_numeric",
+              "label": "额定频率",
+              "value": 60.0,
+              "unit": "HZ"
+            }
+          ]
+        },
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
               "type": "contains",
-              "label": "直接连接架空线路"
+              "label": "短路性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "regex_match",
+              "pattern": "断路器等级\\s*(?:(?:[:：=]|为|是)\\s*)?S2(?:级)?"
+            },
+            {
+              "source": "query",
+              "type": "greater_or_equal_numeric",
+              "label": "额定电压",
+              "value": 24.0,
+              "unit": "kV"
+            },
+            {
+              "source": "query",
+              "type": "greater_numeric",
+              "label": "短路开断电流",
+              "value": 12.5,
+              "unit": "kA"
+            },
+            {
+              "source": "query",
+              "type": "equals_numeric",
+              "label": "额定频率",
+              "value": 60.0,
+              "unit": "HZ"
+            }
+          ]
+        },
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "短路性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "断路器等级"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "S2级"
+            },
+            {
+              "source": "query",
+              "type": "greater_numeric",
+              "label": "额定电压",
+              "value": 72.5,
+              "unit": "kV"
+            },
+            {
+              "source": "query",
+              "type": "greater_numeric",
+              "label": "额定短路开断电流",
+              "value": 12.5,
+              "unit": "kA"
+            },
+            {
+              "source": "query",
+              "type": "equals_numeric",
+              "label": "额定频率",
+              "value": 60.0,
+              "unit": "HZ"
+            }
+          ]
+        },
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "短路性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "断路器等级"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "S2级"
+            },
+            {
+              "source": "query",
+              "type": "greater_numeric",
+              "label": "额定电压",
+              "value": 72.5,
+              "unit": "kV"
+            },
+            {
+              "source": "query",
+              "type": "greater_numeric",
+              "label": "短路开断电流",
+              "value": 12.5,
+              "unit": "kA"
             },
             {
               "source": "query",
@@ -2424,17 +2674,8 @@
             },
             {
               "source": "query",
-              "type": "all",
-              "conditions": [
-                {
-                  "source": "query",
-                  "type": "contains_any",
-                  "labels": [
-                    "S2",
-                    "S2级"
-                  ]
-                }
-              ]
+              "type": "regex_match",
+              "pattern": "断路器等级\\s*(?:(?:[:：=]|为|是)\\s*)?S2(?:级)?"
             },
             {
               "source": "query",
@@ -2447,6 +2688,127 @@
               "source": "query",
               "type": "greater_numeric",
               "label": "额定短路开断电流",
+              "value": 12.5,
+              "unit": "kA"
+            },
+            {
+              "source": "query",
+              "type": "equals_numeric",
+              "label": "额定频率",
+              "value": 60.0,
+              "unit": "HZ"
+            }
+          ]
+        },
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "短路性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "regex_match",
+              "pattern": "断路器等级\\s*(?:(?:[:：=]|为|是)\\s*)?S2(?:级)?"
+            },
+            {
+              "source": "query",
+              "type": "greater_or_equal_numeric",
+              "label": "额定电压",
+              "value": 24.0,
+              "unit": "kV"
+            },
+            {
+              "source": "query",
+              "type": "greater_numeric",
+              "label": "短路开断电流",
+              "value": 12.5,
+              "unit": "kA"
+            },
+            {
+              "source": "query",
+              "type": "equals_numeric",
+              "label": "额定频率",
+              "value": 60.0,
+              "unit": "HZ"
+            }
+          ]
+        },
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "短路性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "断路器等级"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "S2级"
+            },
+            {
+              "source": "query",
+              "type": "greater_numeric",
+              "label": "额定电压",
+              "value": 72.5,
+              "unit": "kV"
+            },
+            {
+              "source": "query",
+              "type": "greater_numeric",
+              "label": "额定短路开断电流",
+              "value": 12.5,
+              "unit": "kA"
+            },
+            {
+              "source": "query",
+              "type": "equals_numeric",
+              "label": "额定频率",
+              "value": 60.0,
+              "unit": "HZ"
+            }
+          ]
+        },
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "短路性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "断路器等级"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "S2级"
+            },
+            {
+              "source": "query",
+              "type": "greater_numeric",
+              "label": "额定电压",
+              "value": 72.5,
+              "unit": "kV"
+            },
+            {
+              "source": "query",
+              "type": "greater_numeric",
+              "label": "短路开断电流",
               "value": 12.5,
               "unit": "kA"
             },
@@ -2772,24 +3134,6 @@
               "unit": "Hz"
             }
           ]
-        },
-        {
-          "source": "query",
-          "type": "all",
-          "conditions": [
-            {
-              "source": "query",
-              "type": "contains",
-              "label": "短路性能型式试验"
-            },
-            {
-              "source": "query",
-              "type": "greater_numeric",
-              "label": "频率为60Hz并且额定短路开断电流的直流分量",
-              "value": 20.0,
-              "unit": "%"
-            }
-          ]
         }
       ],
       "deny_when_no_match": true
@@ -2815,7 +3159,7 @@
               "source": "query",
               "type": "less_numeric",
               "label": "额定电压",
-              "value": 42.5,
+              "value": 40.5,
               "unit": "kv"
             },
             {
@@ -2853,6 +3197,13 @@
               "label": "额定电压",
               "value": 72.5,
               "unit": "kV"
+            },
+            {
+              "source": "query",
+              "type": "not_equals_numeric",
+              "label": "额定频率",
+              "value": 60.0,
+              "unit": "Hz"
             }
           ]
         }
@@ -2882,6 +3233,85 @@
               "label": "额定电压",
               "value": 72.5,
               "unit": "kV"
+            },
+            {
+              "source": "query",
+              "type": "not_equals_numeric",
+              "label": "额定频率",
+              "value": 60.0,
+              "unit": "Hz"
+            }
+          ]
+        }
+      ],
+      "deny_when_no_match": true
+    },
+    {
+      "rule_id": "short_circuit.gb.t100s_a_60hz_applicability",
+      "domain": "short_circuit",
+      "kind": "applicability",
+      "standard": "gb",
+      "test_item": "T100s(a)(60Hz)",
+      "status": "active",
+      "allow_when_any": [
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "短路性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "greater_or_equal_numeric",
+              "label": "额定电压",
+              "value": 72.5,
+              "unit": "kV"
+            },
+            {
+              "source": "query",
+              "type": "equals_numeric",
+              "label": "额定频率",
+              "value": 60.0,
+              "unit": "Hz"
+            }
+          ]
+        }
+      ],
+      "deny_when_no_match": true
+    },
+    {
+      "rule_id": "short_circuit.gb.t100s_b_60hz_applicability",
+      "domain": "short_circuit",
+      "kind": "applicability",
+      "standard": "gb",
+      "test_item": "T100s(b)(60Hz)",
+      "status": "active",
+      "allow_when_any": [
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "短路性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "greater_or_equal_numeric",
+              "label": "额定电压",
+              "value": 72.5,
+              "unit": "kV"
+            },
+            {
+              "source": "query",
+              "type": "equals_numeric",
+              "label": "额定频率",
+              "value": 60.0,
+              "unit": "Hz"
             }
           ]
         }
@@ -2984,11 +3414,53 @@
       "allow_when_any": [
         {
           "source": "query",
-          "type": "contains",
-          "label": "绝缘性能型式试验"
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "greater_or_equal_numeric",
+              "label": "额定电压",
+              "value": 72.5,
+              "unit": "kV"
+            },
+            {
+              "source": "query",
+              "type": "contains_any",
+              "labels": [
+                "绝缘性能型式试验",
+                "绝缘型式"
+              ]
+            }
+          ]
         }
       ],
       "deny_when_no_match": true
+    },
+    {
+      "rule_id": "short_circuit.gb.short_peak_current_merge",
+      "domain": "short_circuit",
+      "kind": "pair_merge",
+      "standard": "gb",
+      "test_item": "短时耐受电流试验",
+      "secondary_test_item": "峰值耐受电流试验",
+      "status": "active",
+      "inputs": {
+        "base_current_labels": [
+          "额定短时耐受电流",
+          "短时耐受电流"
+        ],
+        "peak_current_labels": [
+          "额定峰值耐受电流",
+          "峰值耐受电流",
+          "额定峰值电流"
+        ],
+        "ratio_threshold": 2.6
+      },
+      "merged_output": {
+        "test_item": "短时耐受电流和峰值耐受电流试验",
+        "inherits_from": "短时耐受电流试验",
+        "parameter_overrides": {}
+      }
     },
     {
       "rule_id": "short_circuit.gb.peak_withstand_current_applicability",
@@ -3009,7 +3481,7 @@
             },
             {
               "source": "query",
-              "type": "ratio_less",
+              "type": "ratio_greater_or_equal",
               "numerator_labels": [
                 "额定峰值电流",
                 "额定峰值耐受电流"
@@ -3057,19 +3529,10 @@
             },
             {
               "source": "query",
-              "type": "contains_any",
-              "labels": [
-                "额定线路充电电流",
-                "线路充电电流",
-                "线路充电"
-              ]
-            },
-            {
-              "source": "query",
-              "type": "greater_numeric",
-              "label": "额定短路开断电流的直流分量",
-              "value": 20.0,
-              "unit": "%"
+              "type": "not_equals_numeric",
+              "label": "额定频率",
+              "value": 60.0,
+              "unit": "Hz"
             }
           ]
         }
@@ -3097,7 +3560,7 @@
               "source": "query",
               "type": "less_or_equal_numeric",
               "label": "额定电压",
-              "value": 42.5,
+              "value": 40.5,
               "unit": "kv"
             }
           ]
