@@ -239,13 +239,15 @@ def _split_name_and_value(raw_name: str) -> tuple[str, str]:
 
 def _infer_value_source(value_text: str, note_text: str) -> str:
     merged = f"{value_text} {note_text}".strip()
+    # 先检查是否是公式（包含计算符号）
+    if any(token in merged for token in ("计算", "公式", "%", "×", "*", "/", "÷", "+", "-", "=")):
+        return "formula"
+    # 再检查是否需要用户输入
     if any(
             token in merged
             for token in ("用户录入", "用户输入", "用户提供", "客户录入", "客户输入", "客户提供")
     ):
         return "user_input"
-    if any(token in merged for token in ("计算", "公式", "%", "×", "*")):
-        return "formula"
     if "默认" in merged:
         return "default"
     return "standard"
@@ -2854,6 +2856,28 @@ def _apply_domain_rule_decisions_to_project_context(
             resolution_mode="graph_final",
         )
 
+    def _set_all_if_value_missing(
+        param_name: str,
+        value_text: str,
+        *,
+        value_source: str = "rule",
+        calc_rule: str = "",
+        derive_from_rated: str = "",
+    ) -> None:
+        for test_name, params in updated_param_map.items():
+            if not isinstance(params, list):
+                continue
+            if param_name not in params:
+                continue
+            _set_if_value_missing(
+                str(test_name),
+                param_name,
+                value_text,
+                value_source=value_source,
+                calc_rule=calc_rule,
+                derive_from_rated=derive_from_rated,
+            )
+
     for decision in domain_rule_decisions.values():
         if not isinstance(decision, dict):
             continue
@@ -3348,6 +3372,17 @@ def _apply_domain_rule_decisions_to_project_context(
                 calc_rule="40.5kV及以下默认三相。",
             )
 
+    rated_voltage_text = _format_voltage_value(rated_voltage_kv) if rated_voltage_kv is not None else ""
+
+    if rated_voltage_kv is not None:
+        _set_all_if_value_missing(
+            "额定电压",
+            rated_voltage_text,
+            value_source="user_input",
+            calc_rule="用户已明确提供额定电压，问答阶段直接采用该值。",
+            derive_from_rated="额定电压（用户录入）",
+        )
+
     if rated_voltage_kv is not None:
         for test_name in (
             "容性电流开断试验(LC1)",
@@ -3355,7 +3390,6 @@ def _apply_domain_rule_decisions_to_project_context(
             "容性电流开断试验(CC1)",
             "容性电流开断试验(CC2)",
         ):
-            rated_voltage_text = _format_voltage_value(rated_voltage_kv)
             _set_if_value_missing(
                 test_name,
                 "额定电压",
@@ -4023,7 +4057,7 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "工频耐受电压试验(断口)":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
         "工频耐受电压试验(相间及对地)":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
         "工频耐受电压试验(联合电压)":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
-        "雷电冲击耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","额定直流电压(±)","放电次数"},
+        "雷电冲击耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","额定直流电压(±)","放电次数","最大适用海拔"},
         "雷电冲击耐受电压试验(断口)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
         "雷电冲击耐受电压试验(相间及对地)": {"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
         "雷电冲击耐受电压试验(联合电压)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
@@ -4544,11 +4578,11 @@ def _postprocess_electrical_markdown_response(
         return filtered
 
     def _extract_test_name(heading_line: str) -> str | None:
-        match = re.match(r"^##\s*试验项目[:：]\s*(.+?)\s*$", heading_line.strip())
+        match = re.match(r"^(?:##\s*)?试验项目[:：]\s*(.+?)\s*$", heading_line.strip())
         return match.group(1).strip() if match else None
 
     def _rewrite_param_line(test_name: str, line: str) -> str:
-        match = re.match(r"^(\s*-\s*)([^：:]+)([：:])\s*(.+)$", line)
+        match = re.match(r"^(\s*(?:-\s*)?)([^：:]+)([：:])\s*(.+)$", line)
         if not match:
             return line
         prefix, param_name, _colon, remainder = match.groups()
@@ -4563,7 +4597,15 @@ def _postprocess_electrical_markdown_response(
         if "无法确定" in remainder and not str(entry.get("value_text", "") or "").strip():
             return ""
         formatted_line = _format_param_line(canonical_name, param_name, entry)
-        return f"{prefix}{formatted_line[2:]}" if formatted_line.startswith("- ") else line
+        if not formatted_line.startswith("- "):
+            return line
+        return f"{prefix or '- '}{formatted_line[2:]}"
+
+    def _looks_like_param_line(line: str) -> bool:
+        stripped = line.strip()
+        if not stripped or _extract_test_name(stripped) is not None:
+            return False
+        return re.match(r"^(?:-\s*)?[^：:]+[：:].+$", stripped) is not None
 
     def _filter_c_section(lines: list[str]) -> list[str]:
         filtered: list[str] = []
@@ -4587,8 +4629,10 @@ def _postprocess_electrical_markdown_response(
                     if index == 0 and current_name:
                         filtered.append(f"## 试验项目：{display_name}")
                         continue
-                    if block_line.lstrip().startswith("- "):
+                    if _looks_like_param_line(block_line):
                         match = re.match(r"^\s*-\s*([^：:]+)[：:]", block_line)
+                        if not match:
+                            match = re.match(r"^\s*([^：:]+)[：:]", block_line)
                         if match:
                             seen_param_names.add(match.group(1).strip())
                         rewritten = _rewrite_param_line(canonical_name, block_line)
@@ -4615,7 +4659,7 @@ def _postprocess_electrical_markdown_response(
             current_name = None
 
         for line in lines:
-            if line.startswith("## "):
+            if _extract_test_name(line) is not None:
                 _flush()
                 current_name = _extract_test_name(line)
                 current_block = [line]
@@ -6587,6 +6631,10 @@ def _build_controlled_nodes_edges(
         if any(p in merged for p in placeholders):
             return True
 
+        # formula类型参数通常包含计算表达式，不应被过滤
+        if value_source == "formula":
+            return False
+
         # Drop reference-only texts (e.g. "按 GB/Txxxx 规定", "T11022-2011规定")
         # when they do not contain executable values/defaults/enums.
         ref_markers = ("规定", "依据", "按照", "见")
@@ -6662,8 +6710,9 @@ def _build_controlled_nodes_edges(
             return False
         if "\n" in text:
             return True
-        # Drop long prose-like texts that usually come from clause narration leakage.
-        if len(text) > 80 and any(token in text for token in ("。", "；", "，", "适用于", "规定了", "应装设")):
+        # 不再过滤长文本，因为公式类型参数通常包含较长表达式
+        # 只过滤明显是条款叙述泄漏的文本
+        if any(token in text for token in ("适用于", "规定了", "应装设", "本标准", "本规范")):
             return True
         return False
 
