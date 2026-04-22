@@ -240,8 +240,8 @@ def _split_name_and_value(raw_name: str) -> tuple[str, str]:
 def _infer_value_source(value_text: str, note_text: str) -> str:
     merged = f"{value_text} {note_text}".strip()
     if any(
-        token in merged
-        for token in ("用户录入", "用户输入", "用户提供", "客户录入", "客户输入", "客户提供")
+            token in merged
+            for token in ("用户录入", "用户输入", "用户提供", "客户录入", "客户输入", "客户提供")
     ):
         return "user_input"
     if any(token in merged for token in ("计算", "公式", "%", "×", "*")):
@@ -252,12 +252,12 @@ def _infer_value_source(value_text: str, note_text: str) -> str:
 
 
 def _classify_query_value_resolution_mode(
-    value_text: str,
-    value_source: str,
-    value_expr: str = "",
-    constraints: str = "",
-    calc_rule: str = "",
-    derive_from_rated: str = "",
+        value_text: str,
+        value_source: str,
+        value_expr: str = "",
+        constraints: str = "",
+        calc_rule: str = "",
+        derive_from_rated: str = "",
 ) -> str:
     """Classify whether a graph parameter value can be used as a final answer directly.
 
@@ -283,8 +283,8 @@ def _classify_query_value_resolution_mode(
         return "missing"
 
     if value_source == "user_input" or any(
-        token in merged
-        for token in ("用户录入", "用户输入", "用户提供", "客户录入", "客户输入", "客户提供")
+            token in merged
+            for token in ("用户录入", "用户输入", "用户提供", "客户录入", "客户输入", "客户提供")
     ):
         return "needs_user_input"
 
@@ -294,7 +294,7 @@ def _classify_query_value_resolution_mode(
     formula_markers = ("%", "×", "*", "√", "/")
     formula_context_markers = ("额定电压", "额定电流", "Ur", "Isc", "根3", "公式", "计算")
     if any(marker in merged for marker in formula_markers) and any(
-        marker in merged for marker in formula_context_markers
+            marker in merged for marker in formula_context_markers
     ):
         return "needs_formula"
 
@@ -335,7 +335,7 @@ def _classify_query_value_resolution_mode(
         r"(?:用户|客户).*(?:决定|选择|提供)",
     )
     if derive_from_rated.strip() or any(
-        marker in merged for marker in conditional_markers
+            marker in merged for marker in conditional_markers
     ) or any(re.search(pattern, merged) for pattern in conditional_patterns):
         return "needs_condition"
 
@@ -367,7 +367,7 @@ def _extract_corrected_value_text(note_text: str) -> str:
         idx = text.find(marker)
         if idx < 0:
             continue
-        corrected = text[idx + len(marker) :].strip()
+        corrected = text[idx + len(marker):].strip()
         corrected = re.sub(r"^[：:，,。.、\-\s]+", "", corrected)
         if corrected:
             return corrected
@@ -450,7 +450,8 @@ def _extract_missing_feature_params(note_text: str) -> list[tuple[str, str]]:
             if "特征值" in param_name:
                 continue
             if "试验" in param_name and "次数" not in param_name and "相数" not in param_name:
-                if not any(token in param_name for token in ("电压", "电流", "频率", "状态", "部位", "介质", "极性", "时间", "类别", "顺序", "项数")):
+                if not any(token in param_name for token in
+                           ("电压", "电流", "频率", "状态", "部位", "介质", "极性", "时间", "类别", "顺序", "项数")):
                     continue
             items.append((param_name, value_hint))
             continue
@@ -465,7 +466,7 @@ def _extract_missing_feature_params(note_text: str) -> list[tuple[str, str]]:
         for prefix in known_prefixes:
             if stripped_segment.startswith(prefix):
                 matched_prefix = prefix
-                payload = stripped_segment[len(prefix) :].strip("：:，, ")
+                payload = stripped_segment[len(prefix):].strip("：:，, ")
                 break
         if matched_prefix:
             items.append((matched_prefix, payload))
@@ -490,7 +491,7 @@ def _extract_missing_test_items(note_text: str) -> list[tuple[str, str]]:
         if not test_name:
             continue
         detail = ""
-        tail = text[matched.end() :]
+        tail = text[matched.end():]
         detail_matched = re.search(
             r"(?:全量)?特征值(?:应该)?为\s*([^)；;。]+(?:\([^)]*\)[^)；;。]*)?)", tail
         )
@@ -597,8 +598,8 @@ def _resolve_override_value_text(value_text: str, note_text: str, value_source: 
         # T100s/T100a short-circuit tests where the note contains both the
         # user-input variable and the surrounding applicability logic.
         if any(
-            token in note_text
-            for token in ("三相", "单相", "合成试验", "试验方式", "共箱", "分箱", "其余")
+                token in note_text
+                for token in ("三相", "单相", "合成试验", "试验方式", "共箱", "分箱", "其余")
         ):
             return note_text
         user_text = _extract_user_input_text(note_text)
@@ -610,32 +611,32 @@ def _resolve_override_value_text(value_text: str, note_text: str, value_source: 
     # Reviewer often places the final corrected value directly in the note,
     # e.g. "O", "CO", "2 kV". Treat short standalone notes as authoritative.
     if (
-        note_text
-        and len(note_text) <= 32
-        and "\n" not in note_text
-        and not note_text.startswith("缺")
-        and not _note_is_remove(note_text)
+            note_text
+            and len(note_text) <= 32
+            and "\n" not in note_text
+            and not note_text.startswith("缺")
+            and not _note_is_remove(note_text)
     ):
         return note_text
     if note_text:
         # In reviewer-driven annotation mode, note text often is the corrected final value.
         if any(
-            token in note_text
-            for token in (
-                "用户录入",
-                "客户录入",
-                "默认",
-                "根据用户",
-                "应当",
-                "应为",
-                "改为",
-                "改成",
-                "C1",
-                "C2",
-                "sqrt",
-                "根3",
-                "%",
-            )
+                token in note_text
+                for token in (
+                        "用户录入",
+                        "客户录入",
+                        "默认",
+                        "根据用户",
+                        "应当",
+                        "应为",
+                        "改为",
+                        "改成",
+                        "C1",
+                        "C2",
+                        "sqrt",
+                        "根3",
+                        "%",
+                )
         ):
             return note_text
     return (value_text or "").strip()
@@ -717,7 +718,8 @@ def _sanitize_value_text(value_text: str) -> str:
             score += 6
         if _is_english_formula_like(s):
             score -= 16
-        if re.fullmatch(r"(?:u|ur|u_r|rated_voltage|i_sc|rated_short_circuit_current)(?:\s*(?:kv|ka|v|a))?", s, flags=re.IGNORECASE):
+        if re.fullmatch(r"(?:u|ur|u_r|rated_voltage|i_sc|rated_short_circuit_current)(?:\s*(?:kv|ka|v|a))?", s,
+                        flags=re.IGNORECASE):
             score -= 24
         if len(s) > 120:
             score -= 8
@@ -787,10 +789,10 @@ def _sanitize_value_text(value_text: str) -> str:
 
 
 def _find_override_rule_by_test_name(
-    tree_tests_by_path: dict[str, Any],
-    report_type: str,
-    category: str,
-    test_name: str,
+        tree_tests_by_path: dict[str, Any],
+        report_type: str,
+        category: str,
+        test_name: str,
 ) -> dict[str, Any] | None:
     if not isinstance(tree_tests_by_path, dict):
         return None
@@ -802,11 +804,11 @@ def _find_override_rule_by_test_name(
         if not isinstance(rule, dict):
             continue
         if _normalize_text_key(str(rule.get("report_type", "") or "")) != _normalize_text_key(
-            report_type
+                report_type
         ):
             continue
         if _normalize_text_key(str(rule.get("category", "") or "")) != _normalize_text_key(
-            category
+                category
         ):
             continue
         if _normalize_text_key(str(rule.get("test_name", "") or "")) == normalized_name:
@@ -815,10 +817,10 @@ def _find_override_rule_by_test_name(
 
 
 def _expand_shorthand_param_value(
-    value_text: str,
-    param_name: str,
-    override_rule: dict[str, Any],
-    tree_tests_by_path: dict[str, Any],
+        value_text: str,
+        param_name: str,
+        override_rule: dict[str, Any],
+        tree_tests_by_path: dict[str, Any],
 ) -> str:
     text = (value_text or "").strip()
     if not text:
@@ -857,11 +859,11 @@ def _expand_shorthand_param_value(
             if fallback_candidates:
                 for rule in fallback_candidates:
                     if _normalize_text_key(str(rule.get("report_type", "") or "")) != _normalize_text_key(
-                        report_type
+                            report_type
                     ):
                         continue
                     if _normalize_text_key(str(rule.get("category", "") or "")) != _normalize_text_key(
-                        category
+                            category
                     ):
                         continue
                     target_rule = rule
@@ -889,7 +891,7 @@ def _expand_shorthand_param_value(
 
 
 def _load_tree_override_rules_single(
-    schema_cfg: dict | None = None, override_path: Path | None = None
+        schema_cfg: dict | None = None, override_path: Path | None = None
 ) -> dict[str, Any]:
     """Load one annotation source (tree JSON or normalized rules JSON)."""
     if override_path is None:
@@ -901,7 +903,7 @@ def _load_tree_override_rules_single(
     }
 
     def _resolve_legacy_report_type(
-        path_parts: list[str], report_type: str, category: str
+            path_parts: list[str], report_type: str, category: str
     ) -> str:
         report_text = str(report_type or "").strip()
         category_text = str(category or "").strip()
@@ -1253,8 +1255,8 @@ def _load_tree_override_rules_single(
                             raw_rule_name
                         )
                         if (
-                            _normalize_text_key(cleaned_rule_name) == "规则"
-                            and cleaned_rule_payload
+                                _normalize_text_key(cleaned_rule_name) == "规则"
+                                and cleaned_rule_payload
                         ):
                             cleaned_rule_name = (
                                 cleaned_rule_payload.split("|", 1)[0].strip()
@@ -1286,7 +1288,7 @@ def _load_tree_override_rules_single(
 
 
 def _merge_annotation_rules(
-    base_rules: dict[str, Any], patch_rules: dict[str, Any]
+        base_rules: dict[str, Any], patch_rules: dict[str, Any]
 ) -> dict[str, Any]:
     if not base_rules:
         base_rules = {}
@@ -1306,18 +1308,18 @@ def _merge_annotation_rules(
             continue
         combined_rule = dict(existing_rule)
         for top_key in (
-            "test_name",
-            "category",
-            "report_type",
-            "path_parts",
-            "path_key",
-            "note",
-            "aliases",
-            "acceptance_criteria",
-            "required_reports",
-            "parameters_mode",
-            "template_only",
-            "skip",
+                "test_name",
+                "category",
+                "report_type",
+                "path_parts",
+                "path_key",
+                "note",
+                "aliases",
+                "acceptance_criteria",
+                "required_reports",
+                "parameters_mode",
+                "template_only",
+                "skip",
         ):
             if top_key in patch_rule and patch_rule.get(top_key) not in (None, ""):
                 combined_rule[top_key] = patch_rule.get(top_key)
@@ -1546,10 +1548,10 @@ def _load_tree_override_rules(schema_cfg: dict | None = None) -> dict[str, Any]:
         else bool(auto_merge_raw)
     )
     if (
-        auto_merge_to_memory
-        and memory_path is not None
-        and (source_paths or memory_path.exists())
-        and merged_rules
+            auto_merge_to_memory
+            and memory_path is not None
+            and (source_paths or memory_path.exists())
+            and merged_rules
     ):
         try:
             memory_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1981,7 +1983,7 @@ def _evaluate_domain_rule_decisions(
                 if normalized_stand_type == "DLT":
                     expected_rule_id = "insulation.dlt.power_frequency_outdoor_state_split"
                 elif normalized_stand_type == "IEC":
-                    expected_rule_id = "insulation.iec.power_frequency_outdoor_state_split"
+                    expected_rule_id = "insulation.gb.power_frequency_outdoor_state_split"
                 else:
                     expected_rule_id = "insulation.gb.power_frequency_outdoor_state_split"
                 if (
@@ -2076,7 +2078,7 @@ def _evaluate_domain_rule_decisions(
                 if normalized_stand_type == "DLT":
                     expected_rule_id = "insulation.dlt.power_frequency_split"
                 elif normalized_stand_type == "IEC":
-                    expected_rule_id = "insulation.iec.power_frequency_split"
+                    expected_rule_id = "insulation.gb.power_frequency_split"
                 else:
                     expected_rule_id = "insulation.gb.power_frequency_split"
                 if (
@@ -3899,8 +3901,8 @@ def _build_resolved_rule_overrides(
 
 
 def _build_final_test_item_scope(
-    project_param_map: dict[str, list[str]],
-    domain_rule_decisions: dict[str, Any],
+        project_param_map: dict[str, list[str]],
+        domain_rule_decisions: dict[str, Any],
 ) -> tuple[list[str], list[str]]:
     allowed_items = list(project_param_map.keys())
     removed_items: list[str] = []
@@ -4010,7 +4012,7 @@ def _should_bypass_query_cache(global_config: dict[str, Any] | None) -> bool:
 
 
 def _get_display_param_suppressions() -> dict[str, set[str]]:
-    # return {} 
+    # return {}
     return {
         "前后回路电阻测量试验": {"回路电阻", "辅助和控制设备的电阻"},
         "工频耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
@@ -4221,10 +4223,10 @@ def _extract_current_report_scopes(query_text: str, schema_cfg: dict[str, Any] |
             alias_text = str(alias).strip()
             canonical_text = str(canonical).strip()
             if (
-                alias_text
-                and canonical_text
-                and alias_text in text
-                and canonical_text not in matched
+                    alias_text
+                    and canonical_text
+                    and alias_text in text
+                    and canonical_text not in matched
             ):
                 matched.append(canonical_text)
 
@@ -4272,10 +4274,10 @@ def _extract_current_report_scopes(query_text: str, schema_cfg: dict[str, Any] |
                     # Pattern: this prefix, then (connector + another known prefix)*,
                     # then optional connector, then the shared suffix.
                     pat = (
-                        re.escape(prefix)
-                        + r"(?:[及和、,，\s]+(?:" + other_alts + r"))*"
-                        + r"[及和、,，\s]*"
-                        + re.escape(candidate_suffix)
+                            re.escape(prefix)
+                            + r"(?:[及和、,，\s]+(?:" + other_alts + r"))*"
+                            + r"[及和、,，\s]*"
+                            + re.escape(candidate_suffix)
                     )
                     if re.search(pat, text):
                         newly_matched.append(report_name)
@@ -4288,10 +4290,10 @@ def _extract_current_report_scopes(query_text: str, schema_cfg: dict[str, Any] |
 
 
 def _merge_keywords_with_report_scope_fallback(
-    query_text: str,
-    hl_keywords: list[str] | None,
-    ll_keywords: list[str] | None,
-    schema_cfg: dict[str, Any] | None = None,
+        query_text: str,
+        hl_keywords: list[str] | None,
+        ll_keywords: list[str] | None,
+        schema_cfg: dict[str, Any] | None = None,
 ) -> tuple[list[str], list[str]]:
     cfg = schema_cfg or {}
     current_report_scopes = _extract_current_report_scopes(query_text, cfg)
@@ -4332,10 +4334,10 @@ def _merge_keywords_with_report_scope_fallback(
 
 
 def _filter_project_context_by_report_scope(
-    project_param_map: dict[str, list[str]],
-    project_param_value_map: dict[str, dict[str, dict[str, str]]],
-    current_report_scopes: list[str],
-    domain_rule_decisions: dict[str, Any] | None = None,
+        project_param_map: dict[str, list[str]],
+        project_param_value_map: dict[str, dict[str, dict[str, str]]],
+        current_report_scopes: list[str],
+        domain_rule_decisions: dict[str, Any] | None = None,
 ) -> tuple[dict[str, list[str]], dict[str, dict[str, dict[str, str]]]]:
     if not current_report_scopes:
         return project_param_map, project_param_value_map
@@ -4373,8 +4375,8 @@ def _filter_project_context_by_report_scope(
 
 
 def _postprocess_electrical_markdown_response(
-    response_text: str,
-    raw_data: dict[str, Any] | None,
+        response_text: str,
+        raw_data: dict[str, Any] | None,
 ) -> str:
     if not response_text or not isinstance(raw_data, dict):
         return response_text
@@ -4459,7 +4461,7 @@ def _postprocess_electrical_markdown_response(
             entry.update(
                 {
                     "value_source": str(entry.get("value_source", "") or "").strip()
-                    or "rule",
+                                    or "rule",
                     "calc_rule": "未命中SF6、六氟化硫、充气断路器、充油断路器等明确介质证据时，介质性质强制按正常输出。",
                 }
             )
@@ -4576,8 +4578,8 @@ def _postprocess_electrical_markdown_response(
             canonical_name = _canonical_test_name(current_name or "") if current_name else ""
             display_name = _display_test_name(current_name or "") if current_name else ""
             if canonical_name and (
-                canonical_name in allowed_set
-                or (display_name in allowed_display_set and display_name not in removed_display_set)
+                    canonical_name in allowed_set
+                    or (display_name in allowed_display_set and display_name not in removed_display_set)
             ):
                 seen_items.add(canonical_name)
                 seen_param_names: set[str] = set()
@@ -4643,7 +4645,7 @@ def _postprocess_electrical_markdown_response(
                 canonical_name = _canonical_test_name(item)
                 display_name = _display_test_name(item)
                 if canonical_name in allowed_set or (
-                    display_name in allowed_display_set and display_name not in removed_display_set
+                        display_name in allowed_display_set and display_name not in removed_display_set
                 ):
                     count_text = stripped.split(count_label, 1)[1].strip()
                     preferred_count_label = (
@@ -4727,9 +4729,9 @@ def _postprocess_electrical_markdown_response(
 
 
 def _cleanup_model_response_text(
-    response_text: str,
-    sys_prompt: str,
-    query: str,
+        response_text: str,
+        sys_prompt: str,
+        query: str,
 ) -> str:
     cleaned = str(response_text or "")
     if sys_prompt and len(cleaned) > len(sys_prompt):
@@ -4824,9 +4826,9 @@ async def _stream_electrical_response_with_final_event(
 
 
 def _log_electrical_answer_debug(
-    stage: str,
-    raw_data: dict[str, Any] | None,
-    response_text: str | None = None,
+        stage: str,
+        raw_data: dict[str, Any] | None,
+        response_text: str | None = None,
 ) -> None:
     if not isinstance(raw_data, dict):
         return
@@ -4921,8 +4923,8 @@ def _should_keep_full_trace_value(stage: str, key: str) -> bool:
 
 
 def _build_project_param_coverage_summary(
-    project_param_map: dict[str, Any] | None,
-    project_param_value_map: dict[str, Any] | None,
+        project_param_map: dict[str, Any] | None,
+        project_param_value_map: dict[str, Any] | None,
 ) -> dict[str, dict[str, Any]]:
     summary: dict[str, dict[str, Any]] = {}
     normalized_project_param_map = project_param_map or {}
@@ -5016,16 +5018,16 @@ def _summarize_trace_payload(stage: str, payload: dict[str, Any]) -> dict[str, A
 
 
 def _start_electrical_trace_session(
-    *,
-    source: str,
-    mode: str,
-    query: str,
-    retrieval_query: str,
-    user_prompt: str,
-    response_type: str,
-    current_report_scopes: list[str] | None = None,
-    scope_focused_query_applied: bool | None = None,
-    scope_focused_query_reason: str = "",
+        *,
+        source: str,
+        mode: str,
+        query: str,
+        retrieval_query: str,
+        user_prompt: str,
+        response_type: str,
+        current_report_scopes: list[str] | None = None,
+        scope_focused_query_applied: bool | None = None,
+        scope_focused_query_reason: str = "",
 ) -> str:
     trace_id = f"{source}-{uuid.uuid4().hex[:8]}"
     trace_context = {
@@ -5043,7 +5045,7 @@ def _start_electrical_trace_session(
     }
     _CURRENT_ELECTRICAL_TRACE.set(trace_context)
     _electrical_debug_logger.info(
-        "========== ELECTRICAL TRACE START trace=%s ==========" ,
+        "========== ELECTRICAL TRACE START trace=%s ==========",
         trace_id,
     )
     _log_electrical_trace(
@@ -5072,7 +5074,7 @@ def _log_electrical_trace(stage: str, **payload: Any) -> None:
     stage_headers_logged = trace_context.setdefault("stage_headers_logged", set())
     if stage not in stage_headers_logged:
         _electrical_debug_logger.info(
-            "========== **[%s] %s** trace=%s ==========" ,
+            "========== **[%s] %s** trace=%s ==========",
             stage,
             step_desc,
             trace_id,
@@ -5145,7 +5147,7 @@ def _enforce_formula_consistency(response_text: str) -> str:
 
         prefix, current_value, suffix = param_match.groups()
         if _normalize_value_for_compare(current_value) == _normalize_value_for_compare(
-            calc_value
+                calc_value
         ):
             corrected_lines.append(line)
             continue
@@ -5163,12 +5165,12 @@ def _enforce_formula_consistency(response_text: str) -> str:
 
 
 def _log_model_input_trace(
-    stage: str,
-    *,
-    system_prompt: str,
-    user_query: str,
-    context_data: str,
-    history_messages: list[dict[str, str]] | None,
+        stage: str,
+        *,
+        system_prompt: str,
+        user_query: str,
+        context_data: str,
+        history_messages: list[dict[str, str]] | None,
 ) -> None:
     assembled_prompt = "\n\n".join([system_prompt, "---User Query---", user_query])
     _log_electrical_trace(
@@ -5184,7 +5186,7 @@ def _log_model_input_trace(
 
 
 def _truncate_entity_identifier(
-    identifier: str, limit: int, chunk_key: str, identifier_role: str
+        identifier: str, limit: int, chunk_key: str, identifier_role: str
 ) -> str:
     """Truncate entity identifiers that exceed the configured length limit."""
 
@@ -5205,12 +5207,12 @@ def _truncate_entity_identifier(
 
 
 def chunking_by_token_size(
-    tokenizer: Tokenizer,
-    content: str,
-    split_by_character: str | None = None,
-    split_by_character_only: bool = False,
-    chunk_overlap_token_size: int = 100,
-    chunk_token_size: int = 1200,
+        tokenizer: Tokenizer,
+        content: str,
+        split_by_character: str | None = None,
+        split_by_character_only: bool = False,
+        chunk_overlap_token_size: int = 100,
+        chunk_token_size: int = 1200,
 ) -> list[dict[str, Any]]:
     def _prepare_chunk_content_for_table_chunking(raw_text: str) -> str:
         text = str(raw_text or "")
@@ -5253,10 +5255,10 @@ def chunking_by_token_size(
                 _tokens = tokenizer.encode(chunk)
                 if len(_tokens) > chunk_token_size:
                     for start in range(
-                        0, len(_tokens), chunk_token_size - chunk_overlap_token_size
+                            0, len(_tokens), chunk_token_size - chunk_overlap_token_size
                     ):
                         chunk_content = tokenizer.decode(
-                            _tokens[start : start + chunk_token_size]
+                            _tokens[start: start + chunk_token_size]
                         )
                         new_chunks.append(
                             (min(chunk_token_size, len(_tokens) - start), chunk_content)
@@ -5273,9 +5275,9 @@ def chunking_by_token_size(
             )
     else:
         for index, start in enumerate(
-            range(0, len(tokens), chunk_token_size - chunk_overlap_token_size)
+                range(0, len(tokens), chunk_token_size - chunk_overlap_token_size)
         ):
-            chunk_content = tokenizer.decode(tokens[start : start + chunk_token_size])
+            chunk_content = tokenizer.decode(tokens[start: start + chunk_token_size])
             results.append(
                 {
                     "tokens": min(chunk_token_size, len(tokens) - start),
@@ -5287,12 +5289,12 @@ def chunking_by_token_size(
 
 
 async def _handle_entity_relation_summary(
-    description_type: str,
-    entity_or_relation_name: str,
-    description_list: list[str],
-    seperator: str,
-    global_config: dict,
-    llm_response_cache: BaseKVStorage | None = None,
+        description_type: str,
+        entity_or_relation_name: str,
+        description_list: list[str],
+        seperator: str,
+        global_config: dict,
+        llm_response_cache: BaseKVStorage | None = None,
 ) -> tuple[str, bool]:
     """Handle entity relation description summary using map-reduce approach.
 
@@ -5337,8 +5339,8 @@ async def _handle_entity_relation_summary(
         # If total length is within limits, perform final summarization
         if total_tokens <= summary_context_size or len(current_list) <= 2:
             if (
-                len(current_list) < force_llm_summary_on_merge
-                and total_tokens < summary_max_tokens
+                    len(current_list) < force_llm_summary_on_merge
+                    and total_tokens < summary_max_tokens
             ):
                 # no LLM needed, just join the descriptions
                 final_description = seperator.join(current_list)
@@ -5419,11 +5421,11 @@ async def _handle_entity_relation_summary(
 
 
 async def _summarize_descriptions(
-    description_type: str,
-    description_name: str,
-    description_list: list[str],
-    global_config: dict,
-    llm_response_cache: BaseKVStorage | None = None,
+        description_type: str,
+        description_name: str,
+        description_list: list[str],
+        global_config: dict,
+        llm_response_cache: BaseKVStorage | None = None,
 ) -> str:
     """Helper function to summarize a list of descriptions using LLM.
 
@@ -5501,10 +5503,10 @@ async def _summarize_descriptions(
 
 
 async def _handle_single_entity_extraction(
-    record_attributes: list[str],
-    chunk_key: str,
-    timestamp: int,
-    file_path: str = "unknown_source",
+        record_attributes: list[str],
+        chunk_key: str,
+        timestamp: int,
+        file_path: str = "unknown_source",
 ):
     if len(record_attributes) != 4 or "entity" not in record_attributes[0]:
         if len(record_attributes) > 1 and "entity" in record_attributes[0]:
@@ -5532,7 +5534,7 @@ async def _handle_single_entity_extraction(
         )
 
         if not entity_type.strip() or any(
-            char in entity_type for char in ["'", "(", ")", "<", ">", "|", "/", "\\"]
+                char in entity_type for char in ["'", "(", ")", "<", ">", "|", "/", "\\"]
         ):
             logger.warning(
                 f"Entity extraction error: invalid entity type in: {record_attributes}"
@@ -5573,13 +5575,13 @@ async def _handle_single_entity_extraction(
 
 
 async def _handle_single_relationship_extraction(
-    record_attributes: list[str],
-    chunk_key: str,
-    timestamp: int,
-    file_path: str = "unknown_source",
+        record_attributes: list[str],
+        chunk_key: str,
+        timestamp: int,
+        file_path: str = "unknown_source",
 ):
     if (
-        len(record_attributes) != 5 or "relation" not in record_attributes[0]
+            len(record_attributes) != 5 or "relation" not in record_attributes[0]
     ):  # treat "relationship" and "relation" interchangeable
         if len(record_attributes) > 1 and "relation" in record_attributes[0]:
             logger.warning(
@@ -5846,9 +5848,9 @@ async def rebuild_knowledge_from_chunks(
             # Sort src and tgt to ensure order-independent lock key generation
             sorted_key_parts = sorted([src, tgt])
             async with get_storage_keyed_lock(
-                sorted_key_parts,
-                namespace=namespace,
-                enable_logging=False,
+                    sorted_key_parts,
+                    namespace=namespace,
+                    enable_logging=False,
             ):
                 try:
                     await _rebuild_single_relationship(
@@ -5942,9 +5944,9 @@ async def rebuild_knowledge_from_chunks(
 
 
 async def _get_cached_extraction_results(
-    llm_response_cache: BaseKVStorage,
-    chunk_ids: set[str],
-    text_chunks_storage: BaseKVStorage,
+        llm_response_cache: BaseKVStorage,
+        chunk_ids: set[str],
+        text_chunks_storage: BaseKVStorage,
 ) -> dict[str, list[str]]:
     """Get cached extraction results for specific chunk IDs
 
@@ -5989,10 +5991,10 @@ async def _get_cached_extraction_results(
     valid_entries = 0
     for cache_entry in cache_data_list:
         if (
-            cache_entry is not None
-            and isinstance(cache_entry, dict)
-            and cache_entry.get("cache_type") == "extract"
-            and cache_entry.get("chunk_id") in chunk_ids
+                cache_entry is not None
+                and isinstance(cache_entry, dict)
+                and cache_entry.get("cache_type") == "extract"
+                and cache_entry.get("chunk_id") in chunk_ids
         ):
             chunk_id = cache_entry["chunk_id"]
             extraction_result = cache_entry["return"]
@@ -6032,12 +6034,12 @@ async def _get_cached_extraction_results(
 
 
 async def _process_extraction_result(
-    result: str,
-    chunk_key: str,
-    timestamp: int,
-    file_path: str = "unknown_source",
-    tuple_delimiter: str = "<|#|>",
-    completion_delimiter: str = "<|COMPLETE|>",
+        result: str,
+        chunk_key: str,
+        timestamp: int,
+        file_path: str = "unknown_source",
+        tuple_delimiter: str = "<|#|>",
+        completion_delimiter: str = "<|COMPLETE|>",
 ) -> tuple[dict, dict]:
     """Process a single extraction result (either initial or gleaning)
     Args:
@@ -6075,7 +6077,7 @@ async def _process_extraction_result(
         )
         for entity_record in entity_records:
             if not entity_record.startswith("entity") and not entity_record.startswith(
-                "relation"
+                    "relation"
             ):
                 entity_record = f"entity<|{entity_record}"
             entity_relation_records = split_string_by_multi_markers(
@@ -6088,7 +6090,7 @@ async def _process_extraction_result(
             )
             for entity_relation_record in entity_relation_records:
                 if not entity_relation_record.startswith(
-                    "entity"
+                        "entity"
                 ) and not entity_relation_record.startswith("relation"):
                     entity_relation_record = (
                         f"relation{tuple_delimiter}{entity_relation_record}"
@@ -6271,15 +6273,15 @@ def _parameter_quality_score(node_data: dict, stand_type: str | None = None) -> 
         bool(re.search(r"\d", merged_text))
         or any(token in merged_text for token in ("%", "×", "*", "√", "/", "kV", "kA", "Hz", "ms", "min"))
     )
-    reference_penalty = -1 if _is_reference_only_value_text(merged_text,stand_type=stand_type) else 0
+    reference_penalty = -1 if _is_reference_only_value_text(merged_text, stand_type=stand_type) else 0
     specificity = min(len(merged_text), 80) if has_measurable_detail else 0
     has_unit = int(bool(unit))
     return (source_rank, has_measurable_detail, reference_penalty, has_unit, specificity)
 
 
 def _prefer_incoming_parameter(existing: dict, incoming: dict, stand_type: str | None = None) -> bool:
-    existing_score = _parameter_quality_score(existing,stand_type=stand_type)
-    incoming_score = _parameter_quality_score(incoming,stand_type=stand_type)
+    existing_score = _parameter_quality_score(existing, stand_type=stand_type)
+    incoming_score = _parameter_quality_score(incoming, stand_type=stand_type)
     if incoming_score > existing_score:
         return True
     if incoming_score < existing_score:
@@ -6296,7 +6298,7 @@ def _prefer_incoming_parameter(existing: dict, incoming: dict, stand_type: str |
 
 
 def _merge_node_data_with_human_override(
-    existing: dict | None, incoming: dict, stand_type: str | None = None
+        existing: dict | None, incoming: dict, stand_type: str | None = None
 ) -> dict:
     if not existing:
         return incoming
@@ -6324,8 +6326,8 @@ def _merge_node_data_with_human_override(
         return merged
 
     if (
-        str(existing.get("entity_type", "") or "") == "TestParameter"
-        and str(incoming.get("entity_type", "") or "") == "TestParameter"
+            str(existing.get("entity_type", "") or "") == "TestParameter"
+            and str(incoming.get("entity_type", "") or "") == "TestParameter"
     ):
         guarded_fields = {
             "param_name",
@@ -6340,7 +6342,7 @@ def _merge_node_data_with_human_override(
             "table_ref",
             "derive_from_rated",
         }
-        prefer_incoming = _prefer_incoming_parameter(existing, incoming,stand_type=stand_type)
+        prefer_incoming = _prefer_incoming_parameter(existing, incoming, stand_type=stand_type)
         for key, value in incoming.items():
             if key in {"source_id", "file_path", "evidence"}:
                 continue
@@ -6357,7 +6359,7 @@ def _merge_node_data_with_human_override(
 
 
 def _merge_edge_data_with_human_override(
-    existing: dict | None, incoming: dict
+        existing: dict | None, incoming: dict
 ) -> dict:
     if not existing:
         return incoming
@@ -6482,12 +6484,12 @@ def _validate_controlled_payload(data: dict, chunk_text: str, chunk_meta: dict) 
 
 
 def _build_controlled_nodes_edges(
-    payload: dict,
-    chunk_meta: dict,
-    file_path: str,
-    schema_cfg: dict | None = None,
-    chunk_text: str = "",
-    stand_type: str | None = None
+        payload: dict,
+        chunk_meta: dict,
+        file_path: str,
+        schema_cfg: dict | None = None,
+        chunk_text: str = "",
+        stand_type: str | None = None
 ) -> tuple[list[tuple[str, dict]], list[tuple[str, str, dict]]]:
     schema_cfg = schema_cfg or {}
     stand_type = _normalize_operate_standard_type(stand_type)
@@ -6633,7 +6635,7 @@ def _build_controlled_nodes_edges(
         return normalized
 
     def _align_param_name_with_requirements(
-        raw_param_name: str, requirement_names: list[str]
+            raw_param_name: str, requirement_names: list[str]
     ) -> str:
         param_name = str(raw_param_name or "").strip()
         if not param_name or not requirement_names:
@@ -6882,6 +6884,7 @@ def _build_controlled_nodes_edges(
         for item in payload.get("test_items", [])
         if isinstance(item, dict) and _normalize_text_key(str(item.get("category", "") or ""))
     }
+
     # 查找 tests_by_name 规则,补全试验的
     def _match_override_rule(item: dict[str, Any]) -> dict[str, Any]:
         raw_test_name = item.get("test_item", "")
@@ -6947,7 +6950,7 @@ def _build_controlled_nodes_edges(
                             _normalize_text_key(str(p.get("param_name", "") or ""))
                             for p in (cand.get("parameters", []) or [])
                             if isinstance(p, dict)
-                            and _normalize_text_key(str(p.get("param_name", "") or ""))
+                               and _normalize_text_key(str(p.get("param_name", "") or ""))
                         }
                     )
                 )
@@ -6975,15 +6978,15 @@ def _build_controlled_nodes_edges(
                 reverse=True,
             )
             if (
-                len(scored) >= 2
-                and (
+                    len(scored) >= 2
+                    and (
                     len(scored[0].get("parameters", []) or []),
                     len(scored[0].get("rules", []) or []),
-                )
-                > (
+            )
+                    > (
                     len(scored[1].get("parameters", []) or []),
                     len(scored[1].get("rules", []) or []),
-                )
+            )
             ):
                 return scored[0]
 
@@ -7025,11 +7028,11 @@ def _build_controlled_nodes_edges(
             # the current payload only carries category-level report scopes.
             category_scope = _normalize_text_key(category)
             if (
-                not category_scope
-                or (
+                    not category_scope
+                    or (
                     category_scope not in payload_report_names
                     and category_scope not in payload_category_names
-                )
+            )
             ):
                 continue
         item_key = f"{_normalize_text_key(category)}::{_normalize_text_key(test_name)}"
@@ -7184,21 +7187,21 @@ def _build_controlled_nodes_edges(
                 (
                     report_id,
                     test_id,
-                {
-                    "src_id": report_id,
-                    "tgt_id": test_id,
-                    "rel_type": "INCLUDES_TEST",
-                    "is_required": bool(req.get("is_required", True)),
-                    "condition": req.get("condition", ""),
-                    "confidence": float(item.get("confidence", 0.0)),
-                    "weight": float(item.get("confidence", 0.0)) or 1.0,
-                    "evidence": _json_dumps_compact(test_ev_list),
-                    "source_id": chunk_id,
-                    "file_path": file_path,
-                    "human_override": False,
-                },
+                    {
+                        "src_id": report_id,
+                        "tgt_id": test_id,
+                        "rel_type": "INCLUDES_TEST",
+                        "is_required": bool(req.get("is_required", True)),
+                        "condition": req.get("condition", ""),
+                        "confidence": float(item.get("confidence", 0.0)),
+                        "weight": float(item.get("confidence", 0.0)) or 1.0,
+                        "evidence": _json_dumps_compact(test_ev_list),
+                        "source_id": chunk_id,
+                        "file_path": file_path,
+                        "human_override": False,
+                    },
+                )
             )
-        )
 
         required_param_names = required_param_map.get(test_name, [])
         if not required_param_names:
@@ -7209,7 +7212,7 @@ def _build_controlled_nodes_edges(
             _normalize_text_key(str(name))
             for name in required_param_names
             if _normalize_text_key(str(name))
-        } # 下面获得特征映射
+        }  # 下面获得特征映射
         required_param_key_keys = {
             _normalize_text_key(str(param_map.get(str(name), str(name))))
             for name in required_param_names
@@ -7248,7 +7251,7 @@ def _build_controlled_nodes_edges(
         # many valid schema parameters (e.g. T10/T30/T60 only keeping a subset).
         # Keep template filtering opt-in via rule flag `template_only`.
         template_only_mode = bool(override_rule.get("template_only", False))
-        override_param_keys = set() # override_param_filter_to_template false时，不执行参数覆盖
+        override_param_keys = set()  # override_param_filter_to_template false时，不执行参数覆盖
         if override_param_filter_to_template and template_only_mode and override_params:
             for override_param in override_params:
                 if not isinstance(override_param, dict):
@@ -7269,6 +7272,7 @@ def _build_controlled_nodes_edges(
             if mapped_key:
                 return mapped_key
             return _normalize_text_key(name_part)
+
         # 没有 找到replace 类型的
         if param_mode == "replace":
             param_candidates = [param for param in override_params if isinstance(param, dict)]
@@ -7347,9 +7351,9 @@ def _build_controlled_nodes_edges(
                 continue
             normalized_param_key = _normalize_text_key(param_key)
             if (
-                annotation_guardrail_mode
-                and guardrail_allowed_keys
-                and normalized_param_key not in guardrail_allowed_keys
+                    annotation_guardrail_mode
+                    and guardrail_allowed_keys
+                    and normalized_param_key not in guardrail_allowed_keys
             ):
                 logger.debug(
                     "Drop parameter by annotation guardrail: test=%s param_name=%s param_key=%s",
@@ -7392,8 +7396,8 @@ def _build_controlled_nodes_edges(
                 normalized_param_name = _normalize_text_key(param_name)
                 normalized_param_key = _normalize_text_key(param_key)
                 if (
-                    normalized_param_name not in required_param_name_keys
-                    and normalized_param_key not in required_param_key_keys
+                        normalized_param_name not in required_param_name_keys
+                        and normalized_param_key not in required_param_key_keys
                 ):
                     logger.debug(
                         "Drop non-whitelist parameter: test=%s param_name=%s param_key=%s",
@@ -7410,7 +7414,7 @@ def _build_controlled_nodes_edges(
                 )
                 continue
             seen_param_keys.add(normalized_param_key)
-            if _is_placeholder_param_value(param, stand_type): # 缺失则直接跳过
+            if _is_placeholder_param_value(param, stand_type):  # 缺失则直接跳过
                 continue
             value_source = param.get("value_source", "")
             if not value_source:
@@ -7512,7 +7516,8 @@ def _build_controlled_nodes_edges(
                 if not fallback_param:
                     continue
                 fallback_name = required_name_by_key.get(missing_key, str(fallback_param.get("param_name", "")))
-                fallback_key = str(fallback_param.get("param_key", "") or param_map.get(fallback_name, "") or missing_key)
+                fallback_key = str(
+                    fallback_param.get("param_key", "") or param_map.get(fallback_name, "") or missing_key)
                 fallback_value_text = _sanitize_value_text(str(fallback_param.get("value_text", "") or ""))
                 fallback_value_text = _expand_shorthand_param_value(
                     fallback_value_text,
@@ -7630,7 +7635,7 @@ def _build_controlled_nodes_edges(
                     return True
             for marker in remove_rule_match_markers:
                 if marker and norm_text_match and (
-                    marker in norm_text_match or norm_text_match in marker
+                        marker in norm_text_match or norm_text_match in marker
                 ):
                     return True
             return False
@@ -7687,19 +7692,19 @@ def _build_controlled_nodes_edges(
                 (
                     test_id,
                     rule_id,
-                {
-                    "src_id": test_id,
-                    "tgt_id": rule_id,
-                    "rel_type": "HAS_RULE",
-                    "confidence": float(rule.get("confidence", 0.0)),
-                    "weight": float(rule.get("confidence", 0.0)) or 1.0,
-                    "evidence": _json_dumps_compact(test_ev_list),
-                    "source_id": chunk_id,
-                    "file_path": file_path,
-                    "human_override": False,
-                },
+                    {
+                        "src_id": test_id,
+                        "tgt_id": rule_id,
+                        "rel_type": "HAS_RULE",
+                        "confidence": float(rule.get("confidence", 0.0)),
+                        "weight": float(rule.get("confidence", 0.0)) or 1.0,
+                        "evidence": _json_dumps_compact(test_ev_list),
+                        "source_id": chunk_id,
+                        "file_path": file_path,
+                        "human_override": False,
+                    },
+                )
             )
-        )
 
             target_report = report_aliases.get(
                 rule.get("report_type", ""), rule.get("report_type", "")
@@ -7711,18 +7716,18 @@ def _build_controlled_nodes_edges(
                         report_id,
                         rule_id,
                         {
-                        "src_id": report_id,
-                        "tgt_id": rule_id,
-                        "rel_type": "GOVERNS_RULE",
-                        "confidence": float(rule.get("confidence", 0.0)),
-                        "weight": float(rule.get("confidence", 0.0)) or 1.0,
-                        "evidence": _json_dumps_compact(test_ev_list),
-                        "source_id": chunk_id,
-                        "file_path": file_path,
-                        "human_override": False,
-                    },
+                            "src_id": report_id,
+                            "tgt_id": rule_id,
+                            "rel_type": "GOVERNS_RULE",
+                            "confidence": float(rule.get("confidence", 0.0)),
+                            "weight": float(rule.get("confidence", 0.0)) or 1.0,
+                            "evidence": _json_dumps_compact(test_ev_list),
+                            "source_id": chunk_id,
+                            "file_path": file_path,
+                            "human_override": False,
+                        },
+                    )
                 )
-            )
 
             target_param_key = rule.get("target_param_key", "")
             if target_param_key:
@@ -7732,15 +7737,15 @@ def _build_controlled_nodes_edges(
                         rule_id,
                         target_param_id,
                         {
-                        "src_id": rule_id,
-                        "tgt_id": target_param_id,
-                        "rel_type": "TARGETS_PARAMETER",
-                        "confidence": float(rule.get("confidence", 0.0)),
-                        "weight": float(rule.get("confidence", 0.0)) or 1.0,
-                        "evidence": _json_dumps_compact(test_ev_list),
-                        "source_id": chunk_id,
-                        "file_path": file_path,
-                        "human_override": False,
+                            "src_id": rule_id,
+                            "tgt_id": target_param_id,
+                            "rel_type": "TARGETS_PARAMETER",
+                            "confidence": float(rule.get("confidence", 0.0)),
+                            "weight": float(rule.get("confidence", 0.0)) or 1.0,
+                            "evidence": _json_dumps_compact(test_ev_list),
+                            "source_id": chunk_id,
+                            "file_path": file_path,
+                            "human_override": False,
                         },
                     )
                 )
@@ -7750,12 +7755,12 @@ def _build_controlled_nodes_edges(
 
 
 async def _upsert_controlled_node(
-    node_id: str,
-    node_data: dict,
-    knowledge_graph_inst: BaseGraphStorage,
-    entity_vdb: BaseVectorStorage | None,
-    entity_chunks_storage: BaseKVStorage | None,
-    stand_type: str | None = None,
+        node_id: str,
+        node_data: dict,
+        knowledge_graph_inst: BaseGraphStorage,
+        entity_vdb: BaseVectorStorage | None,
+        entity_chunks_storage: BaseKVStorage | None,
+        stand_type: str | None = None,
 ) -> None:
     def _compose_node_description(data: dict) -> str:
         entity_type = str(data.get("entity_type", "") or "")
@@ -7801,9 +7806,9 @@ async def _upsert_controlled_node(
 
     if entity_vdb is not None:
         description = (
-            str(merged.get("description", "") or "").strip()
-            or str(merged.get("name", "") or "")
-            or str(merged.get("test_item", "") or "")
+                str(merged.get("description", "") or "").strip()
+                or str(merged.get("name", "") or "")
+                or str(merged.get("test_item", "") or "")
         )
         content = f"{node_id}\n{description}"
         entity_vdb_id = compute_mdhash_id(str(node_id), prefix="ent-")
@@ -7826,12 +7831,12 @@ async def _upsert_controlled_node(
 
 
 async def _upsert_controlled_edge(
-    src_id: str,
-    tgt_id: str,
-    edge_data: dict,
-    knowledge_graph_inst: BaseGraphStorage,
-    relationships_vdb: BaseVectorStorage | None,
-    relation_chunks_storage: BaseKVStorage | None,
+        src_id: str,
+        tgt_id: str,
+        edge_data: dict,
+        knowledge_graph_inst: BaseGraphStorage,
+        relationships_vdb: BaseVectorStorage | None,
+        relation_chunks_storage: BaseKVStorage | None,
 ) -> None:
     def _compose_edge_description(data: dict) -> str:
         rel_type = str(data.get("rel_type", "") or "")
@@ -7880,10 +7885,10 @@ async def _upsert_controlled_edge(
 
 
 async def _rebuild_from_extraction_result(
-    text_chunks_storage: BaseKVStorage,
-    extraction_result: str,
-    chunk_id: str,
-    timestamp: int,
+        text_chunks_storage: BaseKVStorage,
+        extraction_result: str,
+        chunk_id: str,
+        timestamp: int,
 ) -> tuple[dict, dict]:
     """Parse cached extraction result using the same logic as extract_entities
 
@@ -7916,16 +7921,16 @@ async def _rebuild_from_extraction_result(
 
 
 async def _rebuild_single_entity(
-    knowledge_graph_inst: BaseGraphStorage,
-    entities_vdb: BaseVectorStorage,
-    entity_name: str,
-    chunk_ids: list[str],
-    chunk_entities: dict,
-    llm_response_cache: BaseKVStorage,
-    global_config: dict[str, str],
-    entity_chunks_storage: BaseKVStorage | None = None,
-    pipeline_status: dict | None = None,
-    pipeline_status_lock=None,
+        knowledge_graph_inst: BaseGraphStorage,
+        entities_vdb: BaseVectorStorage,
+        entity_name: str,
+        chunk_ids: list[str],
+        chunk_entities: dict,
+        llm_response_cache: BaseKVStorage,
+        global_config: dict[str, str],
+        entity_chunks_storage: BaseKVStorage | None = None,
+        pipeline_status: dict | None = None,
+        pipeline_status_lock=None,
 ) -> None:
     """Rebuild a single entity from cached extraction results"""
 
@@ -7936,11 +7941,11 @@ async def _rebuild_single_entity(
 
     # Helper function to update entity in both graph and vector storage
     async def _update_entity_storage(
-        final_description: str,
-        entity_type: str,
-        file_paths: list[str],
-        source_chunk_ids: list[str],
-        truncation_info: str = "",
+            final_description: str,
+            entity_type: str,
+            file_paths: list[str],
+            source_chunk_ids: list[str],
+            truncation_info: str = "",
     ):
         try:
             # Update entity in graph storage (critical path)
@@ -8000,7 +8005,7 @@ async def _rebuild_single_entity(
         )
 
     limit_method = (
-        global_config.get("source_ids_limit_method") or SOURCE_IDS_LIMIT_METHOD_KEEP
+            global_config.get("source_ids_limit_method") or SOURCE_IDS_LIMIT_METHOD_KEEP
     )
 
     limited_chunk_ids = apply_source_ids_limit(
@@ -8159,19 +8164,19 @@ async def _rebuild_single_entity(
 
 
 async def _rebuild_single_relationship(
-    knowledge_graph_inst: BaseGraphStorage,
-    relationships_vdb: BaseVectorStorage,
-    entities_vdb: BaseVectorStorage,
-    src: str,
-    tgt: str,
-    chunk_ids: list[str],
-    chunk_relationships: dict,
-    llm_response_cache: BaseKVStorage,
-    global_config: dict[str, str],
-    relation_chunks_storage: BaseKVStorage | None = None,
-    entity_chunks_storage: BaseKVStorage | None = None,
-    pipeline_status: dict | None = None,
-    pipeline_status_lock=None,
+        knowledge_graph_inst: BaseGraphStorage,
+        relationships_vdb: BaseVectorStorage,
+        entities_vdb: BaseVectorStorage,
+        src: str,
+        tgt: str,
+        chunk_ids: list[str],
+        chunk_relationships: dict,
+        llm_response_cache: BaseKVStorage,
+        global_config: dict[str, str],
+        relation_chunks_storage: BaseKVStorage | None = None,
+        entity_chunks_storage: BaseKVStorage | None = None,
+        pipeline_status: dict | None = None,
+        pipeline_status_lock=None,
 ) -> None:
     """Rebuild a single relationship from cached extraction results
 
@@ -8199,7 +8204,7 @@ async def _rebuild_single_relationship(
         )
 
     limit_method = (
-        global_config.get("source_ids_limit_method") or SOURCE_IDS_LIMIT_METHOD_KEEP
+            global_config.get("source_ids_limit_method") or SOURCE_IDS_LIMIT_METHOD_KEEP
     )
     limited_chunk_ids = apply_source_ids_limit(
         normalized_chunk_ids,
@@ -8438,15 +8443,15 @@ async def _rebuild_single_relationship(
 
 
 async def _merge_nodes_then_upsert(
-    entity_name: str,
-    nodes_data: list[dict],
-    knowledge_graph_inst: BaseGraphStorage,
-    entity_vdb: BaseVectorStorage | None,
-    global_config: dict,
-    pipeline_status: dict = None,
-    pipeline_status_lock=None,
-    llm_response_cache: BaseKVStorage | None = None,
-    entity_chunks_storage: BaseKVStorage | None = None,
+        entity_name: str,
+        nodes_data: list[dict],
+        knowledge_graph_inst: BaseGraphStorage,
+        entity_vdb: BaseVectorStorage | None,
+        global_config: dict,
+        pipeline_status: dict = None,
+        pipeline_status_lock=None,
+        llm_response_cache: BaseKVStorage | None = None,
+        entity_chunks_storage: BaseKVStorage | None = None,
 ):
     """Get existing nodes from knowledge graph use name,if exists, merge data, else create, then upsert."""
     already_entity_types = []
@@ -8508,9 +8513,9 @@ async def _merge_nodes_then_upsert(
             source_id = dp.get("source_id")
             # Skip descriptions sourced from chunks dropped by the limitation cap
             if (
-                source_id
-                and source_id not in allowed_source_ids
-                and source_id not in existing_full_source_ids
+                    source_id
+                    and source_id not in allowed_source_ids
+                    and source_id not in existing_full_source_ids
             ):
                 continue
             filtered_nodes.append(dp)
@@ -8520,9 +8525,9 @@ async def _merge_nodes_then_upsert(
 
     # 5. Check if we need to skip summary due to source_ids limit
     if (
-        limit_method == SOURCE_IDS_LIMIT_METHOD_KEEP
-        and len(existing_full_source_ids) >= max_source_limit
-        and not nodes_data
+            limit_method == SOURCE_IDS_LIMIT_METHOD_KEEP
+            and len(existing_full_source_ids) >= max_source_limit
+            and not nodes_data
     ):
         if already_node:
             logger.info(
@@ -8716,19 +8721,19 @@ async def _merge_nodes_then_upsert(
 
 
 async def _merge_edges_then_upsert(
-    src_id: str,
-    tgt_id: str,
-    edges_data: list[dict],
-    knowledge_graph_inst: BaseGraphStorage,
-    relationships_vdb: BaseVectorStorage | None,
-    entity_vdb: BaseVectorStorage | None,
-    global_config: dict,
-    pipeline_status: dict = None,
-    pipeline_status_lock=None,
-    llm_response_cache: BaseKVStorage | None = None,
-    added_entities: list = None,  # New parameter to track entities added during edge processing
-    relation_chunks_storage: BaseKVStorage | None = None,
-    entity_chunks_storage: BaseKVStorage | None = None,
+        src_id: str,
+        tgt_id: str,
+        edges_data: list[dict],
+        knowledge_graph_inst: BaseGraphStorage,
+        relationships_vdb: BaseVectorStorage | None,
+        entity_vdb: BaseVectorStorage | None,
+        global_config: dict,
+        pipeline_status: dict = None,
+        pipeline_status_lock=None,
+        llm_response_cache: BaseKVStorage | None = None,
+        added_entities: list = None,  # New parameter to track entities added during edge processing
+        relation_chunks_storage: BaseKVStorage | None = None,
+        entity_chunks_storage: BaseKVStorage | None = None,
 ):
     if src_id == tgt_id:
         return None
@@ -8813,7 +8818,7 @@ async def _merge_edges_then_upsert(
         identifier=f"`{src_id}`~`{tgt_id}`",
     )
     limit_method = (
-        global_config.get("source_ids_limit_method") or SOURCE_IDS_LIMIT_METHOD_KEEP
+            global_config.get("source_ids_limit_method") or SOURCE_IDS_LIMIT_METHOD_KEEP
     )
 
     # 4. Only keep edges with source_id in the final source_ids list if in KEEP mode
@@ -8824,9 +8829,9 @@ async def _merge_edges_then_upsert(
             source_id = dp.get("source_id")
             # Skip relationship fragments sourced from chunks dropped by keep oldest cap
             if (
-                source_id
-                and source_id not in allowed_source_ids
-                and source_id not in existing_full_source_ids
+                    source_id
+                    and source_id not in allowed_source_ids
+                    and source_id not in existing_full_source_ids
             ):
                 continue
             filtered_edges.append(dp)
@@ -8836,9 +8841,9 @@ async def _merge_edges_then_upsert(
 
     # 5. Check if we need to skip summary due to source_ids limit
     if (
-        limit_method == SOURCE_IDS_LIMIT_METHOD_KEEP
-        and len(existing_full_source_ids) >= max_source_limit
-        and not edges_data
+            limit_method == SOURCE_IDS_LIMIT_METHOD_KEEP
+            and len(existing_full_source_ids) >= max_source_limit
+            and not edges_data
     ):
         if already_edge:
             logger.info(
@@ -9104,8 +9109,8 @@ async def _merge_edges_then_upsert(
 
             # 3. Save merged full list to entity_chunks_storage (conditional)
             if (
-                entity_chunks_storage is not None
-                and merged_full_source_ids != existing_full_source_ids
+                    entity_chunks_storage is not None
+                    and merged_full_source_ids != existing_full_source_ids
             ):
                 updated = True
                 await entity_chunks_storage.upsert(
@@ -9241,23 +9246,23 @@ async def _merge_edges_then_upsert(
 
 
 async def merge_nodes_and_edges(
-    chunk_results: list,
-    knowledge_graph_inst: BaseGraphStorage,
-    entity_vdb: BaseVectorStorage,
-    relationships_vdb: BaseVectorStorage,
-    global_config: dict[str, str],
-    full_entities_storage: BaseKVStorage = None,
-    full_relations_storage: BaseKVStorage = None,
-    doc_id: str = None,
-    pipeline_status: dict = None,
-    pipeline_status_lock=None,
-    llm_response_cache: BaseKVStorage | None = None,
-    entity_chunks_storage: BaseKVStorage | None = None,
-    relation_chunks_storage: BaseKVStorage | None = None,
-    current_file_number: int = 0,
-    total_files: int = 0,
-    file_path: str = "unknown_source",
-    stand_type: str | None = None
+        chunk_results: list,
+        knowledge_graph_inst: BaseGraphStorage,
+        entity_vdb: BaseVectorStorage,
+        relationships_vdb: BaseVectorStorage,
+        global_config: dict[str, str],
+        full_entities_storage: BaseKVStorage = None,
+        full_relations_storage: BaseKVStorage = None,
+        doc_id: str = None,
+        pipeline_status: dict = None,
+        pipeline_status_lock=None,
+        llm_response_cache: BaseKVStorage | None = None,
+        entity_chunks_storage: BaseKVStorage | None = None,
+        relation_chunks_storage: BaseKVStorage | None = None,
+        current_file_number: int = 0,
+        total_files: int = 0,
+        file_path: str = "unknown_source",
+        stand_type: str | None = None
 ) -> None:
     """Two-phase merge: process all entities first, then all relationships
 
@@ -9494,7 +9499,7 @@ async def merge_nodes_and_edges(
             workspace = global_config.get("workspace", "")
             namespace = f"{workspace}:GraphDB" if workspace else "GraphDB"
             async with get_storage_keyed_lock(
-                [entity_name], namespace=namespace, enable_logging=False
+                    [entity_name], namespace=namespace, enable_logging=False
             ):
                 try:
                     logger.debug(f"Processing entity {entity_name}")
@@ -9519,8 +9524,8 @@ async def merge_nodes_and_edges(
                     # Try to update pipeline status, but don't let status update failure affect main exception
                     try:
                         if (
-                            pipeline_status is not None
-                            and pipeline_status_lock is not None
+                                pipeline_status is not None
+                                and pipeline_status_lock is not None
                         ):
                             async with pipeline_status_lock:
                                 pipeline_status["latest_message"] = error_msg
@@ -9597,9 +9602,9 @@ async def merge_nodes_and_edges(
             sorted_edge_key = sorted([edge_key[0], edge_key[1]])
 
             async with get_storage_keyed_lock(
-                sorted_edge_key,
-                namespace=namespace,
-                enable_logging=False,
+                    sorted_edge_key,
+                    namespace=namespace,
+                    enable_logging=False,
             ):
                 try:
                     added_entities = []  # Track entities added during edge processing
@@ -9633,8 +9638,8 @@ async def merge_nodes_and_edges(
                     # Try to update pipeline status, but don't let status update failure affect main exception
                     try:
                         if (
-                            pipeline_status is not None
-                            and pipeline_status_lock is not None
+                                pipeline_status is not None
+                                and pipeline_status_lock is not None
                         ):
                             async with pipeline_status_lock:
                                 pipeline_status["latest_message"] = error_msg
@@ -9768,13 +9773,13 @@ async def merge_nodes_and_edges(
 
 
 async def extract_entities(
-    chunks: dict[str, TextChunkSchema],
-    global_config: dict[str, str],
-    pipeline_status: dict = None,
-    pipeline_status_lock=None,
-    llm_response_cache: BaseKVStorage | None = None,
-    text_chunks_storage: BaseKVStorage | None = None,
-    stand_type: str | None = None
+        chunks: dict[str, TextChunkSchema],
+        global_config: dict[str, str],
+        pipeline_status: dict = None,
+        pipeline_status_lock=None,
+        llm_response_cache: BaseKVStorage | None = None,
+        text_chunks_storage: BaseKVStorage | None = None,
+        stand_type: str | None = None
 ) -> list:
     # Check for cancellation at the start of entity extraction
     if pipeline_status is not None and pipeline_status_lock is not None:
@@ -9827,7 +9832,7 @@ async def extract_entities(
             chunk_size = max(1, len(lines) // target_parts)
             parts: list[str] = []
             for i in range(0, len(lines), chunk_size):
-                part = "\n".join(lines[i : i + chunk_size]).strip()
+                part = "\n".join(lines[i: i + chunk_size]).strip()
                 if part:
                     parts.append(part)
             return parts or [content]
@@ -9846,7 +9851,7 @@ async def extract_entities(
             # Try extracting the primary JSON object region first.
             start = cleaned.find("{")
             end = cleaned.rfind("}")
-            candidate = cleaned[start : end + 1] if start != -1 and end > start else cleaned
+            candidate = cleaned[start: end + 1] if start != -1 and end > start else cleaned
 
             # Fast path: strict JSON
             try:
@@ -9896,9 +9901,9 @@ async def extract_entities(
 
             chunk_meta = {
                 "std_id": chunk_dp.get("std_id", "")
-                or schema_cfg.get("standard_id", ""),
+                          or schema_cfg.get("standard_id", ""),
                 "std_name": chunk_dp.get("std_name", "")
-                or schema_cfg.get("standard_name", ""),
+                            or schema_cfg.get("standard_name", ""),
                 "clause_id": chunk_dp.get("clause_id", ""),
                 "clause_title": chunk_dp.get("clause_title", ""),
                 "chunk_id": chunk_key,
@@ -9917,6 +9922,7 @@ async def extract_entities(
                 PROMPTS["electrical_schema_extraction_system_prompt"],
                 {"config_json": config_json},
             )
+
             async def _extract_with_retries(content_text: str) -> tuple[list, list, str | None]:
                 user_prompt = _safe_prompt_format(
                     PROMPTS["electrical_schema_extraction_user_prompt"],
@@ -9955,7 +9961,7 @@ async def extract_entities(
                         )
                         continue
 
-                    try:# json解析
+                    try:  # json解析
                         parsed = _parse_controlled_json_response(result or "")
                         validated = _validate_controlled_payload(
                             parsed, content_text, chunk_meta
@@ -10284,17 +10290,17 @@ async def extract_entities(
 
 
 async def kg_query(
-    query: str,
-    knowledge_graph_inst: BaseGraphStorage,
-    entities_vdb: BaseVectorStorage,
-    relationships_vdb: BaseVectorStorage,
-    text_chunks_db: BaseKVStorage,
-    query_param: QueryParam,
-    global_config: dict[str, str],
-    hashing_kv: BaseKVStorage | None = None,
-    system_prompt: str | None = None,
-    chunks_vdb: BaseVectorStorage = None,
-    stand_type: str | None = None
+        query: str,
+        knowledge_graph_inst: BaseGraphStorage,
+        entities_vdb: BaseVectorStorage,
+        relationships_vdb: BaseVectorStorage,
+        text_chunks_db: BaseKVStorage,
+        query_param: QueryParam,
+        global_config: dict[str, str],
+        hashing_kv: BaseKVStorage | None = None,
+        system_prompt: str | None = None,
+        chunks_vdb: BaseVectorStorage = None,
+        stand_type: str | None = None
 ) -> QueryResult | None:
     """
     Execute knowledge graph query and return unified QueryResult object.
@@ -10333,7 +10339,7 @@ async def kg_query(
     print("22222222222222222222222stand_type:", stand_type)
     if not query:
         return QueryResult(content=PROMPTS["fail_response"])
-    
+
     if query_param.model_func:
         use_model_func = query_param.model_func
     else:
@@ -10427,7 +10433,7 @@ async def kg_query(
 
             prefix, current_value, suffix = param_match.groups()
             if _normalize_value_for_compare(current_value) == _normalize_value_for_compare(
-                calc_value
+                    calc_value
             ):
                 corrected_lines.append(line)
                 continue
@@ -10595,9 +10601,9 @@ async def kg_query(
         )
 
         if (
-            not bypass_query_cache
-            and hashing_kv
-            and hashing_kv.global_config.get("enable_llm_cache")
+                not bypass_query_cache
+                and hashing_kv
+                and hashing_kv.global_config.get("enable_llm_cache")
         ):
             queryparam_dict = {
                 "mode": query_param.mode,
@@ -10755,10 +10761,10 @@ async def kg_query(
 
 
 async def get_keywords_from_query(
-    query: str,
-    query_param: QueryParam,
-    global_config: dict[str, str],
-    hashing_kv: BaseKVStorage | None = None,
+        query: str,
+        query_param: QueryParam,
+        global_config: dict[str, str],
+        hashing_kv: BaseKVStorage | None = None,
 ) -> tuple[list[str], list[str]]:
     """
     Retrieves high-level and low-level keywords for RAG operations.
@@ -10785,9 +10791,10 @@ async def get_keywords_from_query(
     )
     return hl_keywords, ll_keywords
 
+
 def _prepare_scope_focused_query(
-    query: str,
-    schema_cfg: dict[str, Any] | None = None,
+        query: str,
+        schema_cfg: dict[str, Any] | None = None,
 ) -> tuple[str, dict[str, Any]]:
     current_report_scopes = _extract_current_report_scopes(query, schema_cfg)
     metadata = {
@@ -10815,6 +10822,7 @@ def _prepare_scope_focused_query(
         else "single_insulation_scope_no_change"
     )
     return retrieval_query, metadata
+
 
 # 提问 绝缘性能型式试验，获取参数
 def _build_scope_focused_query(query: str) -> str:
@@ -10865,10 +10873,10 @@ def _build_scope_focused_query(query: str) -> str:
 
 
 async def extract_keywords_only(
-    text: str,
-    param: QueryParam,
-    global_config: dict[str, str],
-    hashing_kv: BaseKVStorage | None = None,
+        text: str,
+        param: QueryParam,
+        global_config: dict[str, str],
+        hashing_kv: BaseKVStorage | None = None,
 ) -> tuple[list[str], list[str]]:
     """
     Extract high-level and low-level keywords from the given 'text' using the LLM.
@@ -10993,10 +11001,10 @@ async def extract_keywords_only(
 
 
 async def _get_vector_context(
-    query: str,
-    chunks_vdb: BaseVectorStorage,
-    query_param: QueryParam,
-    query_embedding: list[float] = None,
+        query: str,
+        chunks_vdb: BaseVectorStorage,
+        query_param: QueryParam,
+        query_embedding: list[float] = None,
 ) -> list[dict]:
     """
     Retrieve text chunks from the vector database without reranking or truncation.
@@ -11081,10 +11089,10 @@ def _resolve_chunk_id(chunk: dict[str, Any]) -> str | None:
     """Resolve stable chunk ID from known fields, with content-hash fallback."""
 
     chunk_id = (
-        chunk.get("chunk_id")
-        or chunk.get("id")
-        or chunk.get("__id__")
-        or chunk.get("source_id")
+            chunk.get("chunk_id")
+            or chunk.get("id")
+            or chunk.get("__id__")
+            or chunk.get("source_id")
     )
     if chunk_id:
         return str(chunk_id)
@@ -11120,6 +11128,8 @@ def _extract_doc_type_filters(query: str) -> set[str]:
         filters.add("GB/T")
     if "电力行业标准" in query:
         filters.add("DL/T")
+    if "国际" in query or"国际标准" in query:
+        filters.add("IEC")
 
     return filters
 
@@ -11144,7 +11154,7 @@ def _infer_doc_type_from_file_path(file_path: str) -> str | None:
 
 
 def _filter_search_result_by_doc_type(
-    search_result: dict[str, Any], doc_type_filters: set[str]
+        search_result: dict[str, Any], doc_type_filters: set[str]
 ) -> dict[str, Any]:
     if not doc_type_filters:
         return search_result
@@ -11184,15 +11194,15 @@ def _filter_search_result_by_doc_type(
 
 
 async def _perform_kg_search(
-    query: str,
-    ll_keywords: str,
-    hl_keywords: str,
-    knowledge_graph_inst: BaseGraphStorage,
-    entities_vdb: BaseVectorStorage,
-    relationships_vdb: BaseVectorStorage,
-    text_chunks_db: BaseKVStorage,
-    query_param: QueryParam,
-    chunks_vdb: BaseVectorStorage = None,
+        query: str,
+        ll_keywords: str,
+        hl_keywords: str,
+        knowledge_graph_inst: BaseGraphStorage,
+        entities_vdb: BaseVectorStorage,
+        relationships_vdb: BaseVectorStorage,
+        text_chunks_db: BaseKVStorage,
+        query_param: QueryParam,
+        chunks_vdb: BaseVectorStorage = None,
 ) -> dict[str, Any]:
     """
     Pure search logic that retrieves raw entities, relations, and vector chunks.
@@ -11354,9 +11364,9 @@ async def _perform_kg_search(
 
 
 async def _apply_token_truncation(
-    search_result: dict[str, Any],
-    query_param: QueryParam,
-    global_config: dict[str, str],
+        search_result: dict[str, Any],
+        query_param: QueryParam,
+        global_config: dict[str, str],
 ) -> dict[str, Any]:
     """
     Apply token-based truncation to entities and relations for LLM efficiency.
@@ -11525,16 +11535,16 @@ async def _apply_token_truncation(
 
 
 async def _merge_all_chunks(
-    filtered_entities: list[dict],
-    filtered_relations: list[dict],
-    vector_chunks: list[dict],
-    query: str = "",
-    knowledge_graph_inst: BaseGraphStorage = None,
-    text_chunks_db: BaseKVStorage = None,
-    query_param: QueryParam = None,
-    chunks_vdb: BaseVectorStorage = None,
-    chunk_tracking: dict = None,
-    query_embedding: list[float] = None,
+        filtered_entities: list[dict],
+        filtered_relations: list[dict],
+        vector_chunks: list[dict],
+        query: str = "",
+        knowledge_graph_inst: BaseGraphStorage = None,
+        text_chunks_db: BaseKVStorage = None,
+        query_param: QueryParam = None,
+        chunks_vdb: BaseVectorStorage = None,
+        chunk_tracking: dict = None,
+        query_embedding: list[float] = None,
 ) -> list[dict]:
     """
     Merge chunks from different sources: vector_chunks + entity_chunks + relation_chunks.
@@ -11627,18 +11637,18 @@ async def _merge_all_chunks(
 
 
 async def _build_context_str(
-    entities_context: list[dict],
-    relations_context: list[dict],
-    merged_chunks: list[dict],
-    query: str,
-    rule_query: str | None,
-    query_param: QueryParam,
-    global_config: dict[str, str],
-    chunk_tracking: dict = None,
-    entity_id_to_original: dict = None,
-    relation_id_to_original: dict = None,
-    knowledge_graph_inst: BaseGraphStorage | None = None,
-    stand_type :str=None
+        entities_context: list[dict],
+        relations_context: list[dict],
+        merged_chunks: list[dict],
+        query: str,
+        rule_query: str | None,
+        query_param: QueryParam,
+        global_config: dict[str, str],
+        chunk_tracking: dict = None,
+        entity_id_to_original: dict = None,
+        relation_id_to_original: dict = None,
+        knowledge_graph_inst: BaseGraphStorage | None = None,
+        stand_type: str = None
 ) -> tuple[str, dict[str, Any]]:
     """
     Build the final LLM context string with token processing.
@@ -11730,7 +11740,7 @@ async def _build_context_str(
     rated_current_amp = _extract_rated_current_amp(rule_query_text)
     rated_voltage_kv = _extract_rated_voltage_kv(rule_query_text)
     explicit_solid_sealed_pole = _query_has_explicit_solid_sealed_pole(rule_query_text)
-    domain_rule_decisions = _evaluate_domain_rule_decisions(rule_query_text, schema_cfg,    stand_type=stand_type)
+    domain_rule_decisions = _evaluate_domain_rule_decisions(rule_query_text, schema_cfg, stand_type=stand_type)
     normalized_stand_type = _normalize_operate_standard_type(stand_type)
     if normalized_stand_type == "DLT":
         pf_split_rule = domain_rule_decisions.get("insulation.dlt.power_frequency_split", {})
@@ -11739,11 +11749,15 @@ async def _build_context_str(
             "insulation.dlt.partial_discharge_applicability", {}
         )
     elif normalized_stand_type == "IEC":
-        pf_split_rule = domain_rule_decisions.get("insulation.iec.power_frequency_split", {})
-        li_split_rule = domain_rule_decisions.get("insulation.iec.lightning_impulse_split", {})
-        pd_app_rule = domain_rule_decisions.get(
-            "insulation.iec.partial_discharge_applicability", {}
+        pf_split_rule = domain_rule_decisions.get("insulation.gb.power_frequency_split", {}) or domain_rule_decisions.get(
+            "insulation.gb.power_frequency_joint_voltage_split", {}
         )
+        li_split_rule = domain_rule_decisions.get("insulation.gb.lightning_impulse_split", {}) or domain_rule_decisions.get(
+            "insulation.gb.lightning_impulse_joint_voltage_split", {}
+        )
+        # pd_app_rule = domain_rule_decisions.get(
+        #     "insulation.gb.partial_discharge_applicability", {}
+        # )
     else:
         pf_split_rule = domain_rule_decisions.get("insulation.gb.power_frequency_split", {}) or domain_rule_decisions.get(
             "insulation.gb.power_frequency_joint_voltage_split", {}
@@ -11760,8 +11774,10 @@ async def _build_context_str(
 
     fracture_pf_enabled = bool(pf_split_rule.get("enabled")) if isinstance(pf_split_rule, dict) else False
     fracture_li_enabled = bool(li_split_rule.get("enabled")) if isinstance(li_split_rule, dict) else False
-    fracture_pf_provided = bool(pf_split_inputs.get("fracture_voltage_provided")) if isinstance(pf_split_inputs, dict) else False
-    fracture_li_provided = bool(li_split_inputs.get("fracture_voltage_provided")) if isinstance(li_split_inputs, dict) else False
+    fracture_pf_provided = bool(pf_split_inputs.get("fracture_voltage_provided")) if isinstance(pf_split_inputs,
+                                                                                                dict) else False
+    fracture_li_provided = bool(li_split_inputs.get("fracture_voltage_provided")) if isinstance(li_split_inputs,
+                                                                                                dict) else False
     pd_allowed = bool(pd_app_rule.get("enabled")) if isinstance(pd_app_rule, dict) else False
     pd_allowed_by_voltage = bool(rated_voltage_kv == 40.5)
     pd_allowed_by_model = bool(
@@ -11783,7 +11799,7 @@ async def _build_context_str(
 
         configured_test_items = schema_cfg.get("test_items", []) or []
         configured_param_requirements = (
-            schema_cfg.get("test_item_param_requirements", {}) or {}
+                schema_cfg.get("test_item_param_requirements", {}) or {}
         )
         if not configured_test_items:
             return {}, {}
@@ -11876,9 +11892,9 @@ async def _build_context_str(
             for src, tgt in edges:
                 edge = await knowledge_graph_inst.get_edge(src, tgt)
                 if (
-                    edge
-                    and edge.get("rel_type") == "HAS_PARAMETER"
-                    and edge.get("src_id") == test_id
+                        edge
+                        and edge.get("rel_type") == "HAS_PARAMETER"
+                        and edge.get("src_id") == test_id
                 ):
                     param_id = str(edge.get("tgt_id", "") or "").strip()
                     if param_id:
@@ -12113,7 +12129,7 @@ async def _build_context_str(
     query_tokens = len(tokenizer.encode(query))
     buffer_tokens = 200  # reserved for reference list and safety buffer
     available_chunk_tokens = max_total_tokens - (
-        sys_prompt_tokens + kg_context_tokens + query_tokens + buffer_tokens
+            sys_prompt_tokens + kg_context_tokens + query_tokens + buffer_tokens
     )
 
     # Keep a minimum chunk budget in mix mode to avoid "retrieved but empty chunk context".
@@ -12138,7 +12154,7 @@ async def _build_context_str(
         )
         kg_context_tokens = len(tokenizer.encode(pre_kg_context))
         available_chunk_tokens = max_total_tokens - (
-            sys_prompt_tokens + kg_context_tokens + query_tokens + buffer_tokens
+                sys_prompt_tokens + kg_context_tokens + query_tokens + buffer_tokens
         )
 
     if available_chunk_tokens <= 0:
@@ -12286,17 +12302,17 @@ async def _build_context_str(
 
 # Now let's update the old _build_query_context to use the new architecture
 async def _build_query_context(
-    query: str,
-    rule_query: str | None,
-    ll_keywords: str,
-    hl_keywords: str,
-    knowledge_graph_inst: BaseGraphStorage,
-    entities_vdb: BaseVectorStorage,
-    relationships_vdb: BaseVectorStorage,
-    text_chunks_db: BaseKVStorage,
-    query_param: QueryParam,
-    chunks_vdb: BaseVectorStorage = None,
-    stand_type: str | None = None
+        query: str,
+        rule_query: str | None,
+        ll_keywords: str,
+        hl_keywords: str,
+        knowledge_graph_inst: BaseGraphStorage,
+        entities_vdb: BaseVectorStorage,
+        relationships_vdb: BaseVectorStorage,
+        text_chunks_db: BaseKVStorage,
+        query_param: QueryParam,
+        chunks_vdb: BaseVectorStorage = None,
+        stand_type: str | None = None
 ) -> QueryContextResult | None:
     """
     Main query context building function using the new 4-stage architecture:
@@ -12357,9 +12373,9 @@ async def _build_query_context(
     )
 
     if (
-        not merged_chunks
-        and not truncation_result["entities_context"]
-        and not truncation_result["relations_context"]
+            not merged_chunks
+            and not truncation_result["entities_context"]
+            and not truncation_result["relations_context"]
     ):
         return None
 
@@ -12417,10 +12433,10 @@ async def _build_query_context(
 
 
 async def _get_node_data(
-    query: str,
-    knowledge_graph_inst: BaseGraphStorage,
-    entities_vdb: BaseVectorStorage,
-    query_param: QueryParam,
+        query: str,
+        knowledge_graph_inst: BaseGraphStorage,
+        entities_vdb: BaseVectorStorage,
+        query_param: QueryParam,
 ):
     # get similar entities
     logger.info(
@@ -12475,9 +12491,9 @@ async def _get_node_data(
 
 
 async def _find_most_related_edges_from_entities(
-    node_datas: list[dict],
-    query_param: QueryParam,
-    knowledge_graph_inst: BaseGraphStorage,
+        node_datas: list[dict],
+        query_param: QueryParam,
+        knowledge_graph_inst: BaseGraphStorage,
 ):
     node_names = [dp["entity_name"] for dp in node_datas]
     batch_edges_dict = await knowledge_graph_inst.get_nodes_edges_batch(node_names)
@@ -12531,14 +12547,14 @@ async def _find_most_related_edges_from_entities(
 
 
 async def _find_related_text_unit_from_entities(
-    node_datas: list[dict],
-    query_param: QueryParam,
-    text_chunks_db: BaseKVStorage,
-    knowledge_graph_inst: BaseGraphStorage,
-    query: str = None,
-    chunks_vdb: BaseVectorStorage = None,
-    chunk_tracking: dict = None,
-    query_embedding=None,
+        node_datas: list[dict],
+        query_param: QueryParam,
+        text_chunks_db: BaseKVStorage,
+        knowledge_graph_inst: BaseGraphStorage,
+        query: str = None,
+        chunks_vdb: BaseVectorStorage = None,
+        chunk_tracking: dict = None,
+        query_embedding=None,
 ):
     """
     Find text chunks related to entities using configurable chunk selection method.
@@ -12585,7 +12601,7 @@ async def _find_related_text_unit_from_entities(
         deduplicated_chunks = []
         for chunk_id in entity_info["chunks"]:
             chunk_occurrence_count[chunk_id] = (
-                chunk_occurrence_count.get(chunk_id, 0) + 1
+                    chunk_occurrence_count.get(chunk_id, 0) + 1
             )
 
             # If this is the first occurrence (count == 1), keep it; otherwise skip (duplicate from later position)
@@ -12690,10 +12706,10 @@ async def _find_related_text_unit_from_entities(
 
 
 async def _get_edge_data(
-    keywords,
-    knowledge_graph_inst: BaseGraphStorage,
-    relationships_vdb: BaseVectorStorage,
-    query_param: QueryParam,
+        keywords,
+        knowledge_graph_inst: BaseGraphStorage,
+        relationships_vdb: BaseVectorStorage,
+        query_param: QueryParam,
 ):
     logger.info(
         f"Query edges: {keywords} (top_k:{query_param.top_k}, cosine:{relationships_vdb.cosine_better_than_threshold})"
@@ -12746,9 +12762,9 @@ async def _get_edge_data(
 
 
 async def _find_most_related_entities_from_relationships(
-    edge_datas: list[dict],
-    query_param: QueryParam,
-    knowledge_graph_inst: BaseGraphStorage,
+        edge_datas: list[dict],
+        query_param: QueryParam,
+        knowledge_graph_inst: BaseGraphStorage,
 ):
     entity_names = []
     seen = set()
@@ -12779,14 +12795,14 @@ async def _find_most_related_entities_from_relationships(
 
 
 async def _find_related_text_unit_from_relations(
-    edge_datas: list[dict],
-    query_param: QueryParam,
-    text_chunks_db: BaseKVStorage,
-    entity_chunks: list[dict] = None,
-    query: str = None,
-    chunks_vdb: BaseVectorStorage = None,
-    chunk_tracking: dict = None,
-    query_embedding=None,
+        edge_datas: list[dict],
+        query_param: QueryParam,
+        text_chunks_db: BaseKVStorage,
+        entity_chunks: list[dict] = None,
+        query: str = None,
+        chunks_vdb: BaseVectorStorage = None,
+        chunk_tracking: dict = None,
+        query_embedding=None,
 ):
     """
     Find text chunks related to relationships using configurable chunk selection method.
@@ -12860,7 +12876,7 @@ async def _find_related_text_unit_from_relations(
                 continue
 
             chunk_occurrence_count[chunk_id] = (
-                chunk_occurrence_count.get(chunk_id, 0) + 1
+                    chunk_occurrence_count.get(chunk_id, 0) + 1
             )
 
             # If this is the first occurrence (count == 1), keep it; otherwise skip (duplicate from later position)
@@ -12983,35 +12999,35 @@ async def _find_related_text_unit_from_relations(
 
 @overload
 async def naive_query(
-    query: str,
-    chunks_vdb: BaseVectorStorage,
-    query_param: QueryParam,
-    global_config: dict[str, str],
-    hashing_kv: BaseKVStorage | None = None,
-    system_prompt: str | None = None,
-    return_raw_data: Literal[True] = True,
+        query: str,
+        chunks_vdb: BaseVectorStorage,
+        query_param: QueryParam,
+        global_config: dict[str, str],
+        hashing_kv: BaseKVStorage | None = None,
+        system_prompt: str | None = None,
+        return_raw_data: Literal[True] = True,
 ) -> dict[str, Any]: ...
 
 
 @overload
 async def naive_query(
-    query: str,
-    chunks_vdb: BaseVectorStorage,
-    query_param: QueryParam,
-    global_config: dict[str, str],
-    hashing_kv: BaseKVStorage | None = None,
-    system_prompt: str | None = None,
-    return_raw_data: Literal[False] = False,
+        query: str,
+        chunks_vdb: BaseVectorStorage,
+        query_param: QueryParam,
+        global_config: dict[str, str],
+        hashing_kv: BaseKVStorage | None = None,
+        system_prompt: str | None = None,
+        return_raw_data: Literal[False] = False,
 ) -> str | AsyncIterator[str]: ...
 
 
 async def naive_query(
-    query: str,
-    chunks_vdb: BaseVectorStorage,
-    query_param: QueryParam,
-    global_config: dict[str, str],
-    hashing_kv: BaseKVStorage | None = None,
-    system_prompt: str | None = None,
+        query: str,
+        chunks_vdb: BaseVectorStorage,
+        query_param: QueryParam,
+        global_config: dict[str, str],
+        hashing_kv: BaseKVStorage | None = None,
+        system_prompt: str | None = None,
 ) -> QueryResult | None:
     """
     Execute naive query and return unified QueryResult object.
@@ -13089,7 +13105,7 @@ async def naive_query(
     query_tokens = len(tokenizer.encode(query))
     buffer_tokens = 200  # reserved for reference list and safety buffer
     available_chunk_tokens = max_total_tokens - (
-        sys_prompt_tokens + query_tokens + buffer_tokens
+            sys_prompt_tokens + query_tokens + buffer_tokens
     )
 
     logger.debug(
@@ -13244,7 +13260,7 @@ async def naive_query(
         # Non-streaming response (string)
         if len(response) > len(sys_prompt):
             response = (
-                response[len(sys_prompt) :]
+                response[len(sys_prompt):]
                 .replace(sys_prompt, "")
                 .replace("user", "")
                 .replace("model", "")
