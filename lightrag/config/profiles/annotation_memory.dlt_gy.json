@@ -20171,13 +20171,13 @@
         },
         {
           "param_name": "试验电流A",
-          "value_text": "用户录入额定参数中的额定电流 A",
-          "value_expr": "用户录入额定参数中的额定电流 A",
+          "value_text": "用户输入额定电流*1.1 A",
+          "value_expr": "用户输入额定电流*1.1 A",
           "value_source": "user_input",
           "value_type": "user_input",
-          "constraints": "用户录入额定参数中的额定电流 A",
+          "constraints": "用户输入额定电流*1.1 A",
           "calc_rule": "",
-          "derive_from_rated": "用户录入额定参数中的额定电流 A"
+          "derive_from_rated": "用户输入额定电流*1.1 A"
         },
         {
           "param_name": "试验相数",
@@ -20268,13 +20268,13 @@
         },
         {
           "param_name": "试验电流A",
-          "value_text": "用户录入额定参数中的额定电流 A",
-          "value_expr": "用户录入额定参数中的额定电流 A",
+          "value_text": "用户输入额定电流*1.1 A",
+          "value_expr": "用户输入额定电流*1.1 A",
           "value_source": "user_input",
           "value_type": "user_input",
-          "constraints": "用户录入额定参数中的额定电流 A",
+          "constraints": "用户输入额定电流*1.1 A",
           "calc_rule": "",
-          "derive_from_rated": "用户录入额定参数中的额定电流 A"
+          "derive_from_rated": "用户输入额定电流*1.1 A"
         },
         {
           "param_name": "试验相数",
@@ -20355,13 +20355,13 @@
         },
         {
           "param_name": "试验电流A",
-          "value_text": "额定连续电流 Ir",
-          "value_expr": "额定连续电流 Ir",
+          "value_text": "用户输入额定电流*1.1 A",
+          "value_expr": "用户输入额定电流*1.1 A",
           "value_source": "user_input",
           "value_type": "user_input",
-          "constraints": "额定连续电流 Ir",
+          "constraints": "用户输入额定电流*1.1 A",
           "calc_rule": "",
-          "derive_from_rated": "额定连续电流 Ir"
+          "derive_from_rated": "用户输入额定电流*1.1 A"
         },
         {
           "param_name": "试验相数",
@@ -20442,13 +20442,13 @@
         },
         {
           "param_name": "试验电流A",
-          "value_text": "额定连续电流 Ir",
-          "value_expr": "额定连续电流 Ir",
+          "value_text": "用户输入额定电流*1.1 A",
+          "value_expr": "用户输入额定电流*1.1 A",
           "value_source": "user_input",
           "value_type": "user_input",
-          "constraints": "额定连续电流 Ir",
+          "constraints": "用户输入额定电流*1.1 A",
           "calc_rule": "",
-          "derive_from_rated": "额定连续电流 Ir"
+          "derive_from_rated": "用户输入额定电流*1.1 A"
         },
         {
           "param_name": "试验相数",
@@ -42202,13 +42202,13 @@
           },
           {
             "param_name": "试验电流A",
-            "value_text": "用户录入额定参数中的额定电流 A",
-            "value_expr": "用户录入额定参数中的额定电流 A",
+            "value_text": "用户输入额定电流*1.1 A",
+            "value_expr": "用户输入额定电流*1.1  A",
             "value_source": "user_input",
             "value_type": "user_input",
-            "constraints": "用户录入额定参数中的额定电流 A",
+            "constraints": "用户输入额定电流*1.1  A",
             "calc_rule": "",
-            "derive_from_rated": "用户录入额定参数中的额定电流 A"
+            "derive_from_rated": "用户输入额定电流*1.1  A"
           },
           {
             "param_name": "试验相数",
@@ -42299,13 +42299,13 @@
           },
           {
             "param_name": "试验电流A",
-            "value_text": "用户录入额定参数中的额定电流 A",
-            "value_expr": "用户录入额定参数中的额定电流 A",
+            "value_text": "用户输入额定电流*1.1 A ",
+            "value_expr": "用户输入额定电流*1.1 A ",
             "value_source": "user_input",
             "value_type": "user_input",
-            "constraints": "用户录入额定参数中的额定电流 A",
+            "constraints": "用户输入额定电流*1.1 A ",
             "calc_rule": "",
-            "derive_from_rated": "用户录入额定参数中的额定电流 A"
+            "derive_from_rated": "用户输入额定电流*1.1 A "
           },
           {
             "param_name": "试验相数",
@@ -42388,13 +42388,13 @@
           },
           {
             "param_name": "试验电流A",
-            "value_text": "额定连续电流 Ir",
-            "value_expr": "额定连续电流 Ir",
+            "value_text": "用户输入额定电流*1.1 A",
+            "value_expr": "用户输入额定电流*1.1 A",
             "value_source": "user_input",
             "value_type": "user_input",
-            "constraints": "额定连续电流 Ir",
+            "constraints": "用户输入额定电流*1.1 A",
             "calc_rule": "",
-            "derive_from_rated": "额定连续电流 Ir"
+            "derive_from_rated": "用户输入额定电流*1.1 A"
           },
           {
             "param_name": "试验相数",
@@ -42475,13 +42475,13 @@
           },
           {
             "param_name": "试验电流A",
-            "value_text": "额定连续电流 Ir",
-            "value_expr": "额定连续电流 Ir",
+            "value_text": "用户输入额定电流*1.1 A",
+            "value_expr": "用户输入额定电流*1.1 A",
             "value_source": "user_input",
             "value_type": "user_input",
-            "constraints": "额定连续电流 Ir",
+            "constraints": "用户输入额定电流*1.1 A",
             "calc_rule": "",
-            "derive_from_rated": "额定连续电流 Ir"
+            "derive_from_rated": "用户输入额定电流*1.1 A"
           },
           {
             "param_name": "试验相数",
@@ -54195,13 +54195,13 @@
         },
         {
           "param_name": "试验电流A",
-          "value_text": "用户录入额定参数中的额定电流 A",
-          "value_expr": "用户录入额定参数中的额定电流 A",
+          "value_text": "用户输入额定电流*1.1 A",
+          "value_expr": "用户输入额定电流*1.1 A",
           "value_source": "user_input",
           "value_type": "user_input",
-          "constraints": "用户录入额定参数中的额定电流 A",
+          "constraints": "用户输入额定电流*1.1 A",
           "calc_rule": "",
-          "derive_from_rated": "用户录入额定参数中的额定电流 A"
+          "derive_from_rated": "用户输入额定电流*1.1 A"
         },
         {
           "param_name": "试验相数",
@@ -54284,13 +54284,13 @@
         },
         {
           "param_name": "试验电流A",
-          "value_text": "额定连续电流 Ir",
-          "value_expr": "额定连续电流 Ir",
+          "value_text": "用户输入额定电流*1.1 A",
+          "value_expr": "用户输入额定电流*1.1 A",
           "value_source": "user_input",
           "value_type": "user_input",
-          "constraints": "额定连续电流 Ir",
+          "constraints": "用户输入额定电流*1.1 A",
           "calc_rule": "",
-          "derive_from_rated": "额定连续电流 Ir"
+          "derive_from_rated": "用户输入额定电流*1.1 A"
         },
         {
           "param_name": "试验相数",
