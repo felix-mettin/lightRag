@@ -25,47 +25,8 @@ from lightrag.utils import (
     compute_mdhash_id,
     Tokenizer,
     is_float_regex,
-    sanitize_and_normalize_extracted_text,
-    pack_user_ass_to_openai_messages,
-    split_string_by_multi_markers,
-    truncate_list_by_token_size,
-    compute_args_hash,
-    handle_cache,
-    save_to_cache,
-    CacheData,
-    use_llm_func_with_cache,
-    update_chunk_cache_list,
-    remove_think_tags,
-    pick_by_weighted_polling,
-    pick_by_vector_similarity,
-    process_chunks_unified,
-    safe_vdb_operation_with_exception,
-    create_prefixed_exception,
-    fix_tuple_delimiter_corruption,
-    convert_to_user_format,
-    generate_reference_list_from_chunks,
-    apply_source_ids_limit,
-    merge_source_ids,
-    make_relation_chunk_key,
 )
-from lightrag.base import (
-    BaseGraphStorage,
-    BaseKVStorage,
-    BaseVectorStorage,
-    TextChunkSchema,
-    QueryParam,
-    QueryResult,
-    QueryContextResult,
-)
-from lightrag.prompt import PROMPTS
 from lightrag.constants import (
-    GRAPH_FIELD_SEP,
-    DEFAULT_MAX_ENTITY_TOKENS,
-    DEFAULT_MAX_RELATION_TOKENS,
-    DEFAULT_MAX_TOTAL_TOKENS,
-    DEFAULT_RELATED_CHUNK_NUMBER,
-    DEFAULT_KG_CHUNK_PICK_METHOD,
-    DEFAULT_ENTITY_TYPES,
     DEFAULT_SUMMARY_LANGUAGE,
     SOURCE_IDS_LIMIT_METHOD_KEEP,
     SOURCE_IDS_LIMIT_METHOD_FIFO,
@@ -73,15 +34,8 @@ from lightrag.constants import (
     DEFAULT_MAX_FILE_PATHS,
     DEFAULT_ENTITY_NAME_MAX_LENGTH,
 )
-from lightrag.kg.shared_storage import get_storage_keyed_lock
 from lightrag.standards import normalize_standard_type
-import time
-from dotenv import load_dotenv
-
-# use the .env that is inside the current folder
-# allows to use different .env file for each lightrag instance
-# the OS environment variables take precedence over the .env file
-load_dotenv(dotenv_path=Path(__file__).resolve().parent / ".env", override=False)
+from lightrag.kg.shared_storage import get_storage_keyed_lock
 
 _TREE_OVERRIDE_CACHE: dict[str, tuple[float, dict[str, Any]]] = {}
 _DOMAIN_RULE_CACHE: dict[str, tuple[float, dict[str, Any]]] = {}
@@ -2631,15 +2585,40 @@ def _apply_domain_rule_decisions_to_project_context(
         for label in labels:
             pattern = (
                 rf"{re.escape(label)}\s*(?:[:：=]\s*)?"
-                rf"([0-9]+(?:\.[0-9]+)?)\s*(?:\(\s*\+\s*([0-9]+(?:\.[0-9]+)?)\s*\))?\s*(?:kV)?"
+                rf"([0-9\.\+\(\)\s]+?)\s*(?:kV\b|$)"
             )
             match = re.search(pattern, normalized, flags=re.IGNORECASE)
             if not match:
                 continue
-            primary_value = float(match.group(1))
-            auxiliary_value = (
-                float(match.group(2)) if match.group(2) is not None else None
+            value_text = re.sub(r"\s+", "", str(match.group(1) or ""))
+            if not value_text:
+                continue
+
+            pair_match = re.fullmatch(
+                r"([0-9]+(?:\.[0-9]+)?)\(\+([0-9]+(?:\.[0-9]+)?)\)",
+                value_text,
             )
+            if not pair_match:
+                pair_match = re.fullmatch(
+                    r"\(([0-9]+(?:\.[0-9]+)?)\+([0-9]+(?:\.[0-9]+)?)\)",
+                    value_text,
+                )
+            if not pair_match:
+                pair_match = re.fullmatch(
+                    r"([0-9]+(?:\.[0-9]+)?)\+([0-9]+(?:\.[0-9]+)?)",
+                    value_text,
+                )
+
+            if pair_match:
+                primary_value = float(pair_match.group(1))
+                auxiliary_value = float(pair_match.group(2))
+                return primary_value, auxiliary_value
+
+            single_match = re.fullmatch(r"([0-9]+(?:\.[0-9]+)?)", value_text)
+            if not single_match:
+                continue
+            primary_value = float(single_match.group(1))
+            auxiliary_value = None
             return primary_value, auxiliary_value
         return None
 
@@ -2690,13 +2669,14 @@ def _apply_domain_rule_decisions_to_project_context(
 
     def _resolve_capacitive_nonuniform_coefficient_local(
         query_text: str,
-    ) -> tuple[float, str, str]:
+    ) -> tuple[float, str, str, bool]:
         explicit_value = _extract_named_scalar_local(query_text, ["不均匀系数"])
         if explicit_value is not None:
             return (
                 explicit_value,
                 str(explicit_value).rstrip("0").rstrip("."),
                 "用户已明确提供不均匀系数，直接采用。",
+                True,
             )
 
         text = str(query_text or "").strip()
@@ -2709,14 +2689,33 @@ def _apply_domain_rule_decisions_to_project_context(
         if break_count_match:
             break_count = int(break_count_match.group(1))
             if break_count > 1:
-                return 1.05, "1.05", f"问题中给出断口数量为 {break_count}，按多断口默认不均匀系数 1.05 计算。"
-            return 1.0, "1", f"问题中给出断口数量为 {break_count}，按单断口默认不均匀系数 1 计算。"
+                return 1.05, "1.05", f"问题中给出断口数量为 {break_count}，按双断口/多断口默认不均匀系数 1.05 计算。", False
+            return 1.0, "1", f"问题中给出断口数量为 {break_count}，按单断口默认不均匀系数 1 计算。", False
 
-        if any(token in normalized for token in ("多断口", "多端口")):
-            return 1.05, "1.05", "问题中命中多断口/多端口描述，默认不均匀系数取 1.05。"
+        if any(token in normalized for token in ("双断口", "双端口", "多断口", "多端口")):
+            return 1.05, "1.05", "问题中命中双断口/多断口描述，默认不均匀系数取 1.05。", False
         if any(token in normalized for token in ("单断口", "单端口")):
-            return 1.0, "1", "问题中命中单断口/单端口描述，默认不均匀系数取 1。"
-        return 1.0, "1", "未明确给出不均匀系数且未识别出多断口信息，默认按单断口取 1。"
+            return 1.0, "1", "问题中命中单断口/单端口描述，默认不均匀系数取 1。", False
+        return 1.0, "1", "未明确给出不均匀系数且无法识别断口数量，默认按单断口取 1。", False
+
+    def _resolve_break_count_local(query_text: str) -> tuple[int, str]:
+        text = str(query_text or "").strip()
+        normalized = text.replace("（", "(").replace("）", ")")
+        break_count_match = re.search(
+            r"断口数量\s*(?:[:：=]\s*)?([0-9]+)",
+            normalized,
+            flags=re.IGNORECASE,
+        )
+        if break_count_match:
+            break_count = max(int(break_count_match.group(1)), 1)
+            return break_count, f"问题中给出断口数量为 {break_count}，按该断口数量计算。"
+        if any(token in normalized for token in ("双断口", "双端口")):
+            return 2, "问题中命中双断口/双端口描述，断口数量按 2 计算。"
+        if any(token in normalized for token in ("多断口", "多端口")):
+            return 2, "问题中命中多断口/多端口描述但未明确数量，断口数量默认按 2 计算。"
+        if any(token in normalized for token in ("单断口", "单端口")):
+            return 1, "问题中命中单断口/单端口描述，断口数量按 1 计算。"
+        return 1, "未明确给出断口数量时，默认按单断口即 1 个断口计算。"
 
     def _resolve_capacitive_test_voltage_local(
         query_text: str,
@@ -2725,9 +2724,10 @@ def _apply_domain_rule_decisions_to_project_context(
         phase_value, phase_rule = _detect_capacitive_test_phase_local(
             query_text, rated_voltage
         )
-        nonuniform_value, nonuniform_text, nonuniform_rule = (
+        nonuniform_value, nonuniform_text, nonuniform_rule, _ = (
             _resolve_capacitive_nonuniform_coefficient_local(query_text)
         )
+        break_count, break_count_rule = _resolve_break_count_local(query_text)
         if rated_voltage is None:
             return None, phase_value, nonuniform_text, "未识别到额定电压，无法计算容性电流开断试验试验电压。"
         if phase_value == "三相":
@@ -2735,16 +2735,19 @@ def _apply_domain_rule_decisions_to_project_context(
                 _format_voltage_value(rated_voltage),
                 phase_value,
                 nonuniform_text,
-                f"{phase_rule} 三相断路器的 LC/CC 试验电压直接取额定电压 {_format_voltage_value(rated_voltage)}。",
+                f"{phase_rule} 三相容性电流开断试验试验电压直接取额定电压 {_format_voltage_value(rated_voltage)}。",
             )
 
         kc_value = 1.2
-        computed_voltage = kc_value * (rated_voltage / math.sqrt(3.0)) * nonuniform_value
+        computed_voltage = (
+            ((kc_value * rated_voltage) / math.sqrt(3.0) / break_count)
+            * nonuniform_value
+        )
         return (
             _format_voltage_value(computed_voltage),
             phase_value,
             nonuniform_text,
-            f"{phase_rule} {nonuniform_rule} 单相试验电压按 kc × (额定电压/√3) × 不均匀系数 计算，其中 kc={kc_value}，即 {kc_value} × ({rated_voltage}/√3) × {nonuniform_text} = {_format_voltage_value(computed_voltage)}。",
+            f"{phase_rule} {nonuniform_rule} {break_count_rule} 单相试验电压按 kc × 额定电压 / √3 / 断口数量 × 不均匀系数 计算，其中 kc={kc_value}，即 {kc_value} × {rated_voltage} / √3 / {break_count} × {nonuniform_text} = {_format_voltage_value(computed_voltage)}。",
         )
 
     def _preferred_capacitive_current_a_local(
@@ -2816,6 +2819,29 @@ def _apply_domain_rule_decisions_to_project_context(
     rated_frequency_hz = (
         float(rated_frequency_match.group(1)) if rated_frequency_match else 50.0
     )
+    rated_closing_ka = _extract_named_current_ka_local(
+        query_text,
+        ["额定短路关合电流", "短路关合电流", "关合电流"],
+    )
+    explicit_first_pole_kpp = _extract_named_scalar_local(
+        query_text,
+        ["首开极系数kpp", "首开极系数"],
+    )
+    first_pole_kpp_from_user = explicit_first_pole_kpp is not None
+    if explicit_first_pole_kpp is not None:
+        first_pole_kpp = explicit_first_pole_kpp
+        first_pole_kpp_rule = "用户已明确提供首开极系数 kpp，问答阶段直接采用该值。"
+    elif rated_voltage_kv is not None and rated_voltage_kv <= 40.5:
+        first_pole_kpp = 1.5
+        first_pole_kpp_rule = f"额定电压 {rated_voltage_kv} kV 不高于 40.5 kV，首开极系数 kpp 默认取 1.5。"
+    elif rated_voltage_kv is not None and rated_voltage_kv >= 72.5:
+        first_pole_kpp = 1.3
+        first_pole_kpp_rule = f"额定电压 {rated_voltage_kv} kV 不低于 72.5 kV，首开极系数 kpp 默认取 1.3。"
+    else:
+        first_pole_kpp = None
+        first_pole_kpp_rule = "未明确提供首开极系数 kpp，且当前额定电压区间无默认值。"
+    is_low_voltage = rated_voltage_kv is not None and rated_voltage_kv <= 40.5
+    is_breaker_class_not_applicable = rated_voltage_kv is not None and rated_voltage_kv > 72.5
     pf_withstand_kv = _extract_named_voltage_kv_local(
         query_text,
         ["额定短时工频耐受电压", "额定工频耐受电压"],
@@ -2840,24 +2866,57 @@ def _apply_domain_rule_decisions_to_project_context(
         query_text,
         ["额定雷电冲击耐受电压(断口)"],
     )
+    si_withstand_kv = _extract_named_voltage_kv_local(
+        query_text,
+        ["额定操作冲击耐受电压"],
+    )
     si_joint_voltage_parts = _extract_named_joint_voltage_parts_local(
         query_text,
         ["额定操作冲击耐受电压(断口)"],
     )
-    bc_current_a = None
+    bc_current_a = _extract_named_scalar_local(
+        query_text,
+        [
+            "额定电容器组电流",
+            "电容器组开断电流",
+            "电容器组开合电流",
+            "电容器电流",
+            "额定背对背电容器组开断电流",
+            "背对背电容器组开断电流",
+            "额定单个电容器组开断电流",
+            "单个电容器组开断电流",
+        ],
+    )
     bc_test_category = ""
-    for label in (
-        "额定背对背电容器组开断电流",
-        "背对背电容器组开断电流",
-        "额定单个电容器组开断电流",
-        "单个电容器组开断电流",
-    ):
-        pattern = rf"{re.escape(label)}\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*(?:A)?"
-        match = re.search(pattern, query_text, flags=re.IGNORECASE)
-        if match:
-            bc_current_a = float(match.group(1))
-            bc_test_category = "背对背电容器组" if "背对背" in label else "单个电容器组"
-            break
+    if bc_current_a is not None:
+        if any(token in query_text for token in ("背对背", "Ibb")):
+            bc_test_category = "背对背电容器组"
+        elif any(token in query_text for token in ("单个电容器组", "单个电容器")):
+            bc_test_category = "单个电容器组"
+        else:
+            bc_test_category = "电容器组"
+    cc_current_a = _extract_named_scalar_local(
+        query_text,
+        [
+            "额定电缆充电电流",
+            "额定电缆充电开断电流",
+            "额定电缆充电开合电流",
+            "电缆充电开断电流",
+            "电缆充电开合电流",
+            "电缆充电电流",
+        ],
+    )
+    lc_current_a = _extract_named_scalar_local(
+        query_text,
+        [
+            "额定线路充电电流",
+            "额定线路充电开断电流",
+            "额定线路充电开合电流",
+            "线路充电开断电流",
+            "线路充电开合电流",
+            "线路充电电流",
+        ],
+    )
     c_grade = None
     c_grade_match = re.search(
         r"(?:容性电流开合时重击穿等级|开合容性电流能力的级别|重击穿等级|能力级别|试验级别)\s*(?:[:：=]|为|是)?\s*(C[12])",
@@ -2876,44 +2935,511 @@ def _apply_domain_rule_decisions_to_project_context(
     capacitive_trial_count_rule = (
         f"开合容性电流能力级别判定为{capacitive_grade_value}，容性电流开断试验次数取{capacitive_trial_count_text}。"
     )
-    if c_grade == "C1":
-        updated_param_map.pop("T60(预备试验)", None)
-        updated_value_map.pop("T60(预备试验)", None)
-    rated_peak_ka = _extract_named_current_ka_local(
-        query_text, ["额定峰值耐受电流", "峰值耐受电流"]
+    capacitive_split_trial_count_text = "24次" if capacitive_grade_value == "C2" else "12次"
+    capacitive_split_trial_count_rule = (
+        f"开合容性电流能力级别判定为{capacitive_grade_value}，拆分后的容性电流开断试验次数取{capacitive_split_trial_count_text}。"
     )
-    rated_short_time_s_match = re.search(
-        r"额定短路持续时间\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*s\b",
-        query_text,
-        flags=re.IGNORECASE,
-    )
-    rated_short_time_s = (
-        float(rated_short_time_s_match.group(1)) if rated_short_time_s_match else None
-    )
-    rated_closing_ka = _extract_named_current_ka_local(
-        query_text, ["额定短路关合电流", "短路关合电流"]
-    )
-    first_pole_match = re.search(
-        r"首开极系数(?:kpp)?\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)",
-        query_text,
-        flags=re.IGNORECASE,
-    )
-    first_pole_kpp = None
-    first_pole_kpp_rule = ""
-    if first_pole_match:
-        first_pole_kpp = float(first_pole_match.group(1))
-        first_pole_kpp_rule = "用户已提供首开极系数，问答阶段直接采用该值。"
-    elif rated_voltage_kv is not None and rated_voltage_kv <= 40.5:
-        first_pole_kpp = 1.5
-        first_pole_kpp_rule = (
-            f"额定电压 {rated_voltage_kv} kV 不高于 40.5 kV，首开极系数默认取 1.5。"
+
+    def _set_capacitive_current_local(
+        test_name: str,
+        current_a: float,
+        ratio: float,
+        source_label: str,
+    ) -> None:
+        current_text = _format_current_a_local(current_a * ratio)
+        ratio_text = str(int(ratio * 100)).rstrip("0").rstrip(".")
+        calc_rule = (
+            f"{test_name}试验电流取{source_label}的{ratio_text}%，即 {str(current_a).rstrip('0').rstrip('.')} A × {ratio_text}% = {current_text}。"
         )
-    elif rated_voltage_kv is not None and rated_voltage_kv >= 72.5:
-        first_pole_kpp = 1.3
-        first_pole_kpp_rule = (
-            f"额定电压 {rated_voltage_kv} kV 不低于 72.5 kV，首开极系数默认取 1.3。"
-        )
+        for param_name in ("试验电流A", "试验电流"):
+            _set_if_present(
+                test_name,
+                param_name,
+                current_text,
+                calc_rule=calc_rule,
+            )
+
+    capacitive_voltage_targets = (
+        "容性电流开断试验(LC1)",
+        "容性电流开断试验(LC1)#1",
+        "容性电流开断试验(LC1)#2",
+        "容性电流开断试验(LC2)",
+        "容性电流开断试验(LC2)#1",
+        "容性电流开断试验(LC2)#2",
+        "容性电流开断试验(CC1)",
+        "容性电流开断试验(CC1)#1",
+        "容性电流开断试验(CC1)#2",
+        "容性电流开断试验(CC2)",
+        "容性电流开断试验(CC2)#1",
+        "容性电流开断试验(CC2)#2",
+        "容性电流开断试验(BC1)",
+        "容性电流开断试验(BC2)",
+        "BC1(60HZ)",
+        "BC2(60HZ)",
+        "CC1(60HZ)",
+        "CC2(60HZ)",
+        "LC1(60HZ)",
+        "LC2(60HZ)",
+    )
     is_three_phase_default = rated_voltage_kv is not None and rated_voltage_kv <= 40.5
+
+    def _resolve_partial_discharge_parameters_local() -> dict[str, tuple[str, str]]:
+        resolved: dict[str, tuple[str, str]] = {}
+        if rated_voltage_kv is None:
+            return resolved
+
+        if rated_voltage_kv <= 40.5:
+            pre_voltage = round(rated_voltage_kv * 1.3, 2)
+            ac_voltage = round(rated_voltage_kv * 1.1, 2)
+            resolved["局部放电值"] = (
+                "≤10 pC",
+                f"额定电压 {rated_voltage_kv} kV 不高于 40.5 kV，局部放电值限值取 ≤10 pC。",
+            )
+            resolved["预加电压"] = (
+                _format_voltage_value(pre_voltage),
+                f"低压局部放电试验预加电压按 1.3 × 额定电压 计算，即 1.3 × {rated_voltage_kv} kV = {_format_voltage_value(pre_voltage)}。",
+            )
+            resolved["交流电压"] = (
+                _format_voltage_value(ac_voltage),
+                f"低压局部放电试验交流电压按 1.1 × 额定电压 计算，即 1.1 × {rated_voltage_kv} kV = {_format_voltage_value(ac_voltage)}。",
+            )
+            return resolved
+
+        resolved["局部放电值"] = (
+            "≤5 pC",
+            f"额定电压 {rated_voltage_kv} kV 高于 40.5 kV，局部放电值限值取 ≤5 pC。",
+        )
+        if pf_withstand_kv is not None:
+            resolved["预加电压"] = (
+                _format_voltage_value(pf_withstand_kv),
+                f"高压局部放电试验预加电压取用户提供的额定短时工频耐受电压 {_format_voltage_value(pf_withstand_kv)}。",
+            )
+        if first_pole_kpp is not None:
+            if abs(first_pole_kpp - 1.5) < 1e-6:
+                ac_voltage = round(rated_voltage_kv * 1.2, 2)
+                resolved["交流电压"] = (
+                    _format_voltage_value(ac_voltage),
+                    f"高压局部放电试验在首开极系数 kpp={str(first_pole_kpp).rstrip('0').rstrip('.')} 时，交流电压按 1.2 × 额定电压 计算，即 1.2 × {rated_voltage_kv} kV = {_format_voltage_value(ac_voltage)}。",
+                )
+            elif abs(first_pole_kpp - 1.3) < 1e-6:
+                ac_voltage = round((rated_voltage_kv * 1.2) / math.sqrt(3.0), 2)
+                resolved["交流电压"] = (
+                    _format_voltage_value(ac_voltage),
+                    f"高压局部放电试验在首开极系数 kpp={str(first_pole_kpp).rstrip('0').rstrip('.')} 时，交流电压按 1.2 × 额定电压 / √3 计算，即 1.2 × {rated_voltage_kv} / √3 = {_format_voltage_value(ac_voltage)}。",
+                )
+        return resolved
+
+    def _resolve_state_t10_parameters_local() -> dict[str, tuple[str, str]]:
+        resolved: dict[str, tuple[str, str]] = {}
+        normalized = query_text.replace("（", "(").replace("）", ")")
+
+        has_multiple_units = any(
+            token in normalized
+            for token in (
+                "断路器串联关合和开断单元数量为多个",
+                "断路器串联关合和开断单元数量多个",
+                "串联关合和开断单元数量为多个",
+                "串联关合和开断单元数量多个",
+                "多个关合和开断单元",
+                "多个开断单元",
+                "多单元",
+            )
+        ) or (
+            "关合和开断单元" in normalized
+            and any(token in normalized for token in ("多个", "多组", "多单元"))
+        )
+        has_asymmetric_path = any(
+            token in normalized
+            for token in (
+                "电流路径不对称",
+                "路径不对称",
+                "电流通路不对称",
+                "电流回路不对称",
+                "回路不对称",
+            )
+        )
+        if has_multiple_units and has_asymmetric_path:
+            resolved["试验次数"] = (
+                "30次",
+                "问题中明确提到断路器串联关合和开断单元数量为多个且电流路径不对称，状态检查试验(T10)试验次数取30次。",
+            )
+        else:
+            resolved["试验次数"] = (
+                "20次",
+                "未识别到“多个串联关合和开断单元且电流路径不对称”的条件时，状态检查试验(T10)试验次数默认取20次。",
+            )
+
+        if rated_voltage_kv is not None and rated_voltage_kv <= 40.5:
+            resolved["试验相数"] = (
+                "三相",
+                f"额定电压 {rated_voltage_kv} kV 不高于 40.5 kV，状态检查试验(T10)默认按三相。",
+            )
+        elif rated_voltage_kv is not None and rated_voltage_kv >= 72.5:
+            resolved["试验相数"] = (
+                "单相",
+                f"额定电压 {rated_voltage_kv} kV 不低于 72.5 kV，状态检查试验(T10)默认按单相。",
+            )
+        elif rated_voltage_kv is not None:
+            resolved["试验相数"] = (
+                "单相",
+                f"额定电压 {rated_voltage_kv} kV 未落在 40.5 kV 及以下档，状态检查试验(T10)默认按单相。",
+            )
+
+        if rated_voltage_kv is not None:
+            if 72.5 <= rated_voltage_kv <= 252.0 and li_withstand_kv is not None:
+                test_voltage = round(li_withstand_kv * 0.6, 3)
+                resolved["试验电压"] = (
+                    _format_voltage_value(test_voltage),
+                    f"72.5 kV ≤ 额定电压 ≤ 252 kV 时，状态检查试验(T10)试验电压取额定雷电冲击耐受电压的60%，即 {li_withstand_kv} kV × 60% = {_format_voltage_value(test_voltage)}。",
+                )
+            elif abs(rated_voltage_kv - 363.0) < 1e-6 and si_withstand_kv is not None:
+                test_voltage = round(si_withstand_kv * 0.8, 3)
+                resolved["试验电压"] = (
+                    _format_voltage_value(test_voltage),
+                    f"额定电压为 363 kV 时，状态检查试验(T10)试验电压取额定操作冲击耐受电压的80%，即 {si_withstand_kv} kV × 80% = {_format_voltage_value(test_voltage)}。",
+                )
+            elif 550.0 <= rated_voltage_kv <= 1100.0 and si_withstand_kv is not None:
+                test_voltage = round(si_withstand_kv * 0.9, 3)
+                resolved["试验电压"] = (
+                    _format_voltage_value(test_voltage),
+                    f"550 kV ≤ 额定电压 ≤ 1100 kV 时，状态检查试验(T10)试验电压取额定操作冲击耐受电压的90%，即 {si_withstand_kv} kV × 90% = {_format_voltage_value(test_voltage)}。",
+                )
+            else:
+                test_voltage = round(rated_voltage_kv * 0.5, 3)
+                resolved["试验电压"] = (
+                    _format_voltage_value(test_voltage),
+                    f"当前额定电压 {rated_voltage_kv} kV 未命中状态检查试验(T10)的特定分段规则，回退按 50% × 额定电压 计算，即 {_format_voltage_value(test_voltage)}。",
+                )
+
+        if short_break_ka is not None:
+            test_current = round(short_break_ka * 0.1, 3)
+            current_text = f"{str(test_current).rstrip('0').rstrip('.')} kA"
+            resolved["试验电流"] = (
+                current_text,
+                f"状态检查试验(T10)试验电流取额定短路开断电流的10%，即 {short_break_ka} kA × 10% = {current_text}。",
+            )
+
+        return resolved
+
+    def _resolve_op2_parameters_local() -> dict[str, tuple[str, str]]:
+        resolved: dict[str, tuple[str, str]] = {}
+        if rated_voltage_kv is None or capacitive_nonuniform_value is None:
+            return resolved
+
+        nonuniform_text = str(capacitive_nonuniform_value).rstrip("0").rstrip(".")
+
+        if rated_voltage_kv <= 40.5:
+            resolved["试验相数"] = (
+                "三相",
+                f"额定电压 {rated_voltage_kv} kV 不高于 40.5 kV，失步关合和开断试验(OP2)按三相。",
+            )
+            test_voltage = round(
+                ((rated_voltage_kv * 2.5) / math.sqrt(3.0))
+                * float(capacitive_nonuniform_value),
+                3,
+            )
+            resolved["试验电压"] = (
+                _format_voltage_value(test_voltage),
+                f"额定电压 {rated_voltage_kv} kV 不高于 40.5 kV 时，失步关合和开断试验(OP2)试验电压按 2.5 × 额定电压 / √3 × 不均匀系数 计算，即 2.5 × {rated_voltage_kv} / √3 × {nonuniform_text} = {_format_voltage_value(test_voltage)}。",
+            )
+            return resolved
+
+        if rated_voltage_kv >= 72.5:
+            resolved["试验相数"] = (
+                "单相",
+                f"额定电压 {rated_voltage_kv} kV 不低于 72.5 kV，失步关合和开断试验(OP2)按单相。",
+            )
+            if first_pole_kpp is None:
+                return resolved
+            kpp_text = str(first_pole_kpp).rstrip("0").rstrip(".")
+            if abs(first_pole_kpp - 1.3) < 1e-6:
+                numerator = 2.0
+            elif abs(first_pole_kpp - 1.5) < 1e-6:
+                numerator = 2.5
+            else:
+                return resolved
+            numerator_text = str(numerator).rstrip("0").rstrip(".")
+            test_voltage = round(
+                ((rated_voltage_kv * numerator) / math.sqrt(3.0))
+                * float(capacitive_nonuniform_value),
+                3,
+            )
+            resolved["试验电压"] = (
+                _format_voltage_value(test_voltage),
+                f"额定电压 {rated_voltage_kv} kV 不低于 72.5 kV 且首开极系数 kpp={kpp_text} 时，失步关合和开断试验(OP2)试验电压按 {numerator_text} × 额定电压 / √3 × 不均匀系数 计算，即 {numerator_text} × {rated_voltage_kv} / √3 × {nonuniform_text} = {_format_voltage_value(test_voltage)}。",
+            )
+
+        return resolved
+
+    def _resolve_op2_making_parameters_local() -> dict[str, tuple[str, str]]:
+        resolved: dict[str, tuple[str, str]] = {}
+        if rated_voltage_kv is None or capacitive_nonuniform_value is None:
+            return resolved
+
+        break_count, break_count_rule = _resolve_break_count_local(query_text)
+        nonuniform_text = str(capacitive_nonuniform_value).rstrip("0").rstrip(".")
+        test_voltage = round(
+            (((rated_voltage_kv * 2.0) / break_count) / math.sqrt(3.0))
+            * float(capacitive_nonuniform_value),
+            3,
+        )
+        resolved["试验电压"] = (
+            _format_voltage_value(test_voltage),
+            f"OP2关合试验电压按 2 × 额定电压 / 断口数量 / √3 × 不均匀系数 计算；{break_count_rule} 即 2 × {rated_voltage_kv} / {break_count} / √3 × {nonuniform_text} = {_format_voltage_value(test_voltage)}。",
+        )
+        return resolved
+
+    def _resolve_60hz_short_circuit_parameters_local() -> dict[str, dict[str, tuple[str, str]]]:
+        resolved: dict[str, dict[str, tuple[str, str]]] = {}
+        normalized = query_text.replace("（", "(").replace("）", ")")
+        operation_sequence_match = re.search(
+            r"(?:额定操作顺序|操作顺序)\s*(?:[:：=]|为|是)?\s*([A-Za-z0-9\.\-\s]+(?:CO|O))",
+            normalized,
+            flags=re.IGNORECASE,
+        )
+        operation_sequence_text = (
+            re.sub(r"\s+", "", operation_sequence_match.group(1))
+            if operation_sequence_match
+            else "O-0.3s-CO-180s-CO"
+        )
+        operation_sequence_rule = (
+            "用户已提供额定操作顺序，问答阶段直接采用该值。"
+            if operation_sequence_match
+            else "未提供额定操作顺序时，默认按 O-0.3s-CO-180s-CO 执行。"
+        )
+        break_count, break_count_rule = _resolve_break_count_local(query_text)
+        min_opening_time_ms = _extract_named_scalar_local(query_text, ["最短分闸时间"])
+        min_opening_time_ms = 20.0 if min_opening_time_ms is None else min_opening_time_ms
+        min_opening_time_text = f"{str(min_opening_time_ms).rstrip('0').rstrip('.')} ms"
+        min_opening_time_rule = (
+            "用户已明确提供最短分闸时间，问答阶段直接采用该值。"
+            if _extract_named_scalar_local(query_text, ["最短分闸时间"]) is not None
+            else "未提供最短分闸时间时，默认按 20 ms 计算。"
+        )
+        time_constant_ms = _extract_named_scalar_local(query_text, ["时间常数"])
+        time_constant_ms = 45.0 if time_constant_ms is None else time_constant_ms
+        time_constant_text = f"{str(time_constant_ms).rstrip('0').rstrip('.')} ms"
+        time_constant_rule = (
+            "用户已明确提供时间常数，问答阶段直接采用该值。"
+            if _extract_named_scalar_local(query_text, ["时间常数"]) is not None
+            else "未提供时间常数时，默认按 45 ms 计算。"
+        )
+
+        for test_name in (
+            "L75(60HZ)",
+            "L90(60HZ)",
+            "T100A(60HZ)",
+            "T100S(60HZ)",
+            "近区故障试验(L75)",
+            "近区故障试验(L90)",
+            "短路开断试验(T100A)",
+            "短路开断试验(T100s)",
+        ):
+            resolved[test_name] = {
+                "操作顺序": (operation_sequence_text, operation_sequence_rule),
+            }
+
+        if rated_voltage_kv is not None:
+            l_voltage = round(rated_voltage_kv / math.sqrt(3.0), 3)
+            l_voltage_text = _format_voltage_value(l_voltage)
+            l_voltage_rule = (
+                f"L75/L90 试验电压按额定电压 / √3 计算，即 {rated_voltage_kv} / √3 = {l_voltage_text}。"
+            )
+            for test_name in ("L75(60HZ)", "L90(60HZ)", "近区故障试验(L75)", "近区故障试验(L90)"):
+                resolved[test_name]["试验电压"] = (l_voltage_text, l_voltage_rule)
+
+            if rated_voltage_kv <= 40.5:
+                rated_voltage_text_local = _format_voltage_value(rated_voltage_kv)
+                t100a_voltage_rule = (
+                    f"额定电压 {rated_voltage_kv} kV 不高于 40.5 kV 且按三相时，T100A 试验电压取额定电压 {rated_voltage_text_local}。"
+                )
+                t100a_phase_rule = (
+                    f"额定电压 {rated_voltage_kv} kV 不高于 40.5 kV，T100A 默认按三相。"
+                )
+                for test_name in ("T100A(60HZ)", "短路开断试验(T100A)"):
+                    resolved[test_name]["试验电压"] = (
+                        rated_voltage_text_local,
+                        t100a_voltage_rule,
+                    )
+                    resolved[test_name]["试验相数"] = (
+                        "三相",
+                        t100a_phase_rule,
+                    )
+
+                t100s_voltage_rule = (
+                    f"额定电压 {rated_voltage_kv} kV 不高于 40.5 kV 且按三相时，T100S 试验电压取额定电压 {rated_voltage_text_local}。"
+                )
+                t100s_phase_rule = (
+                    f"额定电压 {rated_voltage_kv} kV 不高于 40.5 kV，T100S 默认按三相。"
+                )
+                for test_name in ("T100S(60HZ)", "短路开断试验(T100s)"):
+                    resolved[test_name]["试验电压"] = (
+                        rated_voltage_text_local,
+                        t100s_voltage_rule,
+                    )
+                    resolved[test_name]["试验相数"] = (
+                        "三相",
+                        t100s_phase_rule,
+                    )
+            elif rated_voltage_kv >= 72.5 and first_pole_kpp is not None and capacitive_nonuniform_value is not None:
+                kpp_text = str(first_pole_kpp).rstrip("0").rstrip(".")
+                nonuniform_text = str(capacitive_nonuniform_value).rstrip("0").rstrip(".")
+                test_voltage = round(
+                    (((rated_voltage_kv / math.sqrt(3.0)) / break_count)
+                    * float(capacitive_nonuniform_value))
+                    * float(first_pole_kpp),
+                    3,
+                )
+                test_voltage_text = _format_voltage_value(test_voltage)
+                for test_name in ("T100A(60HZ)", "短路开断试验(T100A)"):
+                    resolved[test_name]["试验电压"] = (
+                        test_voltage_text,
+                        f"额定电压 {rated_voltage_kv} kV 不低于 72.5 kV 时，{test_name}试验电压按 额定电压 / √3 / 断口数量 × 不均匀系数 × 首开极系数 计算；{break_count_rule} 即 {rated_voltage_kv} / √3 / {break_count} × {nonuniform_text} × {kpp_text} = {test_voltage_text}。",
+                    )
+                    resolved[test_name]["试验相数"] = (
+                        "单相",
+                        f"额定电压 {rated_voltage_kv} kV 不低于 72.5 kV，{test_name}默认按单相。",
+                    )
+
+        if short_break_ka is not None:
+            t100a_current_text = f"{str(short_break_ka).rstrip('0').rstrip('.')} kA"
+            t100a_current_rule = (
+                f"T100A 试验电流取客户输入的额定短路开断电流 {t100a_current_text}。"
+            )
+            for test_name in ("T100A(60HZ)", "短路开断试验(T100A)"):
+                resolved[test_name]["试验电流"] = (
+                    t100a_current_text,
+                    t100a_current_rule,
+                )
+
+            l90_current = round(short_break_ka * 0.9, 3)
+            l75_current = round(short_break_ka * 0.75, 3)
+            l90_current_text = f"{str(l90_current).rstrip('0').rstrip('.')} kA"
+            l75_current_text = f"{str(l75_current).rstrip('0').rstrip('.')} kA"
+            l90_current_rule = (
+                f"L90 试验电流取额定短路开断电流的90%，即 {short_break_ka} kA × 90% = {l90_current_text}。"
+            )
+            l75_current_rule = (
+                f"L75 试验电流取额定短路开断电流的75%，即 {short_break_ka} kA × 75% = {l75_current_text}。"
+            )
+            for test_name in ("L90(60HZ)", "近区故障试验(L90)"):
+                resolved[test_name]["试验电流"] = (
+                    l90_current_text,
+                    l90_current_rule,
+                )
+            for test_name in ("L75(60HZ)", "近区故障试验(L75)"):
+                resolved[test_name]["试验电流"] = (
+                    l75_current_text,
+                    l75_current_rule,
+                )
+
+        for test_name, effective_frequency_hz in (
+            ("T100A(60HZ)", 60.0),
+            ("短路开断试验(T100A)", rated_frequency_hz),
+        ):
+            frequency_text = f"{str(effective_frequency_hz).rstrip('0').rstrip('.')} Hz"
+            resolved[test_name]["最短分闸时间"] = (
+                min_opening_time_text,
+                min_opening_time_rule,
+            )
+            resolved[test_name]["时间常数"] = (
+                time_constant_text,
+                time_constant_rule,
+            )
+            resolved[test_name]["额定频率"] = (
+                frequency_text,
+                (
+                    "T100A(60HZ)按 60 Hz 固定频率计算。"
+                    if test_name == "T100A(60HZ)"
+                    else "用户已明确提供额定频率时直接采用；未提供时沿用默认 50 Hz。"
+                ),
+            )
+            frequency_offset_ms = 8.3 if abs(float(effective_frequency_hz) - 60.0) < 1e-6 else 10.0
+            dc_component = math.exp(
+                -((float(min_opening_time_ms) + frequency_offset_ms) / float(time_constant_ms))
+            )
+            dc_component_text = f"{dc_component:.4f}".rstrip("0").rstrip(".")
+            resolved[test_name]["直流分量(试验)"] = (
+                dc_component_text,
+                f"{test_name}直流分量(试验)按 e^-[(最短分闸时间+a)/时间常数] 计算；最短分闸时间取 {min_opening_time_text}，时间常数取 {time_constant_text}，额定频率 {frequency_text} 对应 a={str(frequency_offset_ms).rstrip('0').rstrip('.')} ms，因此 e^(-(({str(min_opening_time_ms).rstrip('0').rstrip('.')}+{str(frequency_offset_ms).rstrip('0').rstrip('.')})/{str(time_constant_ms).rstrip('0').rstrip('.')})) = {dc_component_text}。",
+            )
+
+        return resolved
+
+    def _resolve_t10_t30_t60_parameters_local() -> dict[str, dict[str, tuple[str, str]]]:
+        resolved: dict[str, dict[str, tuple[str, str]]] = {}
+        normalized = query_text.replace("（", "(").replace("）", ")")
+        operation_sequence_match = re.search(
+            r"(?:额定操作顺序|操作顺序)\s*(?:[:：=]|为|是)?\s*([A-Za-z0-9\.\-\s]+(?:CO|O))",
+            normalized,
+            flags=re.IGNORECASE,
+        )
+        operation_sequence_text = (
+            re.sub(r"\s+", "", operation_sequence_match.group(1))
+            if operation_sequence_match
+            else "O-0.3s-CO-180s-CO"
+        )
+        operation_sequence_rule = (
+            "用户已提供额定操作顺序，问答阶段直接采用该值。"
+            if operation_sequence_match
+            else "未提供额定操作顺序时，默认按 O-0.3s-CO-180s-CO 执行。"
+        )
+        break_count, break_count_rule = _resolve_break_count_local(query_text)
+
+        test_ratio_map = {
+            "短路开断试验(T10)": 0.1,
+            "T10(60Hz)": 0.1,
+            "短路开断试验(T30)": 0.3,
+            "短路开断试验(T60)": 0.6,
+            "T60(60HZ)": 0.6,
+        }
+        for test_name in test_ratio_map:
+            resolved[test_name] = {
+                "操作顺序": (operation_sequence_text, operation_sequence_rule),
+            }
+
+        if rated_voltage_kv is not None:
+            if rated_voltage_kv <= 40.5:
+                rated_voltage_text_local = _format_voltage_value(rated_voltage_kv)
+                for test_name in test_ratio_map:
+                    resolved[test_name]["试验电压"] = (
+                        rated_voltage_text_local,
+                        f"额定电压 {rated_voltage_kv} kV 不高于 40.5 kV 且按三相时，{test_name}试验电压取额定电压 {rated_voltage_text_local}。",
+                    )
+                    resolved[test_name]["试验相数"] = (
+                        "三相",
+                        f"额定电压 {rated_voltage_kv} kV 不高于 40.5 kV，{test_name}默认按三相。",
+                    )
+            elif rated_voltage_kv >= 72.5 and first_pole_kpp is not None and capacitive_nonuniform_value is not None:
+                kpp_text = str(first_pole_kpp).rstrip("0").rstrip(".")
+                nonuniform_text = str(capacitive_nonuniform_value).rstrip("0").rstrip(".")
+                test_voltage = round(
+                    ((rated_voltage_kv / math.sqrt(3.0)) * float(first_pole_kpp) / break_count)
+                    * float(capacitive_nonuniform_value),
+                    3,
+                )
+                test_voltage_text = _format_voltage_value(test_voltage)
+                for test_name in test_ratio_map:
+                    resolved[test_name]["试验电压"] = (
+                        test_voltage_text,
+                        f"额定电压 {rated_voltage_kv} kV 不低于 72.5 kV 时，{test_name}试验电压按 额定电压 / √3 × 首开极系数 / 断口数量 × 不均匀系数 计算；{break_count_rule} 即 {rated_voltage_kv} / √3 × {kpp_text} / {break_count} × {nonuniform_text} = {test_voltage_text}。",
+                    )
+                    resolved[test_name]["试验相数"] = (
+                        "单相",
+                        f"额定电压 {rated_voltage_kv} kV 不低于 72.5 kV，{test_name}默认按单相。",
+                    )
+
+        if short_break_ka is not None:
+            for test_name, ratio in test_ratio_map.items():
+                current_ka = round(short_break_ka * ratio, 3)
+                current_text = f"{str(current_ka).rstrip('0').rstrip('.')} kA"
+                resolved[test_name]["试验电流"] = (
+                    current_text,
+                    f"{test_name}试验电流取额定短路开断电流的{int(ratio * 100)}%，即 {short_break_ka} kA × {int(ratio * 100)}% = {current_text}。",
+                )
+
+        return resolved
+
     dielectric_value = (
         "充气/充油"
         if any(token in query_text for token in ("SF6", "六氟化硫", "充气断路器", "充油断路器"))
@@ -2940,6 +3466,18 @@ def _apply_domain_rule_decisions_to_project_context(
             calc_rule=calc_rule,
             resolution_mode="graph_final",
         )
+
+    def _remove_param_if_present(test_name: str, param_name: str) -> None:
+        if test_name not in updated_param_map:
+            return
+        params = updated_param_map.get(test_name, []) or []
+        if param_name in params:
+            updated_param_map[test_name] = [item for item in params if item != param_name]
+        test_values = updated_value_map.get(test_name, {}) or {}
+        if param_name in test_values:
+            test_values.pop(param_name, None)
+
+    partial_discharge_parameters = _resolve_partial_discharge_parameters_local()
 
     def _set_if_value_missing(
         test_name: str,
@@ -3066,19 +3604,22 @@ def _apply_domain_rule_decisions_to_project_context(
                 else None
             )
             if rated_voltage_kv is not None:
-                pre_voltage = round(rated_voltage_kv * 1.3, 2)
-                ac_voltage = round(rated_voltage_kv * 1.1, 2)
                 pre_time = "30s" if rated_voltage_kv == 40.5 else "60s"
-                _set_param(
-                    "局部放电试验",
-                    "预加电压",
-                    _format_voltage_value(pre_voltage),
-                    value_source="rule",
-                    value_type="text",
-                    constraints=_format_voltage_value(pre_voltage),
-                    calc_rule=f"1.3 × {rated_voltage_kv} kV = {_format_voltage_value(pre_voltage)}",
-                    resolution_mode="graph_final",
-                )
+                for param_name in ("局部放电值", "预加电压", "交流电压"):
+                    resolved_param = partial_discharge_parameters.get(param_name)
+                    if not resolved_param:
+                        continue
+                    value_text, calc_rule = resolved_param
+                    _set_param(
+                        "局部放电试验",
+                        param_name,
+                        value_text,
+                        value_source="rule",
+                        value_type="text",
+                        constraints=value_text,
+                        calc_rule=calc_rule,
+                        resolution_mode="graph_final",
+                    )
                 _set_param(
                     "局部放电试验",
                     "预加时间",
@@ -3091,16 +3632,6 @@ def _apply_domain_rule_decisions_to_project_context(
                         if rated_voltage_kv == 40.5
                         else "Ur=12kV 时预加时间为60s。"
                     ),
-                    resolution_mode="graph_final",
-                )
-                _set_param(
-                    "局部放电试验",
-                    "交流电压",
-                    _format_voltage_value(ac_voltage),
-                    value_source="rule",
-                    value_type="text",
-                    constraints=_format_voltage_value(ac_voltage),
-                    calc_rule=f"1.1 × {rated_voltage_kv} kV = {_format_voltage_value(ac_voltage)}",
                     resolution_mode="graph_final",
                 )
                 _set_param(
@@ -3420,18 +3951,22 @@ def _apply_domain_rule_decisions_to_project_context(
                 resolution_mode="graph_final",
             )
 
-    if rated_voltage_kv is not None and "连续电流试验" in updated_param_map:
-        _set_param(
-            "连续电流试验",
-            "额定电压",
-            _format_voltage_value(rated_voltage_kv),
-            value_source="user_input",
-            value_type="text",
-            constraints=_format_voltage_value(rated_voltage_kv),
-            calc_rule="用户已明确提供额定电压，问答阶段直接采用该值。",
-            resolution_mode="graph_final",
-        )
-    if rated_current_a is not None and "连续电流试验" in updated_param_map:
+    for temperature_rise_test_item in ("温升试验", "温升试验(60HZ)"):
+        if rated_voltage_kv is not None and temperature_rise_test_item in updated_param_map:
+            _set_param(
+                temperature_rise_test_item,
+                "额定电压",
+                _format_voltage_value(rated_voltage_kv),
+                value_source="user_input",
+                value_type="text",
+                constraints=_format_voltage_value(rated_voltage_kv),
+                calc_rule="用户已明确提供额定电压，温升试验直接采用该值。",
+                resolution_mode="graph_final",
+            )
+    if rated_current_a is not None and any(
+        temperature_rise_test_item in updated_param_map
+        for temperature_rise_test_item in ("温升试验", "温升试验(60HZ)")
+    ):
         normalized_stand_type = _normalize_operate_standard_type(stand_type)
         if normalized_stand_type == "DLT":
             current_text = _format_current_a_local_2(rated_current_a)
@@ -3439,20 +3974,24 @@ def _apply_domain_rule_decisions_to_project_context(
             current_text = _format_current_a_local(rated_current_a)
         else:
             current_text = _format_current_a_local(rated_current_a)
-        _set_param(
-            "连续电流试验",
-            "试验电流A",
-            current_text,
-            value_source="user_input",
-            value_type="text",
-            constraints=current_text,
-            calc_rule="用户已明确提供额定电流，连续电流试验直接采用该值。",
-            resolution_mode="graph_final",
-        )
-    _set_if_present("连续电流试验", "试验部位", "主回路", calc_rule="连续电流试验试验部位固定为主回路。")
-    _set_if_present("连续电流试验", "试验次数", "1次", calc_rule="连续电流试验按1次执行。")
+        for temperature_rise_test_item in ("温升试验", "温升试验(60HZ)"):
+            if temperature_rise_test_item in updated_param_map:
+                _set_param(
+                    temperature_rise_test_item,
+                    "试验电流A",
+                    current_text,
+                    value_source="user_input",
+                    value_type="text",
+                    constraints=current_text,
+                    calc_rule="用户已明确提供额定电流，温升试验直接采用该值。",
+                    resolution_mode="graph_final",
+                )
+    _set_if_present("温升试验", "试验部位", "主回路", calc_rule="温升试验试验部位固定为主回路。")
+    _set_if_present("温升试验", "试验次数", "1次", calc_rule="温升试验按1次执行。")
+    _set_if_present("温升试验(60HZ)", "试验部位", "主回路", calc_rule="温升试验(60HZ)试验部位固定为主回路。")
+    _set_if_present("温升试验(60HZ)", "试验次数", "1次", calc_rule="温升试验(60HZ)按1次执行。")
     _set_if_present("辅助和控制回路温升试验", "试验次数", "1次", calc_rule="辅助和控制回路温升试验默认按1次执行。")
-    _set_if_present("前后回路电阻测量试验", "试验次数", "2次", calc_rule="前后回路电阻测量试验按2次执行。")
+    _set_if_present("回路电阻测量", "试验次数", "2次", calc_rule="回路电阻测量按2次执行。")
 
     # Programmatically finalize high-frequency insulation defaults so the model
     # does not need to resolve conditional default prose on its own.
@@ -3471,7 +4010,8 @@ def _apply_domain_rule_decisions_to_project_context(
             "雷电冲击耐受电压试验(相间及对地)",
             "局部放电试验",
             "T60(预备试验)",
-            "连续电流试验",
+            "温升试验",
+            "温升试验(60HZ)",
             "状态检查试验（T10）",
             "电寿命(单分)",
             "电寿命(合分)",
@@ -3543,8 +4083,11 @@ def _apply_domain_rule_decisions_to_project_context(
 
     capacitive_test_voltage_text = None
     capacitive_phase_value = ""
+    capacitive_nonuniform_value = None
     capacitive_nonuniform_text = ""
     capacitive_voltage_rule = ""
+    capacitive_nonuniform_rule = ""
+    capacitive_nonuniform_from_user = False
     if rated_voltage_kv is not None:
         (
             capacitive_test_voltage_text,
@@ -3552,22 +4095,15 @@ def _apply_domain_rule_decisions_to_project_context(
             capacitive_nonuniform_text,
             capacitive_voltage_rule,
         ) = _resolve_capacitive_test_voltage_local(query_text, rated_voltage_kv)
+        (
+            capacitive_nonuniform_value,
+            _,
+            capacitive_nonuniform_rule,
+            capacitive_nonuniform_from_user,
+        ) = _resolve_capacitive_nonuniform_coefficient_local(query_text)
 
     if capacitive_test_voltage_text:
-        for test_name in (
-            "容性电流开断试验(LC1)",
-            "容性电流开断试验(LC1)#1",
-            "容性电流开断试验(LC1)#2",
-            "容性电流开断试验(LC2)",
-            "容性电流开断试验(LC2)#1",
-            "容性电流开断试验(LC2)#2",
-            "容性电流开断试验(CC1)",
-            "容性电流开断试验(CC1)#1",
-            "容性电流开断试验(CC1)#2",
-            "容性电流开断试验(CC2)",
-            "容性电流开断试验(CC2)#1",
-            "容性电流开断试验(CC2)#2",
-        ):
+        for test_name in capacitive_voltage_targets:
             _set_if_present(
                 test_name,
                 "试验电压",
@@ -3580,12 +4116,70 @@ def _apply_domain_rule_decisions_to_project_context(
                 capacitive_phase_value,
                 calc_rule="容性电流开断试验的试验相数按问题描述和额定电压默认规则判定。",
             )
+
+    for test_name in (
+        "容性电流开断试验(BC1)",
+        "BC1(60HZ)",
+    ):
+        if bc_current_a is not None:
+            _set_capacitive_current_local(test_name, bc_current_a, 0.4, "额定电容器组电流")
+        if bc_test_category:
             _set_if_present(
                 test_name,
-                "不均匀系数",
-                capacitive_nonuniform_text,
-                calc_rule="容性电流开断试验的不均匀系数优先取用户输入，否则按单断口=1、多断口=1.05 默认。",
+                "试验类别",
+                bc_test_category,
+                calc_rule=f"根据用户提供的电流标签，试验类别确定为{bc_test_category}。",
             )
+
+    for test_name in (
+        "容性电流开断试验(BC2)",
+        "BC2(60HZ)",
+    ):
+        if bc_current_a is not None:
+            _set_capacitive_current_local(test_name, bc_current_a, 1.0, "额定电容器组电流")
+        if bc_test_category:
+            _set_if_present(
+                test_name,
+                "试验类别",
+                bc_test_category,
+                calc_rule=f"根据用户提供的电流标签，试验类别确定为{bc_test_category}。",
+            )
+
+    for test_name in (
+        "容性电流开断试验(CC1)",
+        "容性电流开断试验(CC1)#1",
+        "容性电流开断试验(CC1)#2",
+        "CC1(60HZ)",
+    ):
+        if cc_current_a is not None:
+            _set_capacitive_current_local(test_name, cc_current_a, 0.4, "额定电缆充电电流")
+
+    for test_name in (
+        "容性电流开断试验(CC2)",
+        "容性电流开断试验(CC2)#1",
+        "容性电流开断试验(CC2)#2",
+        "CC2(60HZ)",
+    ):
+        if cc_current_a is not None:
+            _set_capacitive_current_local(test_name, cc_current_a, 1.0, "额定电缆充电电流")
+
+    for test_name in (
+        "容性电流开断试验(LC1)",
+        "容性电流开断试验(LC1)#1",
+        "容性电流开断试验(LC1)#2",
+        "LC1(60HZ)",
+    ):
+        if lc_current_a is not None:
+            _set_capacitive_current_local(test_name, lc_current_a, 0.4, "额定线路充电电流")
+
+    for test_name in (
+        "容性电流开断试验(LC2)",
+        "容性电流开断试验(LC2)#1",
+        "容性电流开断试验(LC2)#2",
+        "LC2(60HZ)",
+    ):
+        if lc_current_a is not None:
+            _set_capacitive_current_local(test_name, lc_current_a, 1.0, "额定线路充电电流")
 
     for test_name in (
         "容性电流开断试验(LC1)",
@@ -3612,6 +4206,18 @@ def _apply_domain_rule_decisions_to_project_context(
             "试验次数",
             capacitive_trial_count_text,
             calc_rule=capacitive_trial_count_rule,
+        )
+    for test_name in (
+        "容性电流开断试验(LC2)#1",
+        "容性电流开断试验(LC2)#2",
+        "容性电流开断试验(CC2)#1",
+        "容性电流开断试验(CC2)#2",
+    ):
+        _set_if_present(
+            test_name,
+            "试验次数",
+            capacitive_split_trial_count_text,
+            calc_rule=capacitive_split_trial_count_rule,
         )
     if rated_voltage_kv is not None and "T60(预备试验)" in updated_param_map:
         t60_voltage_kv = round(rated_voltage_kv / 2, 2)
@@ -3679,38 +4285,152 @@ def _apply_domain_rule_decisions_to_project_context(
                 calc_rule="用户已明确提供额定短路关合电流，问答阶段直接采用该值。",
             )
         _set_if_present(test_name, "试验相数", "三相", calc_rule="40.5kV及以下默认三相。")
-        _set_if_present(test_name, "断路器等级", "S1", calc_rule="未提供断路器等级时默认按S1处理。")
-        if first_pole_kpp is not None:
-            _set_if_present(
-                test_name,
-                "首开极系数kpp",
-                str(first_pole_kpp).rstrip("0").rstrip("."),
-                calc_rule=first_pole_kpp_rule,
-            )
         _set_if_present(test_name, "额定频率", f"{str(rated_frequency_hz).rstrip('0').rstrip('.')} Hz", calc_rule="用户已明确提供额定频率，问答阶段直接采用该值。")
 
-    if rated_voltage_kv is not None:
+    if first_pole_kpp is not None:
+        first_pole_kpp_text = str(first_pole_kpp).rstrip("0").rstrip(".")
+        for test_name, param_names in tuple(updated_param_map.items()):
+            if "首开极系数kpp" not in (param_names or []):
+                continue
+            if first_pole_kpp_from_user:
+                _set_if_present(
+                    test_name,
+                    "首开极系数kpp",
+                    first_pole_kpp_text,
+                    calc_rule=first_pole_kpp_rule,
+                )
+            else:
+                _set_if_value_missing(
+                    test_name,
+                    "首开极系数kpp",
+                    first_pole_kpp_text,
+                    calc_rule=first_pole_kpp_rule,
+                )
+
+    if capacitive_nonuniform_text:
+        for test_name, param_names in tuple(updated_param_map.items()):
+            if "不均匀系数" not in (param_names or []):
+                continue
+            if capacitive_nonuniform_from_user:
+                _set_if_present(
+                    test_name,
+                    "不均匀系数",
+                    capacitive_nonuniform_text,
+                    calc_rule=capacitive_nonuniform_rule,
+                )
+            else:
+                _set_if_value_missing(
+                    test_name,
+                    "不均匀系数",
+                    capacitive_nonuniform_text,
+                    calc_rule=capacitive_nonuniform_rule,
+                )
+
+    for test_name, param_names in tuple(updated_param_map.items()):
+        if "断路器等级" not in (param_names or []):
+            continue
+        if is_breaker_class_not_applicable:
+            _set_if_present(
+                test_name,
+                "断路器等级",
+                "--",
+                calc_rule="额定电压高于 72.5 kV 时无断路器等级概念，最终输出固定为 --。",
+            )
+            continue
+        if is_low_voltage:
+            _set_if_value_missing(
+                test_name,
+                "断路器等级",
+                "S1",
+                calc_rule="低压试验未提供断路器等级时默认按 S1 处理。",
+            )
+
+    state_t10_parameters = _resolve_state_t10_parameters_local()
+    for state_t10_test_name in ("状态检查试验（T10）", "状态检查试验(T10)"):
+        if rated_voltage_kv is not None:
+            _set_if_present(
+                state_t10_test_name,
+                "额定电压",
+                _format_voltage_value(rated_voltage_kv),
+                calc_rule="用户已明确提供额定电压，问答阶段直接采用该值。",
+            )
+        for param_name in ("试验次数", "试验相数", "试验电压", "试验电流", "试验电流kA"):
+            resolved_value = state_t10_parameters.get(
+                "试验电流" if param_name == "试验电流kA" else param_name
+            )
+            if not resolved_value:
+                continue
+            value_text, calc_rule = resolved_value
+            _set_if_present(
+                state_t10_test_name,
+                param_name,
+                value_text,
+                calc_rule=calc_rule,
+            )
+
+    op2_parameters = _resolve_op2_parameters_local()
+    for param_name in ("试验相数", "试验电压"):
+        resolved_value = op2_parameters.get(param_name)
+        if not resolved_value:
+            continue
+        value_text, calc_rule = resolved_value
         _set_if_present(
-            "状态检查试验（T10）",
-            "额定电压",
-            _format_voltage_value(rated_voltage_kv),
-            calc_rule="用户已明确提供额定电压，问答阶段直接采用该值。",
+            "失步关合和开断试验(OP2)",
+            param_name,
+            value_text,
+            calc_rule=calc_rule,
         )
-        state_t10_voltage = round(rated_voltage_kv * 0.5, 3)
+
+    op2_making_parameters = _resolve_op2_making_parameters_local()
+    for param_name in ("试验电压",):
+        resolved_value = op2_making_parameters.get(param_name)
+        if not resolved_value:
+            continue
+        value_text, calc_rule = resolved_value
         _set_if_present(
-            "状态检查试验（T10）",
-            "试验电压",
-            _format_voltage_value(state_t10_voltage),
-            calc_rule=f"50% × {rated_voltage_kv} kV = {_format_voltage_value(state_t10_voltage)}。",
+            "OP2关合",
+            param_name,
+            value_text,
+            calc_rule=calc_rule,
         )
-    if short_break_ka is not None:
-        state_t10_current = round(short_break_ka * 0.1, 3)
-        _set_if_present(
-            "状态检查试验（T10）",
-            "试验电流kA",
-            f"{str(state_t10_current).rstrip('0').rstrip('.')} kA",
-            calc_rule=f"10% × {short_break_ka} kA = {str(state_t10_current).rstrip('0').rstrip('.')} kA。",
-        )
+
+    short_circuit_60hz_parameters = _resolve_60hz_short_circuit_parameters_local()
+    for test_name, param_values in short_circuit_60hz_parameters.items():
+        for param_name, (value_text, calc_rule) in param_values.items():
+            if param_name == "试验电流":
+                for current_param_name in ("试验电流", "试验电流kA"):
+                    _set_if_present(
+                        test_name,
+                        current_param_name,
+                        value_text,
+                        calc_rule=calc_rule,
+                    )
+                continue
+            _set_if_present(
+                test_name,
+                param_name,
+                value_text,
+                calc_rule=calc_rule,
+            )
+
+    t10_t30_t60_parameters = _resolve_t10_t30_t60_parameters_local()
+    for test_name, param_values in t10_t30_t60_parameters.items():
+        for param_name, (value_text, calc_rule) in param_values.items():
+            if param_name == "试验电流":
+                for current_param_name in ("试验电流", "试验电流kA"):
+                    _set_if_present(
+                        test_name,
+                        current_param_name,
+                        value_text,
+                        calc_rule=calc_rule,
+                    )
+                continue
+            _set_if_present(
+                test_name,
+                param_name,
+                value_text,
+                calc_rule=calc_rule,
+            )
 
     if rated_voltage_kv is not None:
         for test_name in ("电寿命(单分)", "电寿命(合分)", "电寿命(循环)"):
@@ -3882,6 +4602,51 @@ def _apply_domain_rule_decisions_to_project_context(
         phase_count = 3 if phase_text == "三相" else 1
         return phase_count, phase_text, phase_rule
 
+    insulation_phase_count, insulation_phase_text, insulation_phase_rule = (
+        _resolve_insulation_phase_local(query_text, rated_voltage_kv)
+    )
+
+    def _normalize_insulation_test_position_for_phase() -> None:
+        if insulation_phase_text != "单相":
+            return
+
+        single_phase_ground_tests = (
+            "工频耐受电压试验",
+            "工频耐受电压试验#干",
+            "工频耐受电压试验#湿",
+            "工频耐受电压试验(干)",
+            "工频耐受电压试验(湿)",
+            "工频耐受电压试验(相间及对地)",
+            "作为状态检查的工频耐受电压试验",
+            "雷电冲击耐受电压试验",
+            "雷电冲击耐受电压试验(相间及对地)",
+            "操作冲击耐受电压试验",
+            "操作冲击耐受电压试验(干)",
+            "操作冲击耐受电压试验(湿)",
+        )
+        calc_rule = "高压绝缘试验在未明确三相时默认按单相处理；非断口试验部位统一按对地输出。"
+        for test_name in single_phase_ground_tests:
+            if test_name not in updated_param_map:
+                continue
+            if "试验部位" not in updated_param_map.get(test_name, []):
+                continue
+            current_value = str(
+                updated_value_map.get(test_name, {}).get("试验部位", {}).get("value_text", "")
+                or ""
+            ).strip()
+            if current_value and current_value not in {"相间及对地", "对地"}:
+                continue
+            _set_param(
+                test_name,
+                "试验部位",
+                "对地",
+                value_source="rule",
+                value_type="text",
+                constraints="对地",
+                calc_rule=calc_rule,
+                resolution_mode="graph_final",
+            )
+
     def _is_fracture_insulation_test(test_name: str) -> bool:
         return test_name in {
             "工频耐受电压试验(断口)",
@@ -3897,24 +4662,23 @@ def _apply_domain_rule_decisions_to_project_context(
         impulse_factor: int,
         family_label: str,
     ) -> None:
-        phase_count, phase_text, phase_rule = _resolve_insulation_phase_local(
-            query_text, rated_voltage_kv
-        )
         for test_name in test_names:
             phase_multiplier = 2 if _is_fracture_insulation_test(test_name) else 3
-            normal_count = phase_multiplier * phase_count * impulse_factor
+            normal_count = phase_multiplier * insulation_phase_count * impulse_factor
             if impulse_factor == 1:
                 count_rule = (
                     f"{family_label}{test_name}的正常次数按{phase_multiplier}*试验相数计算；"
-                    f"当前试验相数为{phase_text}，因此正常次数为{normal_count}次。"
+                    f"当前试验相数为{insulation_phase_text}，因此正常次数为{normal_count}次。"
                 )
             else:
                 count_rule = (
                     f"{family_label}{test_name}的正常次数按{phase_multiplier}*试验相数*2*15计算；"
-                    f"当前试验相数为{phase_text}，因此正常次数为{normal_count}次。"
+                    f"当前试验相数为{insulation_phase_text}，因此正常次数为{normal_count}次。"
                 )
-            _set_if_present(test_name, "试验相数", phase_text, calc_rule=phase_rule)
+            _set_if_present(test_name, "试验相数", insulation_phase_text, calc_rule=insulation_phase_rule)
             _set_if_present(test_name, "正常次数", f"{normal_count}次", calc_rule=count_rule)
+
+    _normalize_insulation_test_position_for_phase()
 
     _set_insulation_normal_count(
         (
@@ -3975,6 +4739,30 @@ def _build_resolved_rule_overrides(
         text = f"{value:.2f}".rstrip("0").rstrip(".")
         return f"{text} kV"
 
+    def _resolve_partial_discharge_parameters(
+        rated_voltage_kv: float | None,
+        pf_withstand_kv: float | None,
+        first_pole_kpp: float | None,
+    ) -> dict[str, str]:
+        overrides: dict[str, str] = {}
+        if rated_voltage_kv is None:
+            return overrides
+        if rated_voltage_kv <= 40.5:
+            overrides["局部放电值"] = "≤10 pC"
+            overrides["预加电压"] = _format_voltage_value(round(rated_voltage_kv * 1.3, 2))
+            overrides["交流电压"] = _format_voltage_value(round(rated_voltage_kv * 1.1, 2))
+            return overrides
+
+        overrides["局部放电值"] = "≤5 pC"
+        if pf_withstand_kv is not None:
+            overrides["预加电压"] = _format_voltage_value(pf_withstand_kv)
+        if first_pole_kpp is not None:
+            if abs(first_pole_kpp - 1.5) < 1e-6:
+                overrides["交流电压"] = _format_voltage_value(round(rated_voltage_kv * 1.2, 2))
+            elif abs(first_pole_kpp - 1.3) < 1e-6:
+                overrides["交流电压"] = _format_voltage_value(round((rated_voltage_kv * 1.2) / math.sqrt(3.0), 2))
+        return overrides
+
     for decision in domain_rule_decisions.values():
         if not isinstance(decision, dict):
             continue
@@ -4003,15 +4791,28 @@ def _build_resolved_rule_overrides(
                 and rule_inputs.get("rated_voltage_kv") is not None
                 else None
             )
+            pf_withstand_kv = (
+                float(rule_inputs.get("pf_withstand_kv"))
+                if isinstance(rule_inputs, dict)
+                and rule_inputs.get("pf_withstand_kv") is not None
+                else None
+            )
+            first_pole_kpp = (
+                float(rule_inputs.get("first_pole_kpp"))
+                if isinstance(rule_inputs, dict)
+                and rule_inputs.get("first_pole_kpp") is not None
+                else None
+            )
             if test_item == "局部放电试验" and rated_voltage_kv is not None:
-                resolved[test_item]["parameter_overrides"]["预加电压"] = _format_voltage_value(
-                    round(rated_voltage_kv * 1.3, 2)
+                resolved[test_item]["parameter_overrides"].update(
+                    _resolve_partial_discharge_parameters(
+                        rated_voltage_kv,
+                        pf_withstand_kv,
+                        first_pole_kpp,
+                    )
                 )
                 resolved[test_item]["parameter_overrides"]["预加时间"] = (
                     "30s" if rated_voltage_kv == 40.5 else "60s"
-                )
-                resolved[test_item]["parameter_overrides"]["交流电压"] = _format_voltage_value(
-                    round(rated_voltage_kv * 1.1, 2)
                 )
                 resolved[test_item]["parameter_overrides"]["测量时间(min)"] = "1min"
             resolved[test_item]["parameter_overrides"]["试验次数"] = decision.get(
@@ -4108,9 +4909,7 @@ def _build_final_test_item_scope(
         "短路开断试验(T60)" in allowed_deduped
         and "T60(预备试验)" in allowed_deduped
     ):
-        allowed_deduped = [
-            item for item in allowed_deduped if item != "T60(预备试验)"
-        ]
+        allowed_deduped = [item for item in allowed_deduped if item != "T60(预备试验)"]
         if "T60(预备试验)" not in removed_deduped:
             removed_deduped.append("T60(预备试验)")
     return allowed_deduped, removed_deduped
@@ -4177,7 +4976,7 @@ def _should_bypass_query_cache(global_config: dict[str, Any] | None) -> bool:
 def _get_display_param_suppressions() -> dict[str, set[str]]:
     # return {}
     return {
-        "前后回路电阻测量试验": {"回路电阻", "辅助和控制设备的电阻"},
+        "回路电阻测量": {"回路电阻", "辅助和控制设备的电阻"},
         "工频耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
         "工频耐受电压试验(干)":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
         "工频耐受电压试验(湿)":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
@@ -4195,8 +4994,7 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "操作冲击耐受电压试验(干)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
         "操作冲击耐受电压试验(湿)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
         "局部放电试验":{"辅助和控制设备的电阻","SF6气体的最低功能压力(20℃表压)","回路电阻(μΩ)","回路电阻"},
-        "前后回路电阻测量试验":{"回路电阻","辅助和控制设备的电阻"},
-        "连续电流试验":{"是否所配元件","SF6气体的最低功能压力(20℃表压)","材料绝热等级"},
+        "回路电阻测量":{"回路电阻","辅助和控制设备的电阻"},
         "T60(预备试验)":{"额定电压","SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
         "作为状态检查的工频耐受电压试验":{"额定电压","介质性质","SF6气体的最低功能压力(20℃表压)","放电次数"},
         "短时耐受电流和峰值耐受电流试验":{"额定电压","回路电阻","回路电阻(μΩ)"},
@@ -4204,6 +5002,7 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "电寿命(单分)":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电","金短时间","故障类型"},
         "电寿命(循环)":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电","金短时间","故障类型"},
         "温升试验":{"SF6气体的最低功能压力(20℃表压)","是否所配元件","材料绝热等级"},
+        "温升试验(60HZ)":{"SF6气体的最低功能压力(20℃表压)","是否所配元件","材料绝热等级"},
         "近区故障试验(L75)":{"线路侧波阻抗","SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
         "近区故障试验(L90)":{"线路侧波阻抗","SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
         "辅助和控制回路温升试验": {"辅助设备和控制设备的额定电源电压","辅助设备和控制设备的额定电流","材料绝热等级"},
@@ -4243,7 +5042,7 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "T100s（b）":{"金短时间","外壳是否带电","SF6气体的最低功能压力(20℃表压)"},
         "T100s":{"SF6气体的最低功能压力(20℃表压)"},
         "电寿命试验":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电","金短时间","故障类型","SF6气体的额定压力(20℃表压)"},
-        "OP2关合":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
+        "OP2关合":{"试验项数","SF6气体的最低功能压力(20℃表压)","外壳是否带电","直流分量(试验)"},
         "T60(预备试验)":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
         "短时耐受电流试验": {"回路电阻","回路电阻(μΩ)"},
         "峰值耐受电流试验": {"回路电阻","回路电阻(μΩ)"},
@@ -4274,7 +5073,7 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "单相接地故障试验": {"SF6气体的最低功能压力(20℃表压)"},
         "近区故障试验(L60)": {"外壳是否带电"},
         "失步关合和开断试验(OP1)": {"外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","发电机额定容量"},
-        "失步关合和开断试验(OP2)": {"外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","直流分量(试验)","发电机额定容量"},
+        "失步关合和开断试验(OP2)": {"试验项数","外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","直流分量(试验)","发电机额定容量"},
         "控制和辅助回路的绝缘试验": {"额定直流电压(±)"},
     }
 
@@ -4296,10 +5095,10 @@ def _get_report_scope_test_whitelist() -> dict[str, set[str]]:
             "全套绝缘型式试验",
         },
         "温升性能型式试验": {
-            "前后回路电阻测量试验",
+            "回路电阻测量",
             "辅助和控制回路温升试验",
-            "连续电流试验",
-            "连续电流试验(60HZ)",
+            "温升试验",
+            "温升试验(60HZ)",
         },
         "开合性能型式试验": {
             "容性电流开断试验(LC1)",
@@ -4355,7 +5154,7 @@ def _get_report_scope_test_whitelist() -> dict[str, set[str]]:
             "T100s(a)(60Hz)",
             "T100s(b)(60Hz)",
             "T60(60HZ)",
-            "三相共机构验证",
+            "T100s(三相共机构的验证试验)",
             "状态检查试验（T10）",
             "短路开断试验(T100A)",
             "短路开断试验(T100S)",
@@ -12279,12 +13078,6 @@ async def _build_context_str(
             }
             if filtered_values:
                 display_project_param_value_map[str(test_name)] = filtered_values
-    if (
-        "短路开断试验(T60)" in display_project_param_map
-        and "T60(预备试验)" in display_project_param_map
-    ):
-        display_project_param_map.pop("T60(预备试验)", None)
-        display_project_param_value_map.pop("T60(预备试验)", None)
     resolved_rule_overrides = _build_resolved_rule_overrides(domain_rule_decisions)
     allowed_final_test_items, removed_test_items = _build_final_test_item_scope(
         project_param_map,

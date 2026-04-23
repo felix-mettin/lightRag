@@ -527,13 +527,6 @@
             },
             {
               "source": "query",
-              "type": "less_numeric",
-              "label": "额定电压",
-              "value": 72.5,
-              "unit": "kV"
-            },
-            {
-              "source": "query",
               "type": "contains",
               "label": "额定失步开断电流"
             }
@@ -1339,11 +1332,7 @@
                 "额定电缆充电开断电流",
                 "电缆充电开断电流",
                 "额定电缆充电开合电流",
-                "电缆充电开合电流",
-                "额定短路关合电流",
-                "短路关合电流",
-                "额定关合电流",
-                "关合电流"
+                "电缆充电开合电流"
               ]
             }
           ]
@@ -2006,10 +1995,10 @@
     },
     {
       "rule_id": "insulation.gb.loop_resistance_applicability",
-      "domain": "insulation",
+      "domain": "temperature_rise",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "前后回路电阻测量试验",
+      "test_item": "回路电阻测量",
       "status": "active",
       "allow_when_any": [
         {
@@ -3179,18 +3168,153 @@
               "label": "额定电压",
               "value": 72.5,
               "unit": "kV"
-            },
-            {
-              "source": "query",
-              "type": "not_equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         }
       ],
+      "deny_when_any": [
+        {
+          "source": "query",
+          "type": "regex_match",
+          "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "deny_when_no_match": true
+    },
+    {
+      "rule_id": "short_circuit.gb.t100s_a_split_box_shared_mechanism_split",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "gb",
+      "test_item": "T100s（a）",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "source": "query",
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "三相"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "分箱"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共机构"
+              }
+            ]
+          }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "greater_or_equal_numeric",
+            "label": "额定电压",
+            "value": 72.5,
+            "unit": "kV"
+          },
+          {
+            "source": "query",
+            "type": "regex_match",
+            "pattern": "^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "T100s（a）",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "T100s（a）#1",
+          "inherits_from": "T100s（a）",
+          "parameter_overrides": {
+            "试验相数": "单相",
+            "操作顺序": "C",
+            "试验次数": "1次"
+          }
+        },
+        {
+          "test_item": "T100s（a）#2",
+          "inherits_from": "T100s（a）",
+          "parameter_overrides": {
+            "试验相数": "三相",
+            "操作顺序": "C",
+            "试验次数": "1次"
+          }
+        }
+      ]
+    },
+    {
+      "rule_id": "short_circuit.gb.t100s_a_common_tank_shared_mechanism_split",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "gb",
+      "test_item": "T100s（a）",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "source": "query",
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "三相"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共箱"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共机构"
+              }
+            ]
+          }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "greater_or_equal_numeric",
+            "label": "额定电压",
+            "value": 72.5,
+            "unit": "kV"
+          },
+          {
+            "source": "query",
+            "type": "regex_match",
+            "pattern": "^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "T100s（a）",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "T100s（a）#共箱共机构",
+          "inherits_from": "T100s（a）",
+          "parameter_overrides": {
+            "试验相数": "三相",
+            "操作顺序": "C",
+            "试验次数": "1次"
+          }
+        }
+      ]
     },
     {
       "rule_id": "short_circuit.gb.t100s_b_applicability",
@@ -3215,18 +3339,144 @@
               "label": "额定电压",
               "value": 72.5,
               "unit": "kV"
-            },
-            {
-              "source": "query",
-              "type": "not_equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         }
       ],
+      "deny_when_any": [
+        {
+          "source": "query",
+          "type": "regex_match",
+          "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "deny_when_no_match": true
+    },
+    {
+      "rule_id": "short_circuit.gb.t100s_b_split_box_shared_mechanism_split",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "gb",
+      "test_item": "T100s（b）",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "source": "query",
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "三相"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "分箱"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共机构"
+              }
+            ]
+          }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "greater_or_equal_numeric",
+            "label": "额定电压",
+            "value": 72.5,
+            "unit": "kV"
+          },
+          {
+            "source": "query",
+            "type": "regex_match",
+            "pattern": "^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "T100s（b）",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "T100s（b）#共机构",
+          "inherits_from": "T100s（b）",
+          "parameter_overrides": {
+            "试验相数": "三相",
+            "操作顺序": "C",
+            "试验次数": "1次"
+          }
+        }
+      ]
+    },
+    {
+      "rule_id": "short_circuit.gb.t100s_b_common_tank_shared_mechanism_split",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "gb",
+      "test_item": "T100s（b）",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "source": "query",
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "三相"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共箱"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共机构"
+              }
+            ]
+          }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "greater_or_equal_numeric",
+            "label": "额定电压",
+            "value": 72.5,
+            "unit": "kV"
+          },
+          {
+            "source": "query",
+            "type": "regex_match",
+            "pattern": "^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "T100s（b）",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "T100s（b）#共箱共机构",
+          "inherits_from": "T100s（b）",
+          "parameter_overrides": {
+            "试验相数": "三相",
+            "操作顺序": "0-0.3-CO-180s-CO",
+            "试验次数": "1次"
+          }
+        }
+      ]
     },
     {
       "rule_id": "short_circuit.gb.t100s_a_60hz_applicability",
@@ -3265,6 +3515,145 @@
       "deny_when_no_match": true
     },
     {
+      "rule_id": "short_circuit.gb.t100s_a_60hz_split_box_shared_mechanism_split",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "gb",
+      "test_item": "T100s(a)(60Hz)",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "source": "query",
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "三相"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "分箱"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共机构"
+              }
+            ]
+          }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "greater_or_equal_numeric",
+            "label": "额定电压",
+            "value": 72.5,
+            "unit": "kV"
+          },
+          {
+            "source": "query",
+            "type": "equals_numeric",
+            "label": "额定频率",
+            "value": 60.0,
+            "unit": "Hz"
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "T100s(a)(60Hz)",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "T100s(a)(60Hz)#1",
+          "inherits_from": "T100s(a)(60Hz)",
+          "parameter_overrides": {
+            "试验相数": "单相",
+            "操作顺序": "C",
+            "试验次数": "1次"
+          }
+        },
+        {
+          "test_item": "T100s(a)(60Hz)#2",
+          "inherits_from": "T100s(a)(60Hz)",
+          "parameter_overrides": {
+            "试验相数": "三相",
+            "操作顺序": "C",
+            "试验次数": "1次"
+          }
+        }
+      ]
+    },
+    {
+      "rule_id": "short_circuit.gb.t100s_a_60hz_common_tank_shared_mechanism_split",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "gb",
+      "test_item": "T100s(a)(60Hz)",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "source": "query",
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "三相"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共箱"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共机构"
+              }
+            ]
+          }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "greater_or_equal_numeric",
+            "label": "额定电压",
+            "value": 72.5,
+            "unit": "kV"
+          },
+          {
+            "source": "query",
+            "type": "equals_numeric",
+            "label": "额定频率",
+            "value": 60.0,
+            "unit": "Hz"
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "T100s(a)(60Hz)",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "T100s(a)(60Hz)#共箱共机构",
+          "inherits_from": "T100s(a)(60Hz)",
+          "parameter_overrides": {
+            "试验相数": "三相",
+            "操作顺序": "C",
+            "试验次数": "1次"
+          }
+        }
+      ]
+    },
+    {
       "rule_id": "short_circuit.gb.t100s_b_60hz_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
@@ -3299,6 +3688,136 @@
         }
       ],
       "deny_when_no_match": true
+    },
+    {
+      "rule_id": "short_circuit.gb.t100s_b_60hz_split_box_shared_mechanism_split",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "gb",
+      "test_item": "T100s(b)(60Hz)",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "source": "query",
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "三相"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "分箱"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共机构"
+              }
+            ]
+          }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "greater_or_equal_numeric",
+            "label": "额定电压",
+            "value": 72.5,
+            "unit": "kV"
+          },
+          {
+            "source": "query",
+            "type": "equals_numeric",
+            "label": "额定频率",
+            "value": 60.0,
+            "unit": "Hz"
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "T100s(b)(60Hz)",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "T100s(b)(60Hz)#共机构",
+          "inherits_from": "T100s(b)(60Hz)",
+          "parameter_overrides": {
+            "试验相数": "三相",
+            "操作顺序": "C",
+            "试验次数": "1次"
+          }
+        }
+      ]
+    },
+    {
+      "rule_id": "short_circuit.gb.t100s_b_60hz_common_tank_shared_mechanism_split",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "gb",
+      "test_item": "T100s(b)(60Hz)",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "source": "query",
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "三相"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共箱"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共机构"
+              }
+            ]
+          }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "greater_or_equal_numeric",
+            "label": "额定电压",
+            "value": 72.5,
+            "unit": "kV"
+          },
+          {
+            "source": "query",
+            "type": "equals_numeric",
+            "label": "额定频率",
+            "value": 60.0,
+            "unit": "Hz"
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "T100s(b)(60Hz)",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "T100s(b)(60Hz)#共箱共机构",
+          "inherits_from": "T100s(b)(60Hz)",
+          "parameter_overrides": {
+            "试验相数": "三相",
+            "操作顺序": "0-0.3-CO-180s-CO",
+            "试验次数": "1次"
+          }
+        }
+      ]
     },
     {
       "rule_id": "short_circuit.gb.t60_60hz_applicability",
@@ -3357,7 +3876,7 @@
       "domain": "short_circuit",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "三相共机构验证",
+      "test_item": "T100s(三相共机构的验证试验)",
       "status": "active",
       "allow_when_any": [
         {
@@ -3379,12 +3898,136 @@
             {
               "source": "query",
               "type": "contains",
-              "label": "三相分箱共机构"
+              "label": "三相"
+            },
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "分箱"
+            },
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "共机构"
             }
           ]
         }
       ],
       "deny_when_no_match": true
+    },
+    {
+      "rule_id": "short_circuit.gb.t100a_shared_mechanism_split",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "gb",
+      "test_item": "短路开断试验(T100A)",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "source": "query",
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "三相"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共箱"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共机构"
+              }
+            ]
+          }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "regex_match",
+            "pattern": "^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "短路开断试验(T100A)",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "短路开断试验(T100A)#共箱共机构",
+          "inherits_from": "短路开断试验(T100A)",
+          "parameter_overrides": {
+            "试验相数": "三相",
+            "操作顺序": "O",
+            "试验次数": "1次"
+          }
+        }
+      ]
+    },
+    {
+      "rule_id": "short_circuit.gb.t100a_60hz_shared_mechanism_split",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "gb",
+      "test_item": "T100A(60HZ)",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "source": "query",
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "三相"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共箱"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共机构"
+              }
+            ]
+          }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "equals_numeric",
+            "label": "额定频率",
+            "value": 60.0,
+            "unit": "Hz"
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "T100A(60HZ)",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "T100A(60HZ)#共箱共机构",
+          "inherits_from": "T100A(60HZ)",
+          "parameter_overrides": {
+            "试验相数": "三相",
+            "操作顺序": "O",
+            "试验次数": "1次"
+          }
+        }
+      ]
     },
     {
       "rule_id": "insulation.gb.full_insulation_type_test_applicability",
@@ -3508,15 +4151,15 @@
               "source": "query",
               "type": "contains",
               "label": "短路性能型式试验"
-            },
-            {
-              "source": "query",
-              "type": "not_equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
+        }
+      ],
+      "deny_when_any": [
+        {
+          "source": "query",
+          "type": "regex_match",
+          "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
         }
       ],
       "deny_when_no_match": true
@@ -3571,7 +4214,7 @@
       "domain": "temperature_rise",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "连续电流试验",
+      "test_item": "温升试验",
       "status": "active",
       "allow_when_any": [
         {
@@ -3598,7 +4241,7 @@
       "domain": "temperature_rise",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "连续电流试验(60HZ)",
+      "test_item": "温升试验(60HZ)",
       "status": "active",
       "allow_when_any": [
         {
