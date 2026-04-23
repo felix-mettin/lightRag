@@ -802,27 +802,6 @@
               "unit": ""
             }
           ]
-        },
-        {
-          "source": "query",
-          "type": "all",
-          "conditions": [
-            {
-              "source": "query",
-              "type": "contains",
-              "label": "短路性能型式试验"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "首开极系数"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "首开极系数kpp"
-            }
-          ]
         }
       ],
       "deny_when_no_match": true
@@ -1771,7 +1750,7 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.lei_dian_chogn_ji_state",
+      "rule_id": "short_circuit.dlt.lei_dian_chong_ji_state",
       "domain": "short_circuit",
       "kind": "applicability",
       "standard": "dlt",
@@ -1807,7 +1786,7 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.dlt.lei_dian_chogn_ji_state",
+      "rule_id": "switching.dlt.lei_dian_chong_ji_state",
       "domain": "switching",
       "kind": "applicability",
       "standard": "dlt",
