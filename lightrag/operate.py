@@ -5,6 +5,7 @@ from functools import partial
 from pathlib import Path
 import os
 import math
+import time
 
 import asyncio
 import html
@@ -14,28 +15,73 @@ import re
 import uuid
 from typing import Any, AsyncIterator, overload, Literal
 from collections import Counter, defaultdict
+from dotenv import load_dotenv
 
 from lightrag.exceptions import (
     PipelineCancelledException,
     ChunkTokenLimitExceededError,
 )
+from lightrag.base import (
+    BaseGraphStorage,
+    BaseKVStorage,
+    BaseVectorStorage,
+    TextChunkSchema,
+    QueryParam,
+    QueryResult,
+    QueryContextResult,
+)
+from lightrag.prompt import PROMPTS
 from lightrag.utils import (
+    CacheData,
     logger,
     get_file_only_logger,
     compute_mdhash_id,
+    compute_args_hash,
     Tokenizer,
     is_float_regex,
+    apply_source_ids_limit,
+    convert_to_user_format,
+    create_prefixed_exception,
+    fix_tuple_delimiter_corruption,
+    generate_reference_list_from_chunks,
+    handle_cache,
+    make_relation_chunk_key,
+    merge_source_ids,
+    pack_user_ass_to_openai_messages,
+    pick_by_vector_similarity,
+    pick_by_weighted_polling,
+    process_chunks_unified,
+    remove_think_tags,
+    safe_vdb_operation_with_exception,
+    save_to_cache,
+    sanitize_and_normalize_extracted_text,
+    split_string_by_multi_markers,
+    truncate_list_by_token_size,
+    update_chunk_cache_list,
+    use_llm_func_with_cache,
 )
 from lightrag.constants import (
+    DEFAULT_ENTITY_TYPES,
+    DEFAULT_KG_CHUNK_PICK_METHOD,
+    DEFAULT_MAX_ENTITY_TOKENS,
     DEFAULT_SUMMARY_LANGUAGE,
+    DEFAULT_MAX_RELATION_TOKENS,
+    DEFAULT_MAX_TOTAL_TOKENS,
+    DEFAULT_RELATED_CHUNK_NUMBER,
     SOURCE_IDS_LIMIT_METHOD_KEEP,
     SOURCE_IDS_LIMIT_METHOD_FIFO,
     DEFAULT_FILE_PATH_MORE_PLACEHOLDER,
     DEFAULT_MAX_FILE_PATHS,
     DEFAULT_ENTITY_NAME_MAX_LENGTH,
+    GRAPH_FIELD_SEP,
 )
 from lightrag.standards import normalize_standard_type
 from lightrag.kg.shared_storage import get_storage_keyed_lock
+
+# use the .env that is inside the current folder
+# allows to use different .env file for each lightrag instance
+# the OS environment variables take precedence over the .env file
+load_dotenv(dotenv_path=Path(__file__).resolve().parent / ".env", override=False)
 
 _TREE_OVERRIDE_CACHE: dict[str, tuple[float, dict[str, Any]]] = {}
 _DOMAIN_RULE_CACHE: dict[str, tuple[float, dict[str, Any]]] = {}
@@ -4012,7 +4058,7 @@ def _apply_domain_rule_decisions_to_project_context(
             "T60(预备试验)",
             "温升试验",
             "温升试验(60HZ)",
-            "状态检查试验（T10）",
+            "状态检查试验(T10)",
             "电寿命(单分)",
             "电寿命(合分)",
             "电寿命(循环)",
@@ -4346,7 +4392,7 @@ def _apply_domain_rule_decisions_to_project_context(
             )
 
     state_t10_parameters = _resolve_state_t10_parameters_local()
-    for state_t10_test_name in ("状态检查试验（T10）", "状态检查试验(T10)"):
+    for state_t10_test_name in ("状态检查试验(T10)", "状态检查试验(T10)"):
         if rated_voltage_kv is not None:
             _set_if_present(
                 state_t10_test_name,
@@ -5108,7 +5154,7 @@ def _get_report_scope_test_whitelist() -> dict[str, set[str]]:
             "容性电流开断试验(BC1)",
             "容性电流开断试验(BC2)",
             "T60(预备试验)",
-            "状态检查试验（T10）",
+            "状态检查试验(T10)",
             "作为状态检查的工频耐受电压试验",
             "空载特性测量",
             "空载特性测量#1",
@@ -5155,7 +5201,7 @@ def _get_report_scope_test_whitelist() -> dict[str, set[str]]:
             "T100s(b)(60Hz)",
             "T60(60HZ)",
             "T100s(三相共机构的验证试验)",
-            "状态检查试验（T10）",
+            "状态检查试验(T10)",
             "短路开断试验(T100A)",
             "短路开断试验(T100S)",
         },
