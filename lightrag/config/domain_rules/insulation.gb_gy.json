@@ -767,6 +767,13 @@
               "label": "首开极系数kpp",
               "value": 1.3,
               "unit": ""
+            },
+            {
+              "source": "query",
+              "type": "equals_numeric",
+              "label": "kpp",
+              "value": 1.3,
+              "unit": ""
             }
           ]
         }
@@ -794,6 +801,13 @@
               "source": "query",
               "type": "equals_numeric",
               "label": "首开极系数",
+              "value": 1.5,
+              "unit": ""
+            },
+            {
+              "source": "query",
+              "type": "equals_numeric",
+              "label": "kpp",
               "value": 1.5,
               "unit": ""
             }

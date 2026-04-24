@@ -2514,30 +2514,73 @@ def _apply_domain_rule_decisions_to_project_context(
     schema_cfg = schema_cfg or {}
     configured_requirements = schema_cfg.get("test_item_param_requirements", {}) or {}
 
+    def _normalize_test_item_lookup_key_local(value: str) -> str:
+        text = _normalize_text_key(str(value))
+        return text.replace("（", "(").replace("）", ")").lower()
+
+    configured_requirements_normalized = {
+        _normalize_test_item_lookup_key_local(str(test_name)): list(raw_params)
+        for test_name, raw_params in configured_requirements.items()
+        if _normalize_test_item_lookup_key_local(str(test_name))
+        and isinstance(raw_params, list)
+    }
+
+    configured_requirement_names_by_normalized = {
+        _normalize_test_item_lookup_key_local(str(test_name)): str(test_name)
+        for test_name, raw_params in configured_requirements.items()
+        if _normalize_test_item_lookup_key_local(str(test_name))
+        and isinstance(raw_params, list)
+    }
+
+    def _resolve_existing_test_name(test_name: str) -> str:
+        normalized_test_name = _normalize_test_item_lookup_key_local(test_name)
+        if not normalized_test_name:
+            return str(test_name)
+        for existing_name in updated_param_map.keys():
+            if _normalize_test_item_lookup_key_local(str(existing_name)) == normalized_test_name:
+                return str(existing_name)
+        for existing_name in updated_value_map.keys():
+            if _normalize_test_item_lookup_key_local(str(existing_name)) == normalized_test_name:
+                return str(existing_name)
+        return str(test_name)
+
+    def _resolve_config_test_name(test_name: str) -> str:
+        if isinstance(configured_requirements.get(test_name), list):
+            return str(test_name)
+        return configured_requirement_names_by_normalized.get(
+            _normalize_test_item_lookup_key_local(test_name),
+            str(test_name),
+        )
+
     def _ensure_test(test_name: str) -> None:
-        updated_param_map.setdefault(test_name, [])
-        updated_value_map.setdefault(test_name, {})
+        resolved_test_name = _resolve_existing_test_name(test_name)
+        updated_param_map.setdefault(resolved_test_name, [])
+        updated_value_map.setdefault(resolved_test_name, {})
 
     def _ensure_param(test_name: str, param_name: str) -> None:
         _ensure_test(test_name)
-        if param_name not in updated_param_map[test_name]:
-            updated_param_map[test_name].append(param_name)
-        updated_value_map[test_name].setdefault(param_name, {})
+        resolved_test_name = _resolve_existing_test_name(test_name)
+        if param_name not in updated_param_map[resolved_test_name]:
+            updated_param_map[resolved_test_name].append(param_name)
+        updated_value_map[resolved_test_name].setdefault(param_name, {})
 
     def _ensure_test_from_config(test_name: str) -> None:
-        if test_name in updated_param_map:
+        config_test_name = _resolve_config_test_name(test_name)
+        resolved_test_name = _resolve_existing_test_name(config_test_name)
+        if resolved_test_name in updated_param_map:
             return
-        raw_params = configured_requirements.get(test_name, [])
+        raw_params = configured_requirements.get(config_test_name, [])
         params = [
             str(param).strip()
             for param in (raw_params if isinstance(raw_params, list) else [])
             if str(param).strip()
         ]
-        updated_param_map[test_name] = params
-        updated_value_map.setdefault(test_name, {})
+        updated_param_map[resolved_test_name] = params
+        updated_value_map.setdefault(resolved_test_name, {})
 
     def _get_config_required_params(test_name: str) -> list[str]:
-        raw_params = configured_requirements.get(test_name, [])
+        config_test_name = _resolve_config_test_name(test_name)
+        raw_params = configured_requirements.get(config_test_name, [])
         return [
             str(param).strip()
             for param in (raw_params if isinstance(raw_params, list) else [])
@@ -2865,6 +2908,7 @@ def _apply_domain_rule_decisions_to_project_context(
     rated_frequency_hz = (
         float(rated_frequency_match.group(1)) if rated_frequency_match else 50.0
     )
+    normalized_query_text = query_text.replace("（", "(").replace("）", ")")
     rated_closing_ka = _extract_named_current_ka_local(
         query_text,
         ["额定短路关合电流", "短路关合电流", "关合电流"],
@@ -3020,12 +3064,12 @@ def _apply_domain_rule_decisions_to_project_context(
         "容性电流开断试验(CC2)#2",
         "容性电流开断试验(BC1)",
         "容性电流开断试验(BC2)",
-        "BC1(60HZ)",
-        "BC2(60HZ)",
-        "CC1(60HZ)",
-        "CC2(60HZ)",
-        "LC1(60HZ)",
-        "LC2(60HZ)",
+        "BC1(60Hz)",
+        "BC2(60Hz)",
+        "CC1(60Hz)",
+        "CC2(60Hz)",
+        "LC1(60Hz)",
+        "LC2(60Hz)",
     )
     is_three_phase_default = rated_voltage_kv is not None and rated_voltage_kv <= 40.5
 
@@ -3272,14 +3316,14 @@ def _apply_domain_rule_decisions_to_project_context(
         )
 
         for test_name in (
-            "L75(60HZ)",
-            "L90(60HZ)",
-            "T100A(60HZ)",
-            "T100S(60HZ)",
+            "L75(60Hz)",
+            "L90(60Hz)",
+            "T100A(60Hz)",
+            "T100S(60Hz)",
             "近区故障试验(L75)",
             "近区故障试验(L90)",
             "短路开断试验(T100A)",
-            "短路开断试验(T100s)",
+            "短路开断试验(T100S)",
         ):
             resolved[test_name] = {
                 "操作顺序": (operation_sequence_text, operation_sequence_rule),
@@ -3291,7 +3335,7 @@ def _apply_domain_rule_decisions_to_project_context(
             l_voltage_rule = (
                 f"L75/L90 试验电压按额定电压 / √3 计算，即 {rated_voltage_kv} / √3 = {l_voltage_text}。"
             )
-            for test_name in ("L75(60HZ)", "L90(60HZ)", "近区故障试验(L75)", "近区故障试验(L90)"):
+            for test_name in ("L75(60Hz)", "L90(60Hz)", "近区故障试验(L75)", "近区故障试验(L90)"):
                 resolved[test_name]["试验电压"] = (l_voltage_text, l_voltage_rule)
 
             if rated_voltage_kv <= 40.5:
@@ -3302,7 +3346,7 @@ def _apply_domain_rule_decisions_to_project_context(
                 t100a_phase_rule = (
                     f"额定电压 {rated_voltage_kv} kV 不高于 40.5 kV，T100A 默认按三相。"
                 )
-                for test_name in ("T100A(60HZ)", "短路开断试验(T100A)"):
+                for test_name in ("T100A(60Hz)", "短路开断试验(T100A)"):
                     resolved[test_name]["试验电压"] = (
                         rated_voltage_text_local,
                         t100a_voltage_rule,
@@ -3318,7 +3362,7 @@ def _apply_domain_rule_decisions_to_project_context(
                 t100s_phase_rule = (
                     f"额定电压 {rated_voltage_kv} kV 不高于 40.5 kV，T100S 默认按三相。"
                 )
-                for test_name in ("T100S(60HZ)", "短路开断试验(T100s)"):
+                for test_name in ("T100S(60Hz)", "短路开断试验(T100S)"):
                     resolved[test_name]["试验电压"] = (
                         rated_voltage_text_local,
                         t100s_voltage_rule,
@@ -3337,7 +3381,7 @@ def _apply_domain_rule_decisions_to_project_context(
                     3,
                 )
                 test_voltage_text = _format_voltage_value(test_voltage)
-                for test_name in ("T100A(60HZ)", "短路开断试验(T100A)"):
+                for test_name in ("T100A(60Hz)", "短路开断试验(T100A)"):
                     resolved[test_name]["试验电压"] = (
                         test_voltage_text,
                         f"额定电压 {rated_voltage_kv} kV 不低于 72.5 kV 时，{test_name}试验电压按 额定电压 / √3 / 断口数量 × 不均匀系数 × 首开极系数 计算；{break_count_rule} 即 {rated_voltage_kv} / √3 / {break_count} × {nonuniform_text} × {kpp_text} = {test_voltage_text}。",
@@ -3352,7 +3396,7 @@ def _apply_domain_rule_decisions_to_project_context(
             t100a_current_rule = (
                 f"T100A 试验电流取客户输入的额定短路开断电流 {t100a_current_text}。"
             )
-            for test_name in ("T100A(60HZ)", "短路开断试验(T100A)"):
+            for test_name in ("T100A(60Hz)", "短路开断试验(T100A)"):
                 resolved[test_name]["试验电流"] = (
                     t100a_current_text,
                     t100a_current_rule,
@@ -3368,19 +3412,19 @@ def _apply_domain_rule_decisions_to_project_context(
             l75_current_rule = (
                 f"L75 试验电流取额定短路开断电流的75%，即 {short_break_ka} kA × 75% = {l75_current_text}。"
             )
-            for test_name in ("L90(60HZ)", "近区故障试验(L90)"):
+            for test_name in ("L90(60Hz)", "近区故障试验(L90)"):
                 resolved[test_name]["试验电流"] = (
                     l90_current_text,
                     l90_current_rule,
                 )
-            for test_name in ("L75(60HZ)", "近区故障试验(L75)"):
+            for test_name in ("L75(60Hz)", "近区故障试验(L75)"):
                 resolved[test_name]["试验电流"] = (
                     l75_current_text,
                     l75_current_rule,
                 )
 
         for test_name, effective_frequency_hz in (
-            ("T100A(60HZ)", 60.0),
+            ("T100A(60Hz)", 60.0),
             ("短路开断试验(T100A)", rated_frequency_hz),
         ):
             frequency_text = f"{str(effective_frequency_hz).rstrip('0').rstrip('.')} Hz"
@@ -3395,8 +3439,8 @@ def _apply_domain_rule_decisions_to_project_context(
             resolved[test_name]["额定频率"] = (
                 frequency_text,
                 (
-                    "T100A(60HZ)按 60 Hz 固定频率计算。"
-                    if test_name == "T100A(60HZ)"
+                    "T100A(60Hz)按 60 Hz 固定频率计算。"
+                    if test_name == "T100A(60Hz)"
                     else "用户已明确提供额定频率时直接采用；未提供时沿用默认 50 Hz。"
                 ),
             )
@@ -3437,7 +3481,7 @@ def _apply_domain_rule_decisions_to_project_context(
             "T10(60Hz)": 0.1,
             "短路开断试验(T30)": 0.3,
             "短路开断试验(T60)": 0.6,
-            "T60(60HZ)": 0.6,
+            "T60(60Hz)": 0.6,
         }
         for test_name in test_ratio_map:
             resolved[test_name] = {
@@ -3641,16 +3685,46 @@ def _apply_domain_rule_decisions_to_project_context(
             if decision.get("enabled"):
                 _ensure_test_from_config(test_item)
             else:
-                updated_param_map.pop(test_item, None)
-                updated_value_map.pop(test_item, None)
+                resolved_test_item = _resolve_existing_test_name(test_item)
+                updated_param_map.pop(resolved_test_item, None)
+                updated_value_map.pop(resolved_test_item, None)
             continue
 
         if rule_kind == "pair_merge":
-            if not decision.get("enabled"):
-                continue
-            secondary_test_item = str(decision.get("secondary_test_item", "") or "").strip()
             merged_output = decision.get("merged_output", {}) or {}
             merged_test_name = str(merged_output.get("test_item", "") or "").strip()
+            if not decision.get("enabled"):
+                if merged_test_name:
+                    normalized_merged_name = _normalize_test_item_lookup_key_local(
+                        merged_test_name
+                    )
+                    stale_merged_names: list[str] = []
+                    for existing_name in tuple(updated_param_map.keys()):
+                        if (
+                            _normalize_test_item_lookup_key_local(str(existing_name))
+                            == normalized_merged_name
+                        ):
+                            stale_merged_names.append(str(existing_name))
+                    for existing_name in tuple(updated_value_map.keys()):
+                        if (
+                            _normalize_test_item_lookup_key_local(str(existing_name))
+                            == normalized_merged_name
+                        ):
+                            stale_merged_names.append(str(existing_name))
+                    stale_merged_names.extend(
+                        [
+                            _resolve_existing_test_name(merged_test_name),
+                            _resolve_config_test_name(merged_test_name),
+                            merged_test_name,
+                        ]
+                    )
+                    for stale_name in dict.fromkeys(
+                        name for name in stale_merged_names if str(name).strip()
+                    ):
+                        updated_param_map.pop(str(stale_name), None)
+                        updated_value_map.pop(str(stale_name), None)
+                continue
+            secondary_test_item = str(decision.get("secondary_test_item", "") or "").strip()
             if not test_item or not secondary_test_item or not merged_test_name:
                 continue
             primary_params = list(updated_param_map.get(test_item, []) or [])
@@ -3971,6 +4045,7 @@ def _apply_domain_rule_decisions_to_project_context(
         )
         if si_joint_auxiliary_kv is not None:
             si_joint_auxiliary_text = _format_voltage_value(si_joint_auxiliary_kv)
+            _ensure_param("操作冲击耐受电压试验(联合电压)", "交流电压")
             _set_if_present(
                 "操作冲击耐受电压试验(联合电压)",
                 "交流电压",
@@ -4043,7 +4118,7 @@ def _apply_domain_rule_decisions_to_project_context(
                 resolution_mode="graph_final",
             )
 
-    for temperature_rise_test_item in ("温升试验", "温升试验(60HZ)"):
+    for temperature_rise_test_item in ("温升试验", "温升试验(60Hz)"):
         if rated_voltage_kv is not None and temperature_rise_test_item in updated_param_map:
             _set_param(
                 temperature_rise_test_item,
@@ -4057,7 +4132,7 @@ def _apply_domain_rule_decisions_to_project_context(
             )
     if rated_current_a is not None and any(
         temperature_rise_test_item in updated_param_map
-        for temperature_rise_test_item in ("温升试验", "温升试验(60HZ)")
+        for temperature_rise_test_item in ("温升试验", "温升试验(60Hz)")
     ):
         normalized_stand_type = _normalize_operate_standard_type(stand_type)
         if normalized_stand_type == "DLT":
@@ -4066,7 +4141,7 @@ def _apply_domain_rule_decisions_to_project_context(
             current_text = _format_current_a_local(rated_current_a)
         else:
             current_text = _format_current_a_local(rated_current_a)
-        for temperature_rise_test_item in ("温升试验", "温升试验(60HZ)"):
+        for temperature_rise_test_item in ("温升试验", "温升试验(60Hz)"):
             if temperature_rise_test_item in updated_param_map:
                 _set_param(
                     temperature_rise_test_item,
@@ -4080,8 +4155,8 @@ def _apply_domain_rule_decisions_to_project_context(
                 )
     _set_if_present("温升试验", "试验部位", "主回路", calc_rule="温升试验试验部位固定为主回路。")
     _set_if_present("温升试验", "试验次数", "1次", calc_rule="温升试验按1次执行。")
-    _set_if_present("温升试验(60HZ)", "试验部位", "主回路", calc_rule="温升试验(60HZ)试验部位固定为主回路。")
-    _set_if_present("温升试验(60HZ)", "试验次数", "1次", calc_rule="温升试验(60HZ)按1次执行。")
+    _set_if_present("温升试验(60Hz)", "试验部位", "主回路", calc_rule="温升试验(60Hz)试验部位固定为主回路。")
+    _set_if_present("温升试验(60Hz)", "试验次数", "1次", calc_rule="温升试验(60Hz)按1次执行。")
     _set_if_present("辅助和控制回路温升试验", "试验次数", "1次", calc_rule="辅助和控制回路温升试验默认按1次执行。")
     _set_if_present("回路电阻测量", "试验次数", "2次", calc_rule="回路电阻测量按2次执行。")
 
@@ -4103,7 +4178,7 @@ def _apply_domain_rule_decisions_to_project_context(
             "局部放电试验",
             "T60(预备试验)",
             "温升试验",
-            "温升试验(60HZ)",
+            "温升试验(60Hz)",
             "状态检查试验(T10)",
             "电寿命(单分)",
             "电寿命(合分)",
@@ -4111,7 +4186,7 @@ def _apply_domain_rule_decisions_to_project_context(
             "短路开断试验(T10)",
             "短路开断试验(T30)",
             "短路开断试验(T60)",
-            "短路开断试验(T100s)",
+            "短路开断试验(T100S)",
             "容性电流开断试验(LC1)",
             "容性电流开断试验(LC2)",
             "容性电流开断试验(CC1)",
@@ -4180,6 +4255,16 @@ def _apply_domain_rule_decisions_to_project_context(
     capacitive_voltage_rule = ""
     capacitive_nonuniform_rule = ""
     capacitive_nonuniform_from_user = False
+    global_test_phase_value, global_test_phase_rule = _detect_capacitive_test_phase_local(
+        query_text,
+        rated_voltage_kv,
+    )
+    global_test_phase_from_user = re.search(
+        r"(?:试验相数|试验方式)\s*(?:[:：=]\s*)?(单相|三相)",
+        normalized_query_text,
+        flags=re.IGNORECASE,
+    ) is not None
+    global_break_count, global_break_count_rule = _resolve_break_count_local(query_text)
     if rated_voltage_kv is not None:
         (
             capacitive_test_voltage_text,
@@ -4211,7 +4296,7 @@ def _apply_domain_rule_decisions_to_project_context(
 
     for test_name in (
         "容性电流开断试验(BC1)",
-        "BC1(60HZ)",
+        "BC1(60Hz)",
     ):
         if bc_current_a is not None:
             _set_capacitive_current_local(test_name, bc_current_a, 0.4, "额定电容器组电流")
@@ -4225,7 +4310,7 @@ def _apply_domain_rule_decisions_to_project_context(
 
     for test_name in (
         "容性电流开断试验(BC2)",
-        "BC2(60HZ)",
+        "BC2(60Hz)",
     ):
         if bc_current_a is not None:
             _set_capacitive_current_local(test_name, bc_current_a, 1.0, "额定电容器组电流")
@@ -4241,7 +4326,7 @@ def _apply_domain_rule_decisions_to_project_context(
         "容性电流开断试验(CC1)",
         "容性电流开断试验(CC1)#1",
         "容性电流开断试验(CC1)#2",
-        "CC1(60HZ)",
+        "CC1(60Hz)",
     ):
         if cc_current_a is not None:
             _set_capacitive_current_local(test_name, cc_current_a, 0.4, "额定电缆充电电流")
@@ -4250,7 +4335,7 @@ def _apply_domain_rule_decisions_to_project_context(
         "容性电流开断试验(CC2)",
         "容性电流开断试验(CC2)#1",
         "容性电流开断试验(CC2)#2",
-        "CC2(60HZ)",
+        "CC2(60Hz)",
     ):
         if cc_current_a is not None:
             _set_capacitive_current_local(test_name, cc_current_a, 1.0, "额定电缆充电电流")
@@ -4259,7 +4344,7 @@ def _apply_domain_rule_decisions_to_project_context(
         "容性电流开断试验(LC1)",
         "容性电流开断试验(LC1)#1",
         "容性电流开断试验(LC1)#2",
-        "LC1(60HZ)",
+        "LC1(60Hz)",
     ):
         if lc_current_a is not None:
             _set_capacitive_current_local(test_name, lc_current_a, 0.4, "额定线路充电电流")
@@ -4268,7 +4353,7 @@ def _apply_domain_rule_decisions_to_project_context(
         "容性电流开断试验(LC2)",
         "容性电流开断试验(LC2)#1",
         "容性电流开断试验(LC2)#2",
-        "LC2(60HZ)",
+        "LC2(60Hz)",
     ):
         if lc_current_a is not None:
             _set_capacitive_current_local(test_name, lc_current_a, 1.0, "额定线路充电电流")
@@ -4343,7 +4428,7 @@ def _apply_domain_rule_decisions_to_project_context(
         "短路开断试验(T10)": 0.1,
         "短路开断试验(T30)": 0.3,
         "短路开断试验(T60)": 0.6,
-        "短路开断试验(T100s)": 1.0,
+        "短路开断试验(T100S)": 1.0,
     }
     for test_name, ratio in short_circuit_outputs.items():
         if rated_voltage_kv is not None:
@@ -4417,6 +4502,34 @@ def _apply_domain_rule_decisions_to_project_context(
                     capacitive_nonuniform_text,
                     calc_rule=capacitive_nonuniform_rule,
                 )
+
+    for test_name, param_names in tuple(updated_param_map.items()):
+        if "断口数量" not in (param_names or []):
+            continue
+        _set_if_value_missing(
+            test_name,
+            "断口数量",
+            str(global_break_count),
+            calc_rule=global_break_count_rule,
+        )
+
+    for test_name, param_names in tuple(updated_param_map.items()):
+        if "试验相数" not in (param_names or []):
+            continue
+        if global_test_phase_from_user:
+            _set_if_present(
+                test_name,
+                "试验相数",
+                global_test_phase_value,
+                calc_rule=global_test_phase_rule,
+            )
+        else:
+            _set_if_value_missing(
+                test_name,
+                "试验相数",
+                global_test_phase_value,
+                calc_rule=global_test_phase_rule,
+            )
 
     for test_name, param_names in tuple(updated_param_map.items()):
         if "断路器等级" not in (param_names or []):
@@ -5097,6 +5210,22 @@ def _build_final_test_item_scope(
         project_param_map: dict[str, list[str]],
         domain_rule_decisions: dict[str, Any],
 ) -> tuple[list[str], list[str]]:
+    def _normalize_test_item_scope_key(value: str) -> str:
+        text = _normalize_text_key(str(value))
+        return text.replace("（", "(").replace("）", ")").lower()
+
+    allowed_item_lookup = {
+        _normalize_test_item_scope_key(str(item)): str(item)
+        for item in project_param_map.keys()
+        if _normalize_test_item_scope_key(str(item))
+    }
+
+    def _resolve_scope_item_name(test_name: str) -> str:
+        normalized_name = _normalize_test_item_scope_key(test_name)
+        if not normalized_name:
+            return str(test_name).strip()
+        return allowed_item_lookup.get(normalized_name, str(test_name).strip())
+
     allowed_items = list(project_param_map.keys())
     removed_items: list[str] = []
     hard_removed_items: set[str] = set()
@@ -5104,7 +5233,7 @@ def _build_final_test_item_scope(
     for decision in domain_rule_decisions.values():
         if not isinstance(decision, dict):
             continue
-        test_item = str(decision.get("test_item", "") or "").strip()
+        test_item = _resolve_scope_item_name(str(decision.get("test_item", "") or "").strip())
         if not test_item:
             continue
         rule_kind = str(decision.get("kind", "") or "").strip()
@@ -5114,15 +5243,25 @@ def _build_final_test_item_scope(
         if rule_kind == "pair_merge" and decision.get("enabled"):
             removed_items.append(test_item)
             hard_removed_items.add(test_item)
-            secondary_test_item = str(decision.get("secondary_test_item", "") or "").strip()
+            secondary_test_item = _resolve_scope_item_name(
+                str(decision.get("secondary_test_item", "") or "").strip()
+            )
             if secondary_test_item:
                 removed_items.append(secondary_test_item)
                 hard_removed_items.add(secondary_test_item)
+        if rule_kind == "pair_merge" and not decision.get("enabled"):
+            merged_output = decision.get("merged_output", {}) or {}
+            merged_test_item = _resolve_scope_item_name(
+                str(merged_output.get("test_item", "") or "").strip()
+            )
+            if merged_test_item:
+                removed_items.append(merged_test_item)
+                hard_removed_items.add(merged_test_item)
         if rule_kind == "split" and decision.get("enabled"):
             split_outputs = decision.get("split_output", []) or []
             original_reused_as_split_output = any(
                 isinstance(split_output, dict)
-                and str(split_output.get("test_item", "") or "").strip() == test_item
+                and _resolve_scope_item_name(str(split_output.get("test_item", "") or "").strip()) == test_item
                 for split_output in split_outputs
             )
             if bool(decision.get("remove_original", True)) and not original_reused_as_split_output:
@@ -5152,9 +5291,18 @@ def _build_final_test_item_scope(
 
 def _build_test_item_display_map(project_param_map: dict[str, list[str]]) -> dict[str, str]:
     display_map: dict[str, str] = {}
+    preserve_split_display_prefixes = (
+        "T100s(a)#",
+        "T100s(b)#",
+        "T100s(a)(60Hz)#",
+        "T100s(b)(60Hz)#",
+    )
     for test_name in project_param_map.keys():
         name = str(test_name or "").strip()
         if not name:
+            continue
+        if name.startswith(preserve_split_display_prefixes):
+            display_map[name] = name
             continue
         if name.endswith("#干"):
             display_map[name] = f"{name[:-2]}(干)"
@@ -5224,20 +5372,19 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "雷电冲击耐受电压试验(断口)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
         "雷电冲击耐受电压试验(相间及对地)": {"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
         "雷电冲击耐受电压试验(联合电压)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
-        "操作冲击耐受电压试验(联合电压)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
-        "操作冲击耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
+        "操作冲击耐受电压试验(联合电压)":{"试验电压","SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
+        "操作冲击耐受电压试验":{"试验电压","SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
         "操作冲击耐受电压试验(干)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
         "操作冲击耐受电压试验(湿)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
         "局部放电试验":{"辅助和控制设备的电阻","SF6气体的最低功能压力(20℃表压)","回路电阻(μΩ)","回路电阻"},
-        "回路电阻测量":{"回路电阻","辅助和控制设备的电阻"},
-        "T60(预备试验)":{"额定电压","SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
-        "作为状态检查的工频耐受电压试验":{"额定电压","介质性质","SF6气体的最低功能压力(20℃表压)","放电次数"},
+        "T60(预备试验)":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
+        "作为状态检查的工频耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","放电次数"},
         "短时耐受电流和峰值耐受电流试验":{"额定电压","回路电阻","回路电阻(μΩ)"},
         "电寿命(合分)":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电","金短时间","故障类型"},
         "电寿命(单分)":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电","金短时间","故障类型"},
         "电寿命(循环)":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电","金短时间","故障类型"},
         "温升试验":{"SF6气体的最低功能压力(20℃表压)","是否所配元件","材料绝热等级"},
-        "温升试验(60HZ)":{"SF6气体的最低功能压力(20℃表压)","是否所配元件","材料绝热等级"},
+        "温升试验(60Hz)":{"SF6气体的最低功能压力(20℃表压)","是否所配元件","材料绝热等级"},
         "近区故障试验(L75)":{"线路侧波阻抗","SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
         "近区故障试验(L90)":{"线路侧波阻抗","SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
         "辅助和控制回路温升试验": {"辅助设备和控制设备的额定电源电压","辅助设备和控制设备的额定电流","材料绝热等级"},
@@ -5279,11 +5426,9 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "T100s":{"SF6气体的最低功能压力(20℃表压)"},
         "电寿命试验":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电","金短时间","故障类型","SF6气体的额定压力(20℃表压)"},
         "OP2关合":{"试验项数","SF6气体的最低功能压力(20℃表压)","外壳是否带电","直流分量(试验)"},
-        "T60(预备试验)":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
         "短时耐受电流试验": {"回路电阻","回路电阻(μΩ)"},
         "峰值耐受电流试验": {"回路电阻","回路电阻(μΩ)"},
         "状态检查试验(T10)":{"外壳是否带电"},
-        "作为状态检查的工频耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","放电次数"},
         "作为状态检查的雷电冲击耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","放电次数"},
         "L60":{"线路侧波阻抗","外壳是否带电"},
         "T100s(60Hz)":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电","故障类型"},
@@ -5303,7 +5448,7 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "短路开断试验(T10)": {"外壳是否带电", "失败次数","SF6气体的最低功能压力(20℃表压)"},
         "短路开断试验(T30)": {"外壳是否带电", "失败次数","SF6气体的最低功能压力(20℃表压)"},
         "短路开断试验(T60)": {"外壳是否带电", "失败次数","SF6气体的最低功能压力(20℃表压)"},
-        "短路开断试验(T100s)": {"外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","失败次数"},
+        "短路开断试验(T100S)": {"外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","失败次数"},
         "短路开断试验(T100A)": {"外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","失败次数"},
         "异相接地故障试验": {"SF6气体的最低功能压力(20℃表压)"},
         "单相接地故障试验": {"SF6气体的最低功能压力(20℃表压)"},
@@ -5334,7 +5479,7 @@ def _get_report_scope_test_whitelist() -> dict[str, set[str]]:
             "回路电阻测量",
             "辅助和控制回路温升试验",
             "温升试验",
-            "温升试验(60HZ)",
+            "温升试验(60Hz)",
         },
         "开合性能型式试验": {
             "容性电流开断试验(LC1)",
@@ -5349,12 +5494,12 @@ def _get_report_scope_test_whitelist() -> dict[str, set[str]]:
             "空载特性测量",
             "空载特性测量#1",
             "空载特性测量#2",
-            "BC1(60HZ)",
-            "BC2(60HZ)",
-            "CC1(60HZ)",
-            "CC2(60HZ)",
-            "LC1(60HZ)",
-            "LC2(60HZ)",
+            "BC1(60Hz)",
+            "BC2(60Hz)",
+            "CC1(60Hz)",
+            "CC2(60Hz)",
+            "LC1(60Hz)",
+            "LC2(60Hz)",
         },
         "短路性能型式试验": {
             "短时耐受电流试验",
@@ -5363,7 +5508,7 @@ def _get_report_scope_test_whitelist() -> dict[str, set[str]]:
             "空载特性测量",
             "空载特性测量#1",
             "空载特性测量#2",
-            "短路开断试验(T100s)",
+            "短路开断试验(T100S)",
             "短路开断试验(T10)",
             "失步关合和开断试验(OP1)",
             "失步关合和开断试验(OP2)",
@@ -5379,17 +5524,17 @@ def _get_report_scope_test_whitelist() -> dict[str, set[str]]:
             "短路开断试验(T100a)",
             "近区故障试验(L90)",
             "近区故障试验(L75)",
-            "L75(60HZ)",
-            "L90(60HZ)",
+            "L75(60Hz)",
+            "L90(60Hz)",
             "OP2关合",
             "T10(60Hz)",
-            "T100A(60HZ)",
-            "T100S(60HZ)",
+            "T100A(60Hz)",
+            "T100S(60Hz)",
             "T100s(a)",
             "T100s(b)",
             "T100s(a)(60Hz)",
             "T100s(b)(60Hz)",
-            "T60(60HZ)",
+            "T60(60Hz)",
             "T100s(三相共机构的验证试验)",
             "状态检查试验(T10)",
             "短路开断试验(T100A)",
