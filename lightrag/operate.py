@@ -3562,6 +3562,52 @@ def _apply_domain_rule_decisions_to_project_context(
             resolution_mode="graph_final",
         )
 
+    def _entry_has_any_value(entry: Any) -> bool:
+        if not isinstance(entry, dict):
+            return False
+        return any(
+            str(entry.get(field_name, "") or "").strip()
+            for field_name in (
+                "value_text",
+                "value_expr",
+                "constraints",
+                "calc_rule",
+                "derive_from_rated",
+            )
+        )
+
+    def _set_entry_if_value_missing(
+        test_name: str,
+        param_name: str,
+        entry: dict[str, Any],
+    ) -> None:
+        if not entry:
+            return
+        _ensure_param(test_name, param_name)
+        current_entry = updated_value_map.get(test_name, {}).get(param_name, {}) or {}
+        if _entry_has_any_value(current_entry):
+            return
+        updated_value_map[test_name][param_name] = deepcopy(entry)
+
+    def _copy_param_entry_if_missing(
+        test_name: str,
+        param_name: str,
+        source_specs: list[tuple[str, list[str]]],
+    ) -> bool:
+        for source_test_name, source_param_names in source_specs:
+            source_values = updated_value_map.get(source_test_name, {}) or {}
+            if not isinstance(source_values, dict):
+                continue
+            for source_param_name in source_param_names:
+                source_entry = source_values.get(source_param_name, {}) or {}
+                if not _entry_has_any_value(source_entry):
+                    continue
+                _set_entry_if_value_missing(test_name, param_name, deepcopy(source_entry))
+                current_entry = updated_value_map.get(test_name, {}).get(param_name, {}) or {}
+                if _entry_has_any_value(current_entry):
+                    return True
+        return False
+
     def _set_all_if_value_missing(
         param_name: str,
         value_text: str,
@@ -4680,7 +4726,8 @@ def _apply_domain_rule_decisions_to_project_context(
                 updated_value_map.get(test_name, {}).get("试验部位", {}).get("value_text", "")
                 or ""
             ).strip()
-            if current_value and current_value not in {"相间及对地", "对地"}:
+            normalized_current_value = current_value.replace("开关断口", "断口")
+            if normalized_current_value == "断口":
                 continue
             _set_param(
                 test_name,
@@ -4760,6 +4807,148 @@ def _apply_domain_rule_decisions_to_project_context(
         impulse_factor=30,
         family_label="操作冲击耐受电压试验族",
     )
+
+    def _recall_full_insulation_type_test_parameters() -> None:
+        test_name = "全套绝缘型式试验"
+        if test_name not in updated_param_map and test_name not in updated_value_map:
+            return
+
+        _ensure_test_from_config(test_name)
+        for required_param_name in _get_config_required_params(test_name):
+            _ensure_param(test_name, required_param_name)
+
+        break_count, break_count_rule = _resolve_break_count_local(query_text)
+        _set_if_value_missing(
+            test_name,
+            "断口数量",
+            str(break_count),
+            value_source="rule",
+            calc_rule=break_count_rule,
+        )
+
+        inherited_rated_voltage = _copy_param_entry_if_missing(
+            test_name,
+            "额定电压",
+            [
+                ("工频耐受电压试验", ["额定电压"]),
+                ("雷电冲击耐受电压试验", ["额定电压"]),
+                ("操作冲击耐受电压试验", ["额定电压"]),
+                ("工频耐受电压试验(联合电压)", ["额定电压"]),
+                ("雷电冲击耐受电压试验(联合电压)", ["额定电压"]),
+            ],
+        )
+        if not inherited_rated_voltage:
+            if rated_voltage_kv is not None:
+                rated_voltage_text = _format_voltage_value(rated_voltage_kv)
+                _set_param(
+                    test_name,
+                    "额定电压",
+                    rated_voltage_text,
+                    value_source="user_input",
+                    value_type="text",
+                    constraints=rated_voltage_text,
+                    calc_rule="用户已明确提供额定电压，问答阶段直接采用该值。",
+                    derive_from_rated=rated_voltage_text,
+                    resolution_mode="graph_final",
+                )
+            else:
+                _set_entry_if_value_missing(
+                    test_name,
+                    "额定电压",
+                    {
+                        "value_text": "用户录入，根据GBT11022 5.2.2及5.2.3向上取数",
+                        "value_source": "user_input",
+                        "value_expr": "用户录入，根据GBT11022 5.2.2及5.2.3向上取数",
+                        "unit": "kV",
+                        "constraints": "用户录入，根据GBT11022 5.2.2及5.2.3向上取数",
+                        "calc_rule": "",
+                        "derive_from_rated": "用户录入，根据GBT11022 5.2.2及5.2.3向上取数",
+                        "resolution_mode": "needs_user_input",
+                    },
+                )
+
+        _set_if_value_missing(
+            test_name,
+            "开关相数",
+            insulation_phase_text,
+            value_source="rule",
+            calc_rule=f"全套绝缘型式试验的开关相数沿用绝缘试验相数判定；{insulation_phase_rule}",
+        )
+
+        _set_entry_if_value_missing(
+            test_name,
+            "其他细则（充补套修）",
+            {
+                "value_text": "充按照是否充气/充油判断，补（是否补气）默认否，套（指套管材质，陶瓷or复合）需用户输入，修（是否修正海拔系数）默认否",
+                "value_source": "standard",
+                "value_expr": "",
+                "unit": "",
+                "constraints": "充按照是否充气/充油判断，补（是否补气）默认否，套（指套管材质，陶瓷or复合）需用户输入，修（是否修正海拔系数）默认否",
+                "calc_rule": "当前问题未给出可完全展开的充补套修细则时，回落到图谱默认说明。",
+                "derive_from_rated": "",
+                "resolution_mode": "needs_condition",
+            },
+        )
+
+        _set_entry_if_value_missing(
+            test_name,
+            "试验项目（全雷操工）",
+            {
+                "value_text": "全(是)雷(否)操(否)工(否)",
+                "value_source": "standard",
+                "value_expr": "",
+                "unit": "",
+                "constraints": "全(是)雷(否)操(否)工(否)",
+                "calc_rule": "当前问题未提供更细的全雷操工判据时，回落到图谱默认值。",
+                "derive_from_rated": "",
+                "resolution_mode": "needs_condition",
+            },
+        )
+
+        _set_entry_if_value_missing(
+            test_name,
+            "正常次数",
+            {
+                "value_text": "1次",
+                "value_source": "default",
+                "value_expr": "1次",
+                "unit": "count",
+                "constraints": "默认1次",
+                "calc_rule": "全套绝缘型式试验当前未命中更具体的次数规则时，按图谱默认试验次数1次回填到正常次数。",
+                "derive_from_rated": "",
+                "resolution_mode": "graph_final",
+            },
+        )
+
+        inherited_altitude = _copy_param_entry_if_missing(
+            test_name,
+            "最大(适用)的海拔",
+            [
+                ("工频耐受电压试验", ["最大(适用)的海拔", "最大(适用)的海拔"]),
+                ("雷电冲击耐受电压试验", ["最大(适用)的海拔", "最大(适用)的海拔"]),
+                ("操作冲击耐受电压试验", ["最大(适用)的海拔", "最大(适用)的海拔"]),
+                ("工频耐受电压试验(联合电压)", ["最大(适用)的海拔", "最大(适用)的海拔"]),
+                ("雷电冲击耐受电压试验(联合电压)", ["最大(适用)的海拔", "最大(适用)的海拔"]),
+                ("操作冲击耐受电压试验(联合电压)", ["最大(适用)的海拔", "最大(适用)的海拔"]),
+            ],
+        )
+        if not inherited_altitude:
+            _set_entry_if_value_missing(
+                test_name,
+                "最大(适用)的海拔",
+                {
+                    "value_text": "用户输入，未输入默认1000m",
+                    "value_source": "user_input",
+                    "value_expr": "用户输入，未输入默认1000m",
+                    "unit": "m",
+                    "constraints": "用户输入，未输入默认1000m",
+                    "calc_rule": "",
+                    "derive_from_rated": "用户输入，未输入默认1000m",
+                    "resolution_mode": "needs_user_input",
+                },
+            )
+
+    _recall_full_insulation_type_test_parameters()
 
     if "空载特性测量" in updated_param_map and "空载特性测量#1" not in updated_param_map:
         source_params = list(updated_param_map.get("空载特性测量", []) or [])
@@ -5052,6 +5241,7 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "近区故障试验(L75)":{"线路侧波阻抗","SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
         "近区故障试验(L90)":{"线路侧波阻抗","SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
         "辅助和控制回路温升试验": {"辅助设备和控制设备的额定电源电压","辅助设备和控制设备的额定电流","材料绝热等级"},
+        "全套绝缘型式试验":{"最大适用海拔","试验项目(全雷操工)"},
         "容性电流开断试验(BC1)": {
             "SF6气体的最低功能压力(20℃表压)",
             "SF6气体的额定压力(20℃表压)",
@@ -5084,8 +5274,8 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
             "SF6气体的额定压力(20℃表压)",
             "外壳是否带电",
         },
-        "T100s（a）":{"外壳是否带电","SF6气体的最低功能压力(20℃表压)"},
-        "T100s（b）":{"金短时间","外壳是否带电","SF6气体的最低功能压力(20℃表压)"},
+        "T100s(a)":{"金短时间","外壳是否带电","SF6气体的最低功能压力(20℃表压)"},
+        "T100s(b)":{"金短时间","外壳是否带电","SF6气体的最低功能压力(20℃表压)"},
         "T100s":{"SF6气体的最低功能压力(20℃表压)"},
         "电寿命试验":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电","金短时间","故障类型","SF6气体的额定压力(20℃表压)"},
         "OP2关合":{"试验项数","SF6气体的最低功能压力(20℃表压)","外壳是否带电","直流分量(试验)"},
@@ -5195,8 +5385,8 @@ def _get_report_scope_test_whitelist() -> dict[str, set[str]]:
             "T10(60Hz)",
             "T100A(60HZ)",
             "T100S(60HZ)",
-            "T100s（a）",
-            "T100s（b）",
+            "T100s(a)",
+            "T100s(b)",
             "T100s(a)(60Hz)",
             "T100s(b)(60Hz)",
             "T60(60HZ)",

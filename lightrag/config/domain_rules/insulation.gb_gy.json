@@ -655,7 +655,7 @@
       "domain": "short_circuit",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "状态检查试验（T10）",
+      "test_item": "状态检查试验(T10)",
       "status": "active",
       "allow_when_any": [
         {
@@ -693,7 +693,7 @@
       "domain": "switching",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "状态检查试验（T10）",
+      "test_item": "状态检查试验(T10)",
       "status": "active",
       "allow_when_any": [
         {
@@ -3150,7 +3150,7 @@
       "domain": "short_circuit",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "T100s（a）",
+      "test_item": "T100s(a)",
       "status": "active",
       "allow_when_any": [
         {
@@ -3186,7 +3186,7 @@
       "domain": "short_circuit",
       "kind": "split",
       "standard": "gb",
-      "test_item": "T100s（a）",
+      "test_item": "T100s(a)",
       "status": "active",
       "remove_original": true,
       "inputs": {
@@ -3229,13 +3229,13 @@
         ]
       },
       "single_output": {
-        "test_item": "T100s（a）",
+        "test_item": "T100s(a)",
         "parameter_overrides": {}
       },
       "split_output": [
         {
-          "test_item": "T100s（a）#1",
-          "inherits_from": "T100s（a）",
+          "test_item": "T100s(a)#1",
+          "inherits_from": "T100s(a)",
           "parameter_overrides": {
             "试验相数": "单相",
             "操作顺序": "C",
@@ -3243,8 +3243,8 @@
           }
         },
         {
-          "test_item": "T100s（a）#2",
-          "inherits_from": "T100s（a）",
+          "test_item": "T100s(a)#2",
+          "inherits_from": "T100s(a)",
           "parameter_overrides": {
             "试验相数": "三相",
             "操作顺序": "C",
@@ -3258,7 +3258,7 @@
       "domain": "short_circuit",
       "kind": "split",
       "standard": "gb",
-      "test_item": "T100s（a）",
+      "test_item": "T100s(a)",
       "status": "active",
       "remove_original": true,
       "inputs": {
@@ -3301,13 +3301,13 @@
         ]
       },
       "single_output": {
-        "test_item": "T100s（a）",
+        "test_item": "T100s(a)",
         "parameter_overrides": {}
       },
       "split_output": [
         {
-          "test_item": "T100s（a）#共箱共机构",
-          "inherits_from": "T100s（a）",
+          "test_item": "T100s(a)#共箱共机构",
+          "inherits_from": "T100s(a)",
           "parameter_overrides": {
             "试验相数": "三相",
             "操作顺序": "C",
@@ -3321,7 +3321,7 @@
       "domain": "short_circuit",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "T100s（b）",
+      "test_item": "T100s(b)",
       "status": "active",
       "allow_when_any": [
         {
@@ -3357,7 +3357,7 @@
       "domain": "short_circuit",
       "kind": "split",
       "standard": "gb",
-      "test_item": "T100s（b）",
+      "test_item": "T100s(b)",
       "status": "active",
       "remove_original": true,
       "inputs": {
@@ -3400,13 +3400,13 @@
         ]
       },
       "single_output": {
-        "test_item": "T100s（b）",
+        "test_item": "T100s(b)",
         "parameter_overrides": {}
       },
       "split_output": [
         {
-          "test_item": "T100s（b）#共机构",
-          "inherits_from": "T100s（b）",
+          "test_item": "T100s(b)#共机构",
+          "inherits_from": "T100s(b)",
           "parameter_overrides": {
             "试验相数": "三相",
             "操作顺序": "C",
@@ -3420,7 +3420,7 @@
       "domain": "short_circuit",
       "kind": "split",
       "standard": "gb",
-      "test_item": "T100s（b）",
+      "test_item": "T100s(b)",
       "status": "active",
       "remove_original": true,
       "inputs": {
@@ -3463,13 +3463,13 @@
         ]
       },
       "single_output": {
-        "test_item": "T100s（b）",
+        "test_item": "T100s(b)",
         "parameter_overrides": {}
       },
       "split_output": [
         {
-          "test_item": "T100s（b）#共箱共机构",
-          "inherits_from": "T100s（b）",
+          "test_item": "T100s(b)#共箱共机构",
+          "inherits_from": "T100s(b)",
           "parameter_overrides": {
             "试验相数": "三相",
             "操作顺序": "0-0.3-CO-180s-CO",
