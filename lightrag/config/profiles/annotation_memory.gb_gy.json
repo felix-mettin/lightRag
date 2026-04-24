@@ -1,17 +1,17 @@
 {
   "tests_by_path": {
-    "型式试验 > 开合性能型式试验 > BC1(60HZ)": {
-      "test_name": "BC1(60HZ)",
+    "型式试验 > 开合性能型式试验 > BC1(60Hz)": {
+      "test_name": "BC1(60Hz)",
       "report_type": "开合性能型式试验",
       "category": "开合性能型式试验",
       "path_parts": [
         "型式试验",
         "开合性能型式试验",
-        "BC1(60HZ)"
+        "BC1(60Hz)"
       ],
-      "path_key": "型式试验 > 开合性能型式试验 > BC1(60HZ)",
+      "path_key": "型式试验 > 开合性能型式试验 > BC1(60Hz)",
       "skip": false,
-      "note": "【contains \"额定电容器组电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 额定频率==60Hz",
+      "note": "【contains \"额定电容器组电流\" 】 and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -157,18 +157,18 @@
       "remove_parameters": [],
       "remove_rules": []
     },
-    "开合性能型式试验 > 开合性能型式试验 > BC1(60HZ)": {
-      "test_name": "BC1(60HZ)",
+    "开合性能型式试验 > 开合性能型式试验 > BC1(60Hz)": {
+      "test_name": "BC1(60Hz)",
       "report_type": "开合性能型式试验",
       "category": "开合性能型式试验",
       "path_parts": [
         "型式试验",
         "开合性能型式试验",
-        "BC1(60HZ)"
+        "BC1(60Hz)"
       ],
-      "path_key": "开合性能型式试验 > 开合性能型式试验 > BC1(60HZ)",
+      "path_key": "开合性能型式试验 > 开合性能型式试验 > BC1(60Hz)",
       "skip": false,
-      "note": "【contains \"额定电容器组电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 额定频率==60Hz",
+      "note": "【contains \"额定电容器组电流\" 】 and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -314,18 +314,18 @@
       "remove_parameters": [],
       "remove_rules": []
     },
-    "型式试验 > 开合性能型式试验 > BC2(60HZ)": {
-      "test_name": "BC2(60HZ)",
+    "型式试验 > 开合性能型式试验 > BC2(60Hz)": {
+      "test_name": "BC2(60Hz)",
       "report_type": "开合性能型式试验",
       "category": "开合性能型式试验",
       "path_parts": [
         "型式试验",
         "开合性能型式试验",
-        "BC2(60HZ)"
+        "BC2(60Hz)"
       ],
-      "path_key": "型式试验 > 开合性能型式试验 > BC2(60HZ)",
+      "path_key": "型式试验 > 开合性能型式试验 > BC2(60Hz)",
       "skip": false,
-      "note": "【contains \"额定电容器组电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】and 额定频率 ==60HZ",
+      "note": "【contains \"额定电容器组电流\" 】 and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -471,18 +471,18 @@
       "remove_parameters": [],
       "remove_rules": []
     },
-    "开合性能型式试验 > 开合性能型式试验 > BC2(60HZ)": {
-      "test_name": "BC2(60HZ)",
+    "开合性能型式试验 > 开合性能型式试验 > BC2(60Hz)": {
+      "test_name": "BC2(60Hz)",
       "report_type": "开合性能型式试验",
       "category": "开合性能型式试验",
       "path_parts": [
         "型式试验",
         "开合性能型式试验",
-        "BC2(60HZ)"
+        "BC2(60Hz)"
       ],
-      "path_key": "开合性能型式试验 > 开合性能型式试验 > BC2(60HZ)",
+      "path_key": "开合性能型式试验 > 开合性能型式试验 > BC2(60Hz)",
       "skip": false,
-      "note": "【contains \"额定电容器组电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】and 额定频率 ==60HZ",
+      "note": "【contains \"额定电容器组电流\" 】 and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -628,18 +628,18 @@
       "remove_parameters": [],
       "remove_rules": []
     },
-    "型式试验 > 开合性能型式试验 > CC1(60HZ)": {
-      "test_name": "CC1(60HZ)",
+    "型式试验 > 开合性能型式试验 > CC1(60Hz)": {
+      "test_name": "CC1(60Hz)",
       "report_type": "开合性能型式试验",
       "category": "开合性能型式试验",
       "path_parts": [
         "型式试验",
         "开合性能型式试验",
-        "CC1(60HZ)"
+        "CC1(60Hz)"
       ],
-      "path_key": "型式试验 > 开合性能型式试验 > CC1(60HZ)",
+      "path_key": "型式试验 > 开合性能型式试验 > CC1(60Hz)",
       "skip": false,
-      "note": "【contains \"额定电缆充电电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 额定频率==60Hz",
+      "note": "【contains \"额定电缆充电电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -755,18 +755,18 @@
       "remove_parameters": [],
       "remove_rules": []
     },
-    "开合性能型式试验 > 开合性能型式试验 > CC1(60HZ)": {
-      "test_name": "CC1(60HZ)",
+    "开合性能型式试验 > 开合性能型式试验 > CC1(60Hz)": {
+      "test_name": "CC1(60Hz)",
       "report_type": "开合性能型式试验",
       "category": "开合性能型式试验",
       "path_parts": [
         "型式试验",
         "开合性能型式试验",
-        "CC1(60HZ)"
+        "CC1(60Hz)"
       ],
-      "path_key": "开合性能型式试验 > 开合性能型式试验 > CC1(60HZ)",
+      "path_key": "开合性能型式试验 > 开合性能型式试验 > CC1(60Hz)",
       "skip": false,
-      "note": "【contains \"额定电缆充电电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 额定频率==60Hz",
+      "note": "【contains \"额定电缆充电电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -882,18 +882,18 @@
       "remove_parameters": [],
       "remove_rules": []
     },
-    "型式试验 > 开合性能型式试验 > CC2(60HZ)": {
-      "test_name": "CC2(60HZ)",
+    "型式试验 > 开合性能型式试验 > CC2(60Hz)": {
+      "test_name": "CC2(60Hz)",
       "report_type": "开合性能型式试验",
       "category": "开合性能型式试验",
       "path_parts": [
         "型式试验",
         "开合性能型式试验",
-        "CC2(60HZ)"
+        "CC2(60Hz)"
       ],
-      "path_key": "型式试验 > 开合性能型式试验 > CC2(60HZ)",
+      "path_key": "型式试验 > 开合性能型式试验 > CC2(60Hz)",
       "skip": false,
-      "note": "contains [\"额定电缆充电开断电流\",\"电缆充电开断电流\",\"额定电缆充电开合电流\"] 其中之一\nand 额定频率==60Hz",
+      "note": "【contains \"额定电缆充电电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -1009,18 +1009,18 @@
       "remove_parameters": [],
       "remove_rules": []
     },
-    "开合性能型式试验 > 开合性能型式试验 > CC2(60HZ)": {
-      "test_name": "CC2(60HZ)",
+    "开合性能型式试验 > 开合性能型式试验 > CC2(60Hz)": {
+      "test_name": "CC2(60Hz)",
       "report_type": "开合性能型式试验",
       "category": "开合性能型式试验",
       "path_parts": [
         "型式试验",
         "开合性能型式试验",
-        "CC2(60HZ)"
+        "CC2(60Hz)"
       ],
-      "path_key": "开合性能型式试验 > 开合性能型式试验 > CC2(60HZ)",
+      "path_key": "开合性能型式试验 > 开合性能型式试验 > CC2(60Hz)",
       "skip": false,
-      "note": "contains [\"额定电缆充电开断电流\",\"电缆充电开断电流\",\"额定电缆充电开合电流\"] 其中之一\nand 额定频率==60Hz",
+      "note": "【contains \"额定电缆充电电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -1136,18 +1136,18 @@
       "remove_parameters": [],
       "remove_rules": []
     },
-    "型式试验 > 短路性能型式试验 > L75(60HZ)": {
-      "test_name": "L75(60HZ)",
+    "型式试验 > 短路性能型式试验 > L75(60Hz)": {
+      "test_name": "L75(60Hz)",
       "report_type": "短路性能型式试验",
       "category": "短路性能型式试验",
       "path_parts": [
         "型式试验",
         "短路性能型式试验",
-        "L75(60HZ)"
+        "L75(60Hz)"
       ],
-      "path_key": "型式试验 > 短路性能型式试验 > L75(60HZ)",
+      "path_key": "型式试验 > 短路性能型式试验 > L75(60Hz)",
       "skip": false,
-      "note": "断路器等级==S2（or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA and 额定频率==60HZ",
+      "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 【额定频率 == 60Hz or 额定频率 == 50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -1243,18 +1243,18 @@
       "remove_parameters": [],
       "remove_rules": []
     },
-    "短路性能型式试验 > 短路性能型式试验 > L75(60HZ)": {
-      "test_name": "L75(60HZ)",
+    "短路性能型式试验 > 短路性能型式试验 > L75(60Hz)": {
+      "test_name": "L75(60Hz)",
       "report_type": "短路性能型式试验",
       "category": "短路性能型式试验",
       "path_parts": [
         "型式试验",
         "短路性能型式试验",
-        "L75(60HZ)"
+        "L75(60Hz)"
       ],
-      "path_key": "短路性能型式试验 > 短路性能型式试验 > L75(60HZ)",
+      "path_key": "短路性能型式试验 > 短路性能型式试验 > L75(60Hz)",
       "skip": false,
-      "note": "断路器等级==S2（or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA and 额定频率==60HZ",
+      "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 【额定频率 == 60Hz or 额定频率 == 50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -1350,18 +1350,18 @@
       "remove_parameters": [],
       "remove_rules": []
     },
-    "型式试验 > 短路性能型式试验 > L90(60HZ)": {
-      "test_name": "L90(60HZ)",
+    "型式试验 > 短路性能型式试验 > L90(60Hz)": {
+      "test_name": "L90(60Hz)",
       "report_type": "短路性能型式试验",
       "category": "短路性能型式试验",
       "path_parts": [
         "型式试验",
         "短路性能型式试验",
-        "L90(60HZ)"
+        "L90(60Hz)"
       ],
-      "path_key": "型式试验 > 短路性能型式试验 > L90(60HZ)",
+      "path_key": "型式试验 > 短路性能型式试验 > L90(60Hz)",
       "skip": false,
-      "note": "断路器等级==S2（额定电压>72.5kV视为S2） and 额定电压≥24kV and 额定短路开断电流＞12.5kA and 额定频率==60HZ",
+      "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 【额定频率 == 60Hz or 额定频率 == 50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -1457,18 +1457,18 @@
       "remove_parameters": [],
       "remove_rules": []
     },
-    "短路性能型式试验 > 短路性能型式试验 > L90(60HZ)": {
-      "test_name": "L90(60HZ)",
+    "短路性能型式试验 > 短路性能型式试验 > L90(60Hz)": {
+      "test_name": "L90(60Hz)",
       "report_type": "短路性能型式试验",
       "category": "短路性能型式试验",
       "path_parts": [
         "型式试验",
         "短路性能型式试验",
-        "L90(60HZ)"
+        "L90(60Hz)"
       ],
-      "path_key": "短路性能型式试验 > 短路性能型式试验 > L90(60HZ)",
+      "path_key": "短路性能型式试验 > 短路性能型式试验 > L90(60Hz)",
       "skip": false,
-      "note": "断路器等级==S2（额定电压>72.5kV视为S2） and 额定电压≥24kV and 额定短路开断电流＞12.5kA and 额定频率==60HZ",
+      "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 【额定频率 == 60Hz or 额定频率 == 50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -1564,18 +1564,18 @@
       "remove_parameters": [],
       "remove_rules": []
     },
-    "型式试验 > 开合性能型式试验 > LC1(60HZ)": {
-      "test_name": "LC1(60HZ)",
+    "型式试验 > 开合性能型式试验 > LC1(60Hz)": {
+      "test_name": "LC1(60Hz)",
       "report_type": "开合性能型式试验",
       "category": "开合性能型式试验",
       "path_parts": [
         "型式试验",
         "开合性能型式试验",
-        "LC1(60HZ)"
+        "LC1(60Hz)"
       ],
-      "path_key": "型式试验 > 开合性能型式试验 > LC1(60HZ)",
+      "path_key": "型式试验 > 开合性能型式试验 > LC1(60Hz)",
       "skip": false,
-      "note": "contains \"额定线路充电电流\" and 额定频率==60Hz",
+      "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -1691,18 +1691,18 @@
       "remove_parameters": [],
       "remove_rules": []
     },
-    "开合性能型式试验 > 开合性能型式试验 > LC1(60HZ)": {
-      "test_name": "LC1(60HZ)",
+    "开合性能型式试验 > 开合性能型式试验 > LC1(60Hz)": {
+      "test_name": "LC1(60Hz)",
       "report_type": "开合性能型式试验",
       "category": "开合性能型式试验",
       "path_parts": [
         "型式试验",
         "开合性能型式试验",
-        "LC1(60HZ)"
+        "LC1(60Hz)"
       ],
-      "path_key": "开合性能型式试验 > 开合性能型式试验 > LC1(60HZ)",
+      "path_key": "开合性能型式试验 > 开合性能型式试验 > LC1(60Hz)",
       "skip": false,
-      "note": "contains \"额定线路充电电流\" and 额定频率==60Hz",
+      "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -1818,18 +1818,18 @@
       "remove_parameters": [],
       "remove_rules": []
     },
-    "型式试验 > 开合性能型式试验 > LC2(60HZ)": {
-      "test_name": "LC2(60HZ)",
+    "型式试验 > 开合性能型式试验 > LC2(60Hz)": {
+      "test_name": "LC2(60Hz)",
       "report_type": "开合性能型式试验",
       "category": "开合性能型式试验",
       "path_parts": [
         "型式试验",
         "开合性能型式试验",
-        "LC2(60HZ)"
+        "LC2(60Hz)"
       ],
-      "path_key": "型式试验 > 开合性能型式试验 > LC2(60HZ)",
+      "path_key": "型式试验 > 开合性能型式试验 > LC2(60Hz)",
       "skip": false,
-      "note": "contains \"额定线路充电电流\" and 额定频率==60Hz",
+      "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -1945,18 +1945,18 @@
       "remove_parameters": [],
       "remove_rules": []
     },
-    "开合性能型式试验 > 开合性能型式试验 > LC2(60HZ)": {
-      "test_name": "LC2(60HZ)",
+    "开合性能型式试验 > 开合性能型式试验 > LC2(60Hz)": {
+      "test_name": "LC2(60Hz)",
       "report_type": "开合性能型式试验",
       "category": "开合性能型式试验",
       "path_parts": [
         "型式试验",
         "开合性能型式试验",
-        "LC2(60HZ)"
+        "LC2(60Hz)"
       ],
-      "path_key": "开合性能型式试验 > 开合性能型式试验 > LC2(60HZ)",
+      "path_key": "开合性能型式试验 > 开合性能型式试验 > LC2(60Hz)",
       "skip": false,
-      "note": "contains \"额定线路充电电流\" and 额定频率==60Hz",
+      "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -2136,36 +2136,6 @@
           "derive_from_rated": "用户输入额定电压值"
         },
         {
-          "param_name": "额定频率",
-          "value_text": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "value_expr": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "发电机额定容量",
-          "value_text": "按系统配置确定",
-          "value_expr": "按系统配置确定",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "按系统配置确定",
-          "calc_rule": "",
-          "derive_from_rated": "按系统配置确定"
-        },
-        {
-          "param_name": "故障类型",
-          "value_text": "失步故障",
-          "value_expr": "失步故障",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "失步故障",
-          "calc_rule": "",
-          "derive_from_rated": "失步故障"
-        },
-        {
           "param_name": "试验次数",
           "value_text": "1次",
           "value_expr": "",
@@ -2283,36 +2253,6 @@
           "derive_from_rated": "用户输入额定电压值"
         },
         {
-          "param_name": "额定频率",
-          "value_text": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "value_expr": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "发电机额定容量",
-          "value_text": "按系统配置确定",
-          "value_expr": "按系统配置确定",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "按系统配置确定",
-          "calc_rule": "",
-          "derive_from_rated": "按系统配置确定"
-        },
-        {
-          "param_name": "故障类型",
-          "value_text": "失步故障",
-          "value_expr": "失步故障",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "失步故障",
-          "calc_rule": "",
-          "derive_from_rated": "失步故障"
-        },
-        {
           "param_name": "试验次数",
           "value_text": "1次",
           "value_expr": "",
@@ -2366,292 +2306,18 @@
       "remove_parameters": [],
       "remove_rules": []
     },
-    "型式试验 > 短路性能型式试验 > T10(60Hz)": {
-      "test_name": "T10(60Hz)",
+    "型式试验 > 短路性能型式试验 > T100A(60Hz)": {
+      "test_name": "T100A(60Hz)",
       "report_type": "短路性能型式试验",
       "category": "短路性能型式试验",
       "path_parts": [
         "型式试验",
         "短路性能型式试验",
-        "T10(60Hz)"
+        "T100A(60Hz)"
       ],
-      "path_key": "型式试验 > 短路性能型式试验 > T10(60Hz)",
+      "path_key": "型式试验 > 短路性能型式试验 > T100A(60Hz)",
       "skip": false,
-      "note": "额定频率==60HZ",
-      "parameters": [
-        {
-          "param_name": "SF6气体的最低功能压力(20℃表压)",
-          "value_text": "用户输入，未输入默认取值\"--\"",
-          "value_expr": "用户输入，未输入默认取值\"--\"",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户输入，未输入默认取值\"--\"",
-          "calc_rule": "",
-          "derive_from_rated": "用户输入，未输入默认取值\"--\""
-        },
-        {
-          "param_name": "不均匀系数",
-          "value_text": "用户输入多断口则取值1.05，输入单断口取值为1，其他情况默认取值为1",
-          "value_expr": "用户输入多断口则取值1.05，输入单断口取值为1，其他情况默认取值为1",
-          "value_source": "formula",
-          "value_type": "formula",
-          "constraints": "用户输入多断口则取值1.05，输入单断口取值为1，其他情况默认取值为1",
-          "calc_rule": "用户输入多断口则取值1.05，输入单断口取值为1，其他情况默认取值为1",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "操作顺序",
-          "value_text": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-          "value_expr": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "断路器等级",
-          "value_text": "40.5kv及以下默认S1，72.5kv以上按照用户输入，未输入默认按S2进行试验,但最终取值输出为\"--\"；\n①40.5kv及以下默认S1，若用户输入则按照用户输入进行试验；\n②72.5kv无默认值，按照用户输入进行试验；\n③72.5kV以上无断路器等级概念，但最终取值输出为\"--\"。",
-          "value_expr": "40.5kv及以下默认S1，72.5kv以上按照用户输入，未输入默认按S2进行试验,但最终取值输出为\"--\"；\n①40.5kv及以下默认S1，若用户输入则按照用户输入进行试验；\n②72.5kv无默认值，按照用户输入进行试验；\n③72.5kV以上无断路器等级概念，但最终取值输出为\"--\"。",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kv及以下默认S1，72.5kv以上按照用户输入，未输入默认按S2进行试验,但最终取值输出为\"--\"；\n①40.5kv及以下默认S1，若用户输入则按照用户输入进行试验；\n②72.5kv无默认值，按照用户输入进行试验；\n③72.5kV以上无断路器等级概念，但最终取值输出为\"--\"。",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "额定电压",
-          "value_text": "额定电压（用户录入）",
-          "value_expr": "额定电压（用户录入）",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "额定电压（用户录入）",
-          "calc_rule": "",
-          "derive_from_rated": "额定电压（用户录入）"
-        },
-        {
-          "param_name": "失败次数",
-          "value_text": "0次",
-          "value_expr": "0次",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "0次",
-          "calc_rule": "",
-          "derive_from_rated": "0次"
-        },
-        {
-          "param_name": "试验次数",
-          "value_text": "1次",
-          "value_expr": "1次",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "1次",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "试验电流kA",
-          "value_text": "用户输入额定短路开断电流*10%",
-          "value_expr": "用户输入额定短路开断电流*10%",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户输入额定短路开断电流*10%",
-          "calc_rule": "",
-          "derive_from_rated": "用户输入额定短路开断电流*10%"
-        },
-        {
-          "param_name": "试验电压",
-          "value_text": "40.5kV及以下为额定电压，72.5kV及以上为额定电压/根3*首开极系数/断口数量*不均匀系数",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "40.5kV及以下为额定电压，72.5kV及以上为额定电压/根3*首开极系数/断口数量*不均匀系数",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "试验相数",
-          "value_text": "40.5kV及以下默认为三相，72.5kv以上默认单相",
-          "value_expr": "40.5kV及以下默认为三相，72.5kv以上默认单相",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kV及以下默认为三相，72.5kv以上默认单相",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "首开极系数",
-          "value_text": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-          "value_expr": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "外壳是否带电",
-          "value_text": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-          "value_expr": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-          "calc_rule": "",
-          "derive_from_rated": "用户输入(判断取值是或者否)，未输入默认取值\"--\""
-        }
-      ],
-      "remove_parameters": [],
-      "remove_rules": []
-    },
-    "短路性能型式试验 > 短路性能型式试验 > T10(60Hz)": {
-      "test_name": "T10(60Hz)",
-      "report_type": "短路性能型式试验",
-      "category": "短路性能型式试验",
-      "path_parts": [
-        "型式试验",
-        "短路性能型式试验",
-        "T10(60Hz)"
-      ],
-      "path_key": "短路性能型式试验 > 短路性能型式试验 > T10(60Hz)",
-      "skip": false,
-      "note": "额定频率==60HZ",
-      "parameters": [
-        {
-          "param_name": "SF6气体的最低功能压力(20℃表压)",
-          "value_text": "用户输入，未输入默认取值\"--\"",
-          "value_expr": "用户输入，未输入默认取值\"--\"",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户输入，未输入默认取值\"--\"",
-          "calc_rule": "",
-          "derive_from_rated": "用户输入，未输入默认取值\"--\""
-        },
-        {
-          "param_name": "不均匀系数",
-          "value_text": "用户输入多断口则取值1.05，输入单断口取值为1，其他情况默认取值为1",
-          "value_expr": "用户输入多断口则取值1.05，输入单断口取值为1，其他情况默认取值为1",
-          "value_source": "formula",
-          "value_type": "formula",
-          "constraints": "用户输入多断口则取值1.05，输入单断口取值为1，其他情况默认取值为1",
-          "calc_rule": "用户输入多断口则取值1.05，输入单断口取值为1，其他情况默认取值为1",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "操作顺序",
-          "value_text": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-          "value_expr": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "断路器等级",
-          "value_text": "40.5kv及以下默认S1，72.5kv以上按照用户输入，未输入默认按S2进行试验,但最终取值输出为\"--\"；\n①40.5kv及以下默认S1，若用户输入则按照用户输入进行试验；\n②72.5kv无默认值，按照用户输入进行试验；\n③72.5kV以上无断路器等级概念，但最终取值输出为\"--\"。",
-          "value_expr": "40.5kv及以下默认S1，72.5kv以上按照用户输入，未输入默认按S2进行试验,但最终取值输出为\"--\"；\n①40.5kv及以下默认S1，若用户输入则按照用户输入进行试验；\n②72.5kv无默认值，按照用户输入进行试验；\n③72.5kV以上无断路器等级概念，但最终取值输出为\"--\"。",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kv及以下默认S1，72.5kv以上按照用户输入，未输入默认按S2进行试验,但最终取值输出为\"--\"；\n①40.5kv及以下默认S1，若用户输入则按照用户输入进行试验；\n②72.5kv无默认值，按照用户输入进行试验；\n③72.5kV以上无断路器等级概念，但最终取值输出为\"--\"。",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "额定电压",
-          "value_text": "额定电压（用户录入）",
-          "value_expr": "额定电压（用户录入）",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "额定电压（用户录入）",
-          "calc_rule": "",
-          "derive_from_rated": "额定电压（用户录入）"
-        },
-        {
-          "param_name": "失败次数",
-          "value_text": "0次",
-          "value_expr": "0次",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "0次",
-          "calc_rule": "",
-          "derive_from_rated": "0次"
-        },
-        {
-          "param_name": "试验次数",
-          "value_text": "1次",
-          "value_expr": "1次",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "1次",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "试验电流kA",
-          "value_text": "用户输入额定短路开断电流*10%",
-          "value_expr": "用户输入额定短路开断电流*10%",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户输入额定短路开断电流*10%",
-          "calc_rule": "",
-          "derive_from_rated": "用户输入额定短路开断电流*10%"
-        },
-        {
-          "param_name": "试验电压",
-          "value_text": "40.5kV及以下为额定电压，72.5kV及以上为额定电压/根3*首开极系数/断口数量*不均匀系数",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "40.5kV及以下为额定电压，72.5kV及以上为额定电压/根3*首开极系数/断口数量*不均匀系数",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "试验相数",
-          "value_text": "40.5kV及以下默认为三相，72.5kv以上默认单相",
-          "value_expr": "40.5kV及以下默认为三相，72.5kv以上默认单相",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kV及以下默认为三相，72.5kv以上默认单相",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "首开极系数",
-          "value_text": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-          "value_expr": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "外壳是否带电",
-          "value_text": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-          "value_expr": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-          "calc_rule": "",
-          "derive_from_rated": "用户输入(判断取值是或者否)，未输入默认取值\"--\""
-        }
-      ],
-      "remove_parameters": [],
-      "remove_rules": []
-    },
-    "型式试验 > 短路性能型式试验 > T100A(60HZ)": {
-      "test_name": "T100A(60HZ)",
-      "report_type": "短路性能型式试验",
-      "category": "短路性能型式试验",
-      "path_parts": [
-        "型式试验",
-        "短路性能型式试验",
-        "T100A(60HZ)"
-      ],
-      "path_key": "型式试验 > 短路性能型式试验 > T100A(60HZ)",
-      "skip": false,
-      "note": "额定频率==60Hz",
+      "note": "额定频率==60Hz or 额定频率==50/60Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -2827,18 +2493,18 @@
       "remove_parameters": [],
       "remove_rules": []
     },
-    "短路性能型式试验 > 短路性能型式试验 > T100A(60HZ)": {
-      "test_name": "T100A(60HZ)",
+    "短路性能型式试验 > 短路性能型式试验 > T100A(60Hz)": {
+      "test_name": "T100A(60Hz)",
       "report_type": "短路性能型式试验",
       "category": "短路性能型式试验",
       "path_parts": [
         "型式试验",
         "短路性能型式试验",
-        "T100A(60HZ)"
+        "T100A(60Hz)"
       ],
-      "path_key": "短路性能型式试验 > 短路性能型式试验 > T100A(60HZ)",
+      "path_key": "短路性能型式试验 > 短路性能型式试验 > T100A(60Hz)",
       "skip": false,
-      "note": "额定频率==60Hz",
+      "note": "额定频率==60Hz or 额定频率==50/60Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -3014,18 +2680,18 @@
       "remove_parameters": [],
       "remove_rules": []
     },
-    "型式试验 > 短路性能型式试验 > T100S(60HZ)": {
-      "test_name": "T100S(60HZ)",
+    "型式试验 > 短路性能型式试验 > T100S(60Hz)": {
+      "test_name": "T100S(60Hz)",
       "report_type": "短路性能型式试验",
       "category": "短路性能型式试验",
       "path_parts": [
         "型式试验",
         "短路性能型式试验",
-        "T100S(60HZ)"
+        "T100S(60Hz)"
       ],
-      "path_key": "型式试验 > 短路性能型式试验 > T100S(60HZ)",
+      "path_key": "型式试验 > 短路性能型式试验 > T100S(60Hz)",
       "skip": false,
-      "note": "额定电压<40.5kv and 额定频率==60Hz\n（验证100%对称短路开断电流）",
+      "note": "额定电压<=40.5kv & 【额定频率==60Hz or 额定频率==50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -3098,26 +2764,6 @@
           "derive_from_rated": "用户录入额定短路关合电流"
         },
         {
-          "param_name": "结构特征",
-          "value_text": "40.5kV及以下不考虑",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "40.5kV及以下不考虑",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "失败次数",
-          "value_text": "0次",
-          "value_expr": "0次",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "0次",
-          "calc_rule": "",
-          "derive_from_rated": "0次"
-        },
-        {
           "param_name": "试验次数",
           "value_text": "1次",
           "value_expr": "1次",
@@ -3154,16 +2800,6 @@
           "value_source": "standard",
           "value_type": "standard",
           "constraints": "额定电压40.5kv以下默认三相",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "首开极系数",
-          "value_text": "40.5kV及以下默认为1.5",
-          "value_expr": "40.5kV及以下默认为1.5",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kV及以下默认为1.5",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -3181,18 +2817,18 @@
       "remove_parameters": [],
       "remove_rules": []
     },
-    "短路性能型式试验 > 短路性能型式试验 > T100S(60HZ)": {
-      "test_name": "T100S(60HZ)",
+    "短路性能型式试验 > 短路性能型式试验 > T100S(60Hz)": {
+      "test_name": "T100S(60Hz)",
       "report_type": "短路性能型式试验",
       "category": "短路性能型式试验",
       "path_parts": [
         "型式试验",
         "短路性能型式试验",
-        "T100S(60HZ)"
+        "T100S(60Hz)"
       ],
-      "path_key": "短路性能型式试验 > 短路性能型式试验 > T100S(60HZ)",
+      "path_key": "短路性能型式试验 > 短路性能型式试验 > T100S(60Hz)",
       "skip": false,
-      "note": "额定电压<40.5kv and 额定频率==60Hz\n（验证100%对称短路开断电流）",
+      "note": "额定电压<=40.5kv & 【额定频率==60Hz or 额定频率==50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -3265,26 +2901,6 @@
           "derive_from_rated": "用户录入额定短路关合电流"
         },
         {
-          "param_name": "结构特征",
-          "value_text": "40.5kV及以下不考虑",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "40.5kV及以下不考虑",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "失败次数",
-          "value_text": "0次",
-          "value_expr": "0次",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "0次",
-          "calc_rule": "",
-          "derive_from_rated": "0次"
-        },
-        {
           "param_name": "试验次数",
           "value_text": "1次",
           "value_expr": "1次",
@@ -3321,16 +2937,6 @@
           "value_source": "standard",
           "value_type": "standard",
           "constraints": "额定电压40.5kv以下默认三相",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "首开极系数",
-          "value_text": "40.5kV及以下默认为1.5",
-          "value_expr": "40.5kV及以下默认为1.5",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kV及以下默认为1.5",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -3359,7 +2965,7 @@
       ],
       "path_key": "型式试验 > 短路性能型式试验 > T100s(a)",
       "skip": false,
-      "note": "额定电压>=72.5  & 额定频率≠60HZ,（注意：当为三相分箱共机构的时候，需要在原基础上在执行一次，试验相数为三相，其余不变）",
+      "note": "额定电压>=72.5kV  & 【额定频率==50HZ or 额定频率==50/60Hz】（注意：当为三相分箱共机构的时候，需要在原基础上在执行一次，试验相数为三相，其余不变）",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -3412,16 +3018,6 @@
           "derive_from_rated": "用户录入）"
         },
         {
-          "param_name": "额定频率",
-          "value_text": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "value_expr": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "calc_rule": "",
-          "derive_from_rated": "用户录入额定频率，用户未录入默认50Hz Hz"
-        },
-        {
           "param_name": "关合电流",
           "value_text": "用户录入，额定短路关合电流",
           "value_expr": "用户录入，额定短路关合电流",
@@ -3430,26 +3026,6 @@
           "constraints": "用户录入，额定短路关合电流",
           "calc_rule": "",
           "derive_from_rated": "用户录入，额定短路关合电流"
-        },
-        {
-          "param_name": "结构特征",
-          "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "金短时间",
-          "value_text": "默认60ms",
-          "value_expr": "默认60ms",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "默认60ms",
-          "calc_rule": "",
-          "derive_from_rated": ""
         },
         {
           "param_name": "试验次数",
@@ -3516,7 +3092,7 @@
       ],
       "path_key": "短路性能型式试验 > 短路性能型式试验 > T100s(a)",
       "skip": false,
-      "note": "额定电压>=72.5  & 额定频率≠60HZ,（注意：当为三相分箱共机构的时候，需要在原基础上在执行一次，试验相数为三相，其余不变）",
+      "note": "额定电压>=72.5kV  & 【额定频率==50HZ or 额定频率==50/60Hz】（注意：当为三相分箱共机构的时候，需要在原基础上在执行一次，试验相数为三相，其余不变）",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -3569,16 +3145,6 @@
           "derive_from_rated": "用户录入）"
         },
         {
-          "param_name": "额定频率",
-          "value_text": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "value_expr": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "calc_rule": "",
-          "derive_from_rated": "用户录入额定频率，用户未录入默认50Hz Hz"
-        },
-        {
           "param_name": "关合电流",
           "value_text": "用户录入，额定短路关合电流",
           "value_expr": "用户录入，额定短路关合电流",
@@ -3587,26 +3153,6 @@
           "constraints": "用户录入，额定短路关合电流",
           "calc_rule": "",
           "derive_from_rated": "用户录入，额定短路关合电流"
-        },
-        {
-          "param_name": "结构特征",
-          "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "金短时间",
-          "value_text": "默认60ms",
-          "value_expr": "默认60ms",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "默认60ms",
-          "calc_rule": "",
-          "derive_from_rated": ""
         },
         {
           "param_name": "试验次数",
@@ -3673,7 +3219,7 @@
       ],
       "path_key": "型式试验 > 短路性能型式试验 > T100s(a)(60Hz)",
       "skip": false,
-      "note": "额定电压>=72.5  & 额定频率=60HZ",
+      "note": "额定电压>=72.5kV  & 额定频率==60Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -3734,26 +3280,6 @@
           "constraints": "用户录入，额定短路关合电流",
           "calc_rule": "",
           "derive_from_rated": "用户录入，额定短路关合电流"
-        },
-        {
-          "param_name": "结构特征",
-          "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "金短时间",
-          "value_text": "默认60ms",
-          "value_expr": "默认60ms",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "默认60ms",
-          "calc_rule": "",
-          "derive_from_rated": ""
         },
         {
           "param_name": "试验次数",
@@ -3820,7 +3346,7 @@
       ],
       "path_key": "短路性能型式试验 > 短路性能型式试验 > T100s(a)(60Hz)",
       "skip": false,
-      "note": "额定电压>=72.5  & 额定频率=60HZ",
+      "note": "额定电压>=72.5kV  & 额定频率==60Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -3881,26 +3407,6 @@
           "constraints": "用户录入，额定短路关合电流",
           "calc_rule": "",
           "derive_from_rated": "用户录入，额定短路关合电流"
-        },
-        {
-          "param_name": "结构特征",
-          "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "金短时间",
-          "value_text": "默认60ms",
-          "value_expr": "默认60ms",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "默认60ms",
-          "calc_rule": "",
-          "derive_from_rated": ""
         },
         {
           "param_name": "试验次数",
@@ -3967,7 +3473,7 @@
       ],
       "path_key": "型式试验 > 短路性能型式试验 > T100s(b)",
       "skip": false,
-      "note": "额定电压>=72.5  & 额定频率≠60HZ",
+      "note": "额定电压>=72.5kV  & 【额定频率==50HZ or 额定频率==50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -4028,16 +3534,6 @@
           "constraints": "用户录入，额定短路关合电流",
           "calc_rule": "",
           "derive_from_rated": "用户录入，额定短路关合电流"
-        },
-        {
-          "param_name": "结构特征",
-          "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "calc_rule": "",
-          "derive_from_rated": ""
         },
         {
           "param_name": "金短时间",
@@ -4124,7 +3620,7 @@
       ],
       "path_key": "短路性能型式试验 > 短路性能型式试验 > T100s(b)",
       "skip": false,
-      "note": "额定电压>=72.5  & 额定频率≠60HZ",
+      "note": "额定电压>=72.5kV  & 【额定频率==50HZ or 额定频率==50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -4185,16 +3681,6 @@
           "constraints": "用户录入，额定短路关合电流",
           "calc_rule": "",
           "derive_from_rated": "用户录入，额定短路关合电流"
-        },
-        {
-          "param_name": "结构特征",
-          "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "calc_rule": "",
-          "derive_from_rated": ""
         },
         {
           "param_name": "金短时间",
@@ -4281,7 +3767,7 @@
       ],
       "path_key": "型式试验 > 短路性能型式试验 > T100s(b)(60Hz)",
       "skip": false,
-      "note": "额定电压>=72.5  & 额定频率=60HZ",
+      "note": "额定电压>=72.5kV  & 【额定频率==60Hz or 额定频率==50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -4342,16 +3828,6 @@
           "constraints": "用户录入，额定短路关合电流",
           "calc_rule": "",
           "derive_from_rated": "用户录入，额定短路关合电流"
-        },
-        {
-          "param_name": "结构特征",
-          "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "calc_rule": "",
-          "derive_from_rated": ""
         },
         {
           "param_name": "金短时间",
@@ -4438,7 +3914,7 @@
       ],
       "path_key": "短路性能型式试验 > 短路性能型式试验 > T100s(b)(60Hz)",
       "skip": false,
-      "note": "额定电压>=72.5  & 额定频率=60HZ",
+      "note": "额定电压>=72.5kV  & 【额定频率==60Hz or 额定频率==50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -4499,16 +3975,6 @@
           "constraints": "用户录入，额定短路关合电流",
           "calc_rule": "",
           "derive_from_rated": "用户录入，额定短路关合电流"
-        },
-        {
-          "param_name": "结构特征",
-          "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "calc_rule": "",
-          "derive_from_rated": ""
         },
         {
           "param_name": "金短时间",
@@ -4758,18 +4224,18 @@
       "remove_parameters": [],
       "remove_rules": []
     },
-    "型式试验 > 短路性能型式试验 > T60(60HZ)": {
-      "test_name": "T60(60HZ)",
+    "型式试验 > 短路性能型式试验 > T60(60Hz)": {
+      "test_name": "T60(60Hz)",
       "report_type": "短路性能型式试验",
       "category": "短路性能型式试验",
       "path_parts": [
         "型式试验",
         "短路性能型式试验",
-        "T60(60HZ)"
+        "T60(60Hz)"
       ],
-      "path_key": "型式试验 > 短路性能型式试验 > T60(60HZ)",
+      "path_key": "型式试验 > 短路性能型式试验 > T60(60Hz)",
       "skip": false,
-      "note": "额定频率==60Hz",
+      "note": "额定频率==60Hz or 额定频率==50/60Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -4875,18 +4341,18 @@
       "remove_parameters": [],
       "remove_rules": []
     },
-    "短路性能型式试验 > 短路性能型式试验 > T60(60HZ)": {
-      "test_name": "T60(60HZ)",
+    "短路性能型式试验 > 短路性能型式试验 > T60(60Hz)": {
+      "test_name": "T60(60Hz)",
       "report_type": "短路性能型式试验",
       "category": "短路性能型式试验",
       "path_parts": [
         "型式试验",
         "短路性能型式试验",
-        "T60(60HZ)"
+        "T60(60Hz)"
       ],
-      "path_key": "短路性能型式试验 > 短路性能型式试验 > T60(60HZ)",
+      "path_key": "短路性能型式试验 > 短路性能型式试验 > T60(60Hz)",
       "skip": false,
-      "note": "额定频率==60Hz",
+      "note": "额定频率==60Hz or 额定频率==50/60Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -5280,16 +4746,6 @@
           "derive_from_rated": ""
         },
         {
-          "param_name": "试验电压",
-          "value_text": "GBT11022-2020表4查询",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "GBT11022-2020表4查询",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
           "param_name": "试验相数",
           "value_text": "72.5kv及以上需要判断断路器结构，用户声明共箱结构或三相共箱的以三相试验来做，分箱结构或三相分箱的以单相试验来做。",
           "value_expr": "72.5kv及以上需要判断断路器结构，用户声明共箱结构或三相共箱的以三相试验来做，分箱结构或三相分箱的以单相试验来做。",
@@ -5427,16 +4883,6 @@
           "derive_from_rated": ""
         },
         {
-          "param_name": "试验电压",
-          "value_text": "GBT11022-2020表4查询",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "GBT11022-2020表4查询",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
           "param_name": "试验相数",
           "value_text": "72.5kv及以上需要判断断路器结构，用户声明共箱结构或三相共箱的以三相试验来做，分箱结构或三相分箱的以单相试验来做。",
           "value_expr": "72.5kv及以上需要判断断路器结构，用户声明共箱结构或三相共箱的以三相试验来做，分箱结构或三相分箱的以单相试验来做。",
@@ -5544,16 +4990,6 @@
           "derive_from_rated": ""
         },
         {
-          "param_name": "额定频率",
-          "value_text": "用户录入额定频率，用户未录入默认50Hz",
-          "value_expr": "用户录入额定频率，用户未录入默认50Hz",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "用户录入额定频率，用户未录入默认50Hz",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
           "param_name": "试验次数",
           "value_text": "1次",
           "value_expr": "",
@@ -5657,16 +5093,6 @@
           "value_source": "standard",
           "value_type": "standard",
           "constraints": "用户录入）",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "额定频率",
-          "value_text": "用户录入额定频率，用户未录入默认50Hz",
-          "value_expr": "用户录入额定频率，用户未录入默认50Hz",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "用户录入额定频率，用户未录入默认50Hz",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -6039,7 +5465,7 @@
       ],
       "path_key": "型式试验 > 短路性能型式试验 > 短路开断试验(T10)",
       "skip": false,
-      "note": "额定频率≠60HZ",
+      "note": "额定频率==50Hz or 额定频率==50/60Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -6138,16 +5564,6 @@
           "value_source": "default",
           "value_type": "default",
           "constraints": "40.5kV及以下默认为三相，72.5kv以上默认单相",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "首开极系数",
-          "value_text": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-          "value_expr": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -6176,7 +5592,7 @@
       ],
       "path_key": "短路性能型式试验 > 短路性能型式试验 > 短路开断试验(T10)",
       "skip": false,
-      "note": "额定频率≠60HZ",
+      "note": "额定频率==50Hz or 额定频率==50/60Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -6279,16 +5695,6 @@
           "derive_from_rated": ""
         },
         {
-          "param_name": "首开极系数",
-          "value_text": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-          "value_expr": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
           "param_name": "外壳是否带电",
           "value_text": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
           "value_expr": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
@@ -6313,7 +5719,7 @@
       ],
       "path_key": "型式试验 > 短路性能型式试验 > 短路开断试验(T100A)",
       "skip": false,
-      "note": "额定频率≠60HZ",
+      "note": "额定频率==50Hz or 额定频率==50/60Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -6376,16 +5782,6 @@
           "derive_from_rated": "端子故障"
         },
         {
-          "param_name": "结构特征",
-          "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "value_expr": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
           "param_name": "失败次数",
           "value_text": "0次",
           "value_expr": "0次",
@@ -6442,16 +5838,6 @@
           "value_source": "standard",
           "value_type": "standard",
           "constraints": "40.5kV及以下固定3相；72.5kV及以上默认单相，当结构特征为三相共箱共机构试验相数为三相",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "首开极系数",
-          "value_text": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若用户录入按照用户录入进行试验",
-          "value_expr": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若用户录入按照用户录入进行试验",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若用户录入按照用户录入进行试验",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -6500,7 +5886,7 @@
       ],
       "path_key": "短路性能型式试验 > 短路性能型式试验 > 短路开断试验(T100A)",
       "skip": false,
-      "note": "额定频率≠60HZ",
+      "note": "额定频率==50Hz or 额定频率==50/60Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -6563,16 +5949,6 @@
           "derive_from_rated": "端子故障"
         },
         {
-          "param_name": "结构特征",
-          "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "value_expr": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
           "param_name": "失败次数",
           "value_text": "0次",
           "value_expr": "0次",
@@ -6633,16 +6009,6 @@
           "derive_from_rated": ""
         },
         {
-          "param_name": "首开极系数",
-          "value_text": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若用户录入按照用户录入进行试验",
-          "value_expr": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若用户录入按照用户录入进行试验",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若用户录入按照用户录入进行试验",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
           "param_name": "外壳是否带电",
           "value_text": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
           "value_expr": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
@@ -6687,7 +6053,7 @@
       ],
       "path_key": "型式试验 > 短路性能型式试验 > 短路开断试验(T100S)",
       "skip": false,
-      "note": "额定电压<=40.5kv & 额定频率≠60HZ",
+      "note": "额定电压<=40.5kv & 【额定频率==50HZ or 额定频率==50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -6760,16 +6126,6 @@
           "derive_from_rated": "用户录入额定短路关合电流"
         },
         {
-          "param_name": "结构特征",
-          "value_text": "40.5kV及以下不考虑",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "40.5kV及以下不考虑",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
           "param_name": "失败次数",
           "value_text": "0次",
           "value_expr": "0次",
@@ -6816,16 +6172,6 @@
           "value_source": "standard",
           "value_type": "standard",
           "constraints": "40.5kv一下默认三相",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "首开极系数",
-          "value_text": "40.5kV及以下默认为1.5",
-          "value_expr": "40.5kV及以下默认为1.5",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kV及以下默认为1.5",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -6854,7 +6200,7 @@
       ],
       "path_key": "短路性能型式试验 > 短路性能型式试验 > 短路开断试验(T100S)",
       "skip": false,
-      "note": "额定电压<=40.5kv & 额定频率≠60HZ",
+      "note": "额定电压<=40.5kv & 【额定频率==50HZ or 额定频率==50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -6927,16 +6273,6 @@
           "derive_from_rated": "用户录入额定短路关合电流"
         },
         {
-          "param_name": "结构特征",
-          "value_text": "40.5kV及以下不考虑",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "40.5kV及以下不考虑",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
           "param_name": "失败次数",
           "value_text": "0次",
           "value_expr": "0次",
@@ -6987,16 +6323,6 @@
           "derive_from_rated": ""
         },
         {
-          "param_name": "首开极系数",
-          "value_text": "40.5kV及以下默认为1.5",
-          "value_expr": "40.5kV及以下默认为1.5",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kV及以下默认为1.5",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
           "param_name": "外壳是否带电",
           "value_text": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
           "value_expr": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
@@ -7021,7 +6347,7 @@
       ],
       "path_key": "型式试验 > 短路性能型式试验 > 短路开断试验(T30)",
       "skip": false,
-      "note": "短路性能型式试验类型下必须执行",
+      "note": "额定频率==50Hz or 额定频率==50/60Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -7074,16 +6400,6 @@
           "derive_from_rated": "额定电压（用户录入）"
         },
         {
-          "param_name": "额定频率",
-          "value_text": "用户录入额定频率，用户未录入默认50Hz",
-          "value_expr": "用户录入额定频率，用户未录入默认50Hz",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户录入额定频率，用户未录入默认50Hz",
-          "calc_rule": "",
-          "derive_from_rated": "用户录入额定频率，用户未录入默认50Hz"
-        },
-        {
           "param_name": "失败次数",
           "value_text": "0次",
           "value_expr": "0次",
@@ -7130,16 +6446,6 @@
           "value_source": "default",
           "value_type": "default",
           "constraints": "72.5及以上为单相，40.5及以下三相",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "首开极系数kpp",
-          "value_text": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
-          "value_expr": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -7168,7 +6474,7 @@
       ],
       "path_key": "短路性能型式试验 > 短路性能型式试验 > 短路开断试验(T30)",
       "skip": false,
-      "note": "短路性能型式试验类型下必须执行",
+      "note": "额定频率==50Hz or 额定频率==50/60Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -7221,16 +6527,6 @@
           "derive_from_rated": "额定电压（用户录入）"
         },
         {
-          "param_name": "额定频率",
-          "value_text": "用户录入额定频率，用户未录入默认50Hz",
-          "value_expr": "用户录入额定频率，用户未录入默认50Hz",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户录入额定频率，用户未录入默认50Hz",
-          "calc_rule": "",
-          "derive_from_rated": "用户录入额定频率，用户未录入默认50Hz"
-        },
-        {
           "param_name": "失败次数",
           "value_text": "0次",
           "value_expr": "0次",
@@ -7281,16 +6577,6 @@
           "derive_from_rated": ""
         },
         {
-          "param_name": "首开极系数kpp",
-          "value_text": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
-          "value_expr": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
           "param_name": "外壳是否带电",
           "value_text": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
           "value_expr": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
@@ -7315,7 +6601,7 @@
       ],
       "path_key": "型式试验 > 短路性能型式试验 > 短路开断试验(T60)",
       "skip": false,
-      "note": "额定频率≠60HZ",
+      "note": "额定频率==50Hz or 额定频率==50/60Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -7462,7 +6748,7 @@
       ],
       "path_key": "短路性能型式试验 > 短路性能型式试验 > 短路开断试验(T60)",
       "skip": false,
-      "note": "额定频率≠60HZ",
+      "note": "额定频率==50Hz or 额定频率==50/60Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -7836,16 +7122,6 @@
           "derive_from_rated": "额定电压（用户录入）"
         },
         {
-          "param_name": "峰值电流kA",
-          "value_text": "用户录入的额定峰值耐受电流 kA",
-          "value_expr": "用户录入的额定峰值耐受电流 kA",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户录入的额定峰值耐受电流 kA",
-          "calc_rule": "",
-          "derive_from_rated": "用户录入的额定峰值耐受电流 kA"
-        },
-        {
           "param_name": "回路电阻(μΩ)",
           "value_text": "用户输入，未输入默认实测 μΩ",
           "value_expr": "",
@@ -7933,16 +7209,6 @@
           "derive_from_rated": "额定电压（用户录入）"
         },
         {
-          "param_name": "峰值电流kA",
-          "value_text": "用户录入的额定峰值耐受电流 kA",
-          "value_expr": "用户录入的额定峰值耐受电流 kA",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户录入的额定峰值耐受电流 kA",
-          "calc_rule": "",
-          "derive_from_rated": "用户录入的额定峰值耐受电流 kA"
-        },
-        {
           "param_name": "回路电阻(μΩ)",
           "value_text": "用户输入，未输入默认实测 μΩ",
           "value_expr": "",
@@ -7999,16 +7265,6 @@
       "skip": false,
       "note": "额定峰值电流/额定短时耐受电流≥2.6",
       "parameters": [
-        {
-          "param_name": "短路持续时间",
-          "value_text": "用户录入的额定短路持续时间，取值需要满足≤5S,>0.3S",
-          "value_expr": "用户录入的额定短路持续时间，取值需要满足≤5S,>0.3S",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户录入的额定短路持续时间，取值需要满足≤5S,>0.3S",
-          "calc_rule": "",
-          "derive_from_rated": "用户录入的额定短路持续时间，取值需要满足≤5S,>0.3S"
-        },
         {
           "param_name": "短时耐受电流",
           "value_text": "用户录入的额定短时耐受电流 kA",
@@ -8087,16 +7343,6 @@
       "note": "额定峰值电流/额定短时耐受电流≥2.6",
       "parameters": [
         {
-          "param_name": "短路持续时间",
-          "value_text": "用户录入的额定短路持续时间，取值需要满足≤5S,>0.3S",
-          "value_expr": "用户录入的额定短路持续时间，取值需要满足≤5S,>0.3S",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户录入的额定短路持续时间，取值需要满足≤5S,>0.3S",
-          "calc_rule": "",
-          "derive_from_rated": "用户录入的额定短路持续时间，取值需要满足≤5S,>0.3S"
-        },
-        {
           "param_name": "短时耐受电流",
           "value_text": "用户录入的额定短时耐受电流 kA",
           "value_expr": "用户录入的额定短时耐受电流 kA",
@@ -8153,80 +7399,6 @@
           "value_source": "standard",
           "value_type": "standard",
           "constraints": "1次",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        }
-      ],
-      "remove_parameters": [],
-      "remove_rules": []
-    },
-    "型式试验 > 温升性能型式试验 > 辅助和控制回路温升试验": {
-      "test_name": "辅助和控制回路温升试验",
-      "report_type": "温升性能型式试验",
-      "category": "温升性能型式试验",
-      "path_parts": [
-        "型式试验",
-        "温升性能型式试验",
-        "辅助和控制回路温升试验"
-      ],
-      "path_key": "型式试验 > 温升性能型式试验 > 辅助和控制回路温升试验",
-      "skip": false,
-      "note": "温升性能型式试验类型下必须执行",
-      "parameters": [
-        {
-          "param_name": "机构是否带合分闸线圈",
-          "value_text": "客户选择是或否；是则必做，否则可不做",
-          "value_expr": "客户选择是或否；是则必做，否则可不做",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "客户选择是或否；是则必做，否则可不做",
-          "calc_rule": "",
-          "derive_from_rated": "客户选择是或否；是则必做，否则可不做"
-        },
-        {
-          "param_name": "试验次数",
-          "value_text": "默认为1次",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "默认为1次",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        }
-      ],
-      "remove_parameters": [],
-      "remove_rules": []
-    },
-    "温升性能型式试验 > 温升性能型式试验 > 辅助和控制回路温升试验": {
-      "test_name": "辅助和控制回路温升试验",
-      "report_type": "温升性能型式试验",
-      "category": "温升性能型式试验",
-      "path_parts": [
-        "型式试验",
-        "温升性能型式试验",
-        "辅助和控制回路温升试验"
-      ],
-      "path_key": "温升性能型式试验 > 温升性能型式试验 > 辅助和控制回路温升试验",
-      "skip": false,
-      "note": "温升性能型式试验类型下必须执行",
-      "parameters": [
-        {
-          "param_name": "机构是否带合分闸线圈",
-          "value_text": "客户选择是或否；是则必做，否则可不做",
-          "value_expr": "客户选择是或否；是则必做，否则可不做",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "客户选择是或否；是则必做，否则可不做",
-          "calc_rule": "",
-          "derive_from_rated": "客户选择是或否；是则必做，否则可不做"
-        },
-        {
-          "param_name": "试验次数",
-          "value_text": "默认为1次",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "默认为1次",
           "calc_rule": "",
           "derive_from_rated": ""
         }
@@ -8499,7 +7671,7 @@
       ],
       "path_key": "型式试验 > 短路性能型式试验 > 近区故障试验(L75)",
       "skip": false,
-      "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 额定频率≠60HZ",
+      "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 【额定频率 == 50Hz or 额定频率 == 50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -8606,7 +7778,7 @@
       ],
       "path_key": "短路性能型式试验 > 短路性能型式试验 > 近区故障试验(L75)",
       "skip": false,
-      "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 额定频率≠60HZ",
+      "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 【额定频率 == 50Hz or 额定频率 == 50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -8713,7 +7885,7 @@
       ],
       "path_key": "型式试验 > 短路性能型式试验 > 近区故障试验(L90)",
       "skip": false,
-      "note": "断路器等级==S2（or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 额定频率≠60HZ",
+      "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压＞40.5kV & 额定短路开断电流＞12.5kA & 【额定频率 == 50Hz or 额定频率 == 50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -8820,7 +7992,7 @@
       ],
       "path_key": "短路性能型式试验 > 短路性能型式试验 > 近区故障试验(L90)",
       "skip": false,
-      "note": "断路器等级==S2（or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 额定频率≠60HZ",
+      "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压＞40.5kV & 额定短路开断电流＞12.5kA & 【额定频率 == 50Hz or 额定频率 == 50/60Hz】",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -9161,7 +8333,7 @@
       ],
       "path_key": "型式试验 > 短路性能型式试验 > 空载特性测量",
       "skip": false,
-      "note": "额定电压<72.5kV or contains_any [\"发电机断路器\", \"限流电抗器\"]",
+      "note": "额定电压<72.5kV",
       "parameters": [
         {
           "param_name": "试验次数",
@@ -9188,7 +8360,7 @@
       ],
       "path_key": "短路性能型式试验 > 短路性能型式试验 > 空载特性测量",
       "skip": false,
-      "note": "额定电压<72.5kV or contains_any [\"发电机断路器\", \"限流电抗器\"]",
+      "note": "额定电压<72.5kV",
       "parameters": [
         {
           "param_name": "试验次数",
@@ -9677,7 +8849,7 @@
       ],
       "path_key": "型式试验 > 温升性能型式试验 > 温升试验",
       "skip": false,
-      "note": "额定频率!=60Hz",
+      "note": "额定频率 == 50Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -9774,7 +8946,7 @@
       ],
       "path_key": "温升性能型式试验 > 温升性能型式试验 > 温升试验",
       "skip": false,
-      "note": "额定频率!=60Hz",
+      "note": "额定频率 == 50Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -9860,18 +9032,18 @@
       "remove_parameters": [],
       "remove_rules": []
     },
-    "型式试验 > 温升性能型式试验 > 温升试验(60HZ)": {
-      "test_name": "温升试验(60HZ)",
+    "型式试验 > 温升性能型式试验 > 温升试验(60Hz)": {
+      "test_name": "温升试验(60Hz)",
       "report_type": "温升性能型式试验",
       "category": "温升性能型式试验",
       "path_parts": [
         "型式试验",
         "温升性能型式试验",
-        "温升试验(60HZ)"
+        "温升试验(60Hz)"
       ],
-      "path_key": "型式试验 > 温升性能型式试验 > 温升试验(60HZ)",
+      "path_key": "型式试验 > 温升性能型式试验 > 温升试验(60Hz)",
       "skip": false,
-      "note": "额定频率==60Hz",
+      "note": "额定频率 == 50/60Hz or 额定频率 == 60Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -9932,33 +9104,23 @@
           "constraints": "40.5kV及以下默认三相，72.5kv及以上需要判断断路器结构，用户声明共箱结构或三相共箱的以三相试验来做，分箱结构或三相分箱的以单相试验来做。",
           "calc_rule": "",
           "derive_from_rated": ""
-        },
-        {
-          "param_name": "是否所配元件",
-          "value_text": "是/否",
-          "value_expr": "是/否",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "是/否",
-          "calc_rule": "",
-          "derive_from_rated": "是/否"
         }
       ],
       "remove_parameters": [],
       "remove_rules": []
     },
-    "温升性能型式试验 > 温升性能型式试验 > 温升试验(60HZ)": {
-      "test_name": "温升试验(60HZ)",
+    "温升性能型式试验 > 温升性能型式试验 > 温升试验(60Hz)": {
+      "test_name": "温升试验(60Hz)",
       "report_type": "温升性能型式试验",
       "category": "温升性能型式试验",
       "path_parts": [
         "型式试验",
         "温升性能型式试验",
-        "温升试验(60HZ)"
+        "温升试验(60Hz)"
       ],
-      "path_key": "温升性能型式试验 > 温升性能型式试验 > 温升试验(60HZ)",
+      "path_key": "温升性能型式试验 > 温升性能型式试验 > 温升试验(60Hz)",
       "skip": false,
-      "note": "额定频率==60Hz",
+      "note": "额定频率 == 50/60Hz or 额定频率 == 60Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -10019,16 +9181,6 @@
           "constraints": "40.5kV及以下默认三相，72.5kv及以上需要判断断路器结构，用户声明共箱结构或三相共箱的以三相试验来做，分箱结构或三相分箱的以单相试验来做。",
           "calc_rule": "",
           "derive_from_rated": ""
-        },
-        {
-          "param_name": "是否所配元件",
-          "value_text": "是/否",
-          "value_expr": "是/否",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "是/否",
-          "calc_rule": "",
-          "derive_from_rated": "是/否"
         }
       ],
       "remove_parameters": [],
@@ -10239,7 +9391,7 @@
       ],
       "path_key": "型式试验 > 开合性能型式试验 > 容性电流开断试验(BC1)",
       "skip": false,
-      "note": "【contains \"额定电容器组电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率!=60Hz",
+      "note": "【contains \"额定电容器组电流\"】and 额定频率== 50Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -10396,7 +9548,7 @@
       ],
       "path_key": "开合性能型式试验 > 开合性能型式试验 > 容性电流开断试验(BC1)",
       "skip": false,
-      "note": "【contains \"额定电容器组电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率!=60Hz",
+      "note": "【contains \"额定电容器组电流\"】and 额定频率== 50Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -10553,7 +9705,7 @@
       ],
       "path_key": "型式试验 > 开合性能型式试验 > 容性电流开断试验(BC2)",
       "skip": false,
-      "note": "【contains \"额定电容器组电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 额定频率!=60Hz",
+      "note": "【contains \"额定电容器组电流\"】and 额定频率== 50Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -10710,7 +9862,7 @@
       ],
       "path_key": "开合性能型式试验 > 开合性能型式试验 > 容性电流开断试验(BC2)",
       "skip": false,
-      "note": "【contains \"额定电容器组电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 额定频率!=60Hz",
+      "note": "【contains \"额定电容器组电流\"】and 额定频率== 50Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -10867,7 +10019,7 @@
       ],
       "path_key": "型式试验 > 开合性能型式试验 > 容性电流开断试验(CC1)",
       "skip": false,
-      "note": "【contains \"额定电缆充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】 and 额定频率!=60Hz",
+      "note": "【contains \"额定电缆充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】 and 额定频率==50Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -10994,7 +10146,7 @@
       ],
       "path_key": "开合性能型式试验 > 开合性能型式试验 > 容性电流开断试验(CC1)",
       "skip": false,
-      "note": "【contains \"额定电缆充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】 and 额定频率!=60Hz",
+      "note": "【contains \"额定电缆充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】 and 额定频率==50Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -11121,7 +10273,7 @@
       ],
       "path_key": "型式试验 > 开合性能型式试验 > 容性电流开断试验(CC2)",
       "skip": false,
-      "note": "【contains [\"额定电缆充电开断电流\",\"电缆充电开断电流\",\"额定电缆充电开合电流\",\"电缆充电开合电流\"] 其中之一 or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】 and 额定频率!=60Hz",
+      "note": "【contains \"额定电缆充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】 and 额定频率==50Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -11248,7 +10400,7 @@
       ],
       "path_key": "开合性能型式试验 > 开合性能型式试验 > 容性电流开断试验(CC2)",
       "skip": false,
-      "note": "【contains [\"额定电缆充电开断电流\",\"电缆充电开断电流\",\"额定电缆充电开合电流\",\"电缆充电开合电流\"] 其中之一 or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】 and 额定频率!=60Hz",
+      "note": "【contains \"额定电缆充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】 and 额定频率==50Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -11375,7 +10527,7 @@
       ],
       "path_key": "型式试验 > 开合性能型式试验 > 容性电流开断试验(LC1)",
       "skip": false,
-      "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率!=60Hz",
+      "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率==50Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -11502,7 +10654,7 @@
       ],
       "path_key": "开合性能型式试验 > 开合性能型式试验 > 容性电流开断试验(LC1)",
       "skip": false,
-      "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率!=60Hz",
+      "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率==50Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -11629,7 +10781,7 @@
       ],
       "path_key": "型式试验 > 开合性能型式试验 > 容性电流开断试验(LC2)",
       "skip": false,
-      "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率!=60Hz",
+      "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率==50Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -11756,7 +10908,7 @@
       ],
       "path_key": "开合性能型式试验 > 开合性能型式试验 > 容性电流开断试验(LC2)",
       "skip": false,
-      "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率!=60Hz",
+      "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率==50Hz",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -12278,16 +11430,6 @@
           "constraints": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
           "calc_rule": "",
           "derive_from_rated": "用户输入(判断取值是或者否)，未输入默认取值\"--\""
-        },
-        {
-          "param_name": "额定频率",
-          "value_text": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "value_expr": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "calc_rule": "",
-          "derive_from_rated": ""
         }
       ],
       "remove_parameters": [],
@@ -12425,16 +11567,6 @@
           "constraints": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
           "calc_rule": "",
           "derive_from_rated": "用户输入(判断取值是或者否)，未输入默认取值\"--\""
-        },
-        {
-          "param_name": "额定频率",
-          "value_text": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "value_expr": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "calc_rule": "",
-          "derive_from_rated": ""
         }
       ],
       "remove_parameters": [],
@@ -12504,16 +11636,6 @@
           "derive_from_rated": ""
         },
         {
-          "param_name": "额定频率",
-          "value_text": "用户录入额定频率，用户未录入默认50Hz",
-          "value_expr": "用户录入额定频率，用户未录入默认50Hz",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "用户录入额定频率，用户未录入默认50Hz",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
           "param_name": "试验次数",
           "value_text": "1次",
           "value_expr": "",
@@ -12552,16 +11674,6 @@
           "constraints": "单相",
           "calc_rule": "",
           "derive_from_rated": ""
-        },
-        {
-          "param_name": "外壳是否带电",
-          "value_text": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-          "value_expr": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-          "calc_rule": "",
-          "derive_from_rated": "用户输入(判断取值是或者否)，未输入默认取值\"--\""
         }
       ],
       "remove_parameters": [],
@@ -12631,16 +11743,6 @@
           "derive_from_rated": ""
         },
         {
-          "param_name": "额定频率",
-          "value_text": "用户录入额定频率，用户未录入默认50Hz",
-          "value_expr": "用户录入额定频率，用户未录入默认50Hz",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "用户录入额定频率，用户未录入默认50Hz",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
           "param_name": "试验次数",
           "value_text": "1次",
           "value_expr": "",
@@ -12679,16 +11781,6 @@
           "constraints": "单相",
           "calc_rule": "",
           "derive_from_rated": ""
-        },
-        {
-          "param_name": "外壳是否带电",
-          "value_text": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-          "value_expr": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-          "calc_rule": "",
-          "derive_from_rated": "用户输入(判断取值是或者否)，未输入默认取值\"--\""
         }
       ],
       "remove_parameters": [],
@@ -13563,22 +12655,196 @@
       ],
       "remove_parameters": [],
       "remove_rules": []
+    },
+    "型式试验 > 短路性能型式试验 > 作为状态检查的T10试验": {
+      "test_name": "作为状态检查的T10试验",
+      "report_type": "短路性能型式试验",
+      "category": "短路性能型式试验",
+      "path_parts": [
+        "型式试验",
+        "短路性能型式试验",
+        "作为状态检查的T10试验"
+      ],
+      "path_key": "型式试验 > 短路性能型式试验 > 作为状态检查的T10试验",
+      "skip": false,
+      "note": "真空断路器 and contain【SF6气体的额定压力(20℃表压)】",
+      "parameters": [
+        {
+          "param_name": "额定电压",
+          "value_text": "用户输入",
+          "value_expr": "用户输入",
+          "value_source": "user_input",
+          "value_type": "user_input",
+          "constraints": "用户输入",
+          "calc_rule": "",
+          "derive_from_rated": "用户输入"
+        },
+        {
+          "param_name": "试验电压",
+          "value_text": "40.5kV及以下：额定电压/2；72.5kv及以上：额定电压/根3/2",
+          "value_expr": "",
+          "value_source": "fomula",
+          "value_type": "fomula",
+          "constraints": "40.5kV及以下：额定电压/2；72.5kv及以上：额定电压/根3/2",
+          "calc_rule": "",
+          "derive_from_rated": ""
+        },
+        {
+          "param_name": "试验电流kA",
+          "value_text": "额定短路开断电流*10%",
+          "value_expr": "",
+          "value_source": "fomula",
+          "value_type": "fomula",
+          "constraints": "额定短路开断电流*10%",
+          "calc_rule": "",
+          "derive_from_rated": ""
+        },
+        {
+          "param_name": "试验相数",
+          "value_text": "40.5kV及以下默认为三相、72.5kv及以上默认为单相",
+          "value_expr": "",
+          "value_source": "standard",
+          "value_type": "standard",
+          "constraints": "40.5kV及以下默认为三相、72.5kv及以上默认为单相",
+          "calc_rule": "",
+          "derive_from_rated": ""
+        },
+        {
+          "param_name": "操作顺序",
+          "value_text": "O",
+          "value_expr": "",
+          "value_source": "standard",
+          "value_type": "standard",
+          "constraints": "O",
+          "calc_rule": "",
+          "derive_from_rated": ""
+        },
+        {
+          "param_name": "SF6气体的最低功能压力(20℃表压)",
+          "value_text": "用户输入",
+          "value_expr": "用户输入",
+          "value_source": "user_input",
+          "value_type": "user_input",
+          "constraints": "用户输入",
+          "calc_rule": "",
+          "derive_from_rated": "用户输入"
+        },
+        {
+          "param_name": "试验次数",
+          "value_text": "1次",
+          "value_expr": "",
+          "value_source": "standard",
+          "value_type": "standard",
+          "constraints": "1次",
+          "calc_rule": "",
+          "derive_from_rated": ""
+        }
+      ],
+      "remove_parameters": [],
+      "remove_rules": []
+    },
+    "短路性能型式试验 > 短路性能型式试验 > 作为状态检查的T10试验": {
+      "test_name": "作为状态检查的T10试验",
+      "report_type": "短路性能型式试验",
+      "category": "短路性能型式试验",
+      "path_parts": [
+        "型式试验",
+        "短路性能型式试验",
+        "作为状态检查的T10试验"
+      ],
+      "path_key": "短路性能型式试验 > 短路性能型式试验 > 作为状态检查的T10试验",
+      "skip": false,
+      "note": "真空断路器 and contain【SF6气体的额定压力(20℃表压)】",
+      "parameters": [
+        {
+          "param_name": "额定电压",
+          "value_text": "用户输入",
+          "value_expr": "用户输入",
+          "value_source": "user_input",
+          "value_type": "user_input",
+          "constraints": "用户输入",
+          "calc_rule": "",
+          "derive_from_rated": "用户输入"
+        },
+        {
+          "param_name": "试验电压",
+          "value_text": "40.5kV及以下：额定电压/2；72.5kv及以上：额定电压/根3/2",
+          "value_expr": "",
+          "value_source": "fomula",
+          "value_type": "fomula",
+          "constraints": "40.5kV及以下：额定电压/2；72.5kv及以上：额定电压/根3/2",
+          "calc_rule": "",
+          "derive_from_rated": ""
+        },
+        {
+          "param_name": "试验电流kA",
+          "value_text": "额定短路开断电流*10%",
+          "value_expr": "",
+          "value_source": "fomula",
+          "value_type": "fomula",
+          "constraints": "额定短路开断电流*10%",
+          "calc_rule": "",
+          "derive_from_rated": ""
+        },
+        {
+          "param_name": "试验相数",
+          "value_text": "40.5kV及以下默认为三相、72.5kv及以上默认为单相",
+          "value_expr": "",
+          "value_source": "standard",
+          "value_type": "standard",
+          "constraints": "40.5kV及以下默认为三相、72.5kv及以上默认为单相",
+          "calc_rule": "",
+          "derive_from_rated": ""
+        },
+        {
+          "param_name": "操作顺序",
+          "value_text": "O",
+          "value_expr": "",
+          "value_source": "standard",
+          "value_type": "standard",
+          "constraints": "O",
+          "calc_rule": "",
+          "derive_from_rated": ""
+        },
+        {
+          "param_name": "SF6气体的最低功能压力(20℃表压)",
+          "value_text": "用户输入",
+          "value_expr": "用户输入",
+          "value_source": "user_input",
+          "value_type": "user_input",
+          "constraints": "用户输入",
+          "calc_rule": "",
+          "derive_from_rated": "用户输入"
+        },
+        {
+          "param_name": "试验次数",
+          "value_text": "1次",
+          "value_expr": "",
+          "value_source": "standard",
+          "value_type": "standard",
+          "constraints": "1次",
+          "calc_rule": "",
+          "derive_from_rated": ""
+        }
+      ],
+      "remove_parameters": [],
+      "remove_rules": []
     }
   },
   "tests_by_name": {
-    "BC1(60HZ)": [
+    "BC1(60Hz)": [
       {
-        "test_name": "BC1(60HZ)",
+        "test_name": "BC1(60Hz)",
         "report_type": "开合性能型式试验",
         "category": "开合性能型式试验",
         "path_parts": [
           "型式试验",
           "开合性能型式试验",
-          "BC1(60HZ)"
+          "BC1(60Hz)"
         ],
-        "path_key": "型式试验 > 开合性能型式试验 > BC1(60HZ)",
+        "path_key": "型式试验 > 开合性能型式试验 > BC1(60Hz)",
         "skip": false,
-        "note": "【contains \"额定电容器组电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 额定频率==60Hz",
+        "note": "【contains \"额定电容器组电流\" 】 and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -13725,17 +12991,17 @@
         "remove_rules": []
       },
       {
-        "test_name": "BC1(60HZ)",
+        "test_name": "BC1(60Hz)",
         "report_type": "开合性能型式试验",
         "category": "开合性能型式试验",
         "path_parts": [
           "型式试验",
           "开合性能型式试验",
-          "BC1(60HZ)"
+          "BC1(60Hz)"
         ],
-        "path_key": "开合性能型式试验 > 开合性能型式试验 > BC1(60HZ)",
+        "path_key": "开合性能型式试验 > 开合性能型式试验 > BC1(60Hz)",
         "skip": false,
-        "note": "【contains \"额定电容器组电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 额定频率==60Hz",
+        "note": "【contains \"额定电容器组电流\" 】 and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -13882,19 +13148,19 @@
         "remove_rules": []
       }
     ],
-    "BC2(60HZ)": [
+    "BC2(60Hz)": [
       {
-        "test_name": "BC2(60HZ)",
+        "test_name": "BC2(60Hz)",
         "report_type": "开合性能型式试验",
         "category": "开合性能型式试验",
         "path_parts": [
           "型式试验",
           "开合性能型式试验",
-          "BC2(60HZ)"
+          "BC2(60Hz)"
         ],
-        "path_key": "型式试验 > 开合性能型式试验 > BC2(60HZ)",
+        "path_key": "型式试验 > 开合性能型式试验 > BC2(60Hz)",
         "skip": false,
-        "note": "【contains \"额定电容器组电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】and 额定频率 ==60HZ",
+        "note": "【contains \"额定电容器组电流\" 】 and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -14041,17 +13307,17 @@
         "remove_rules": []
       },
       {
-        "test_name": "BC2(60HZ)",
+        "test_name": "BC2(60Hz)",
         "report_type": "开合性能型式试验",
         "category": "开合性能型式试验",
         "path_parts": [
           "型式试验",
           "开合性能型式试验",
-          "BC2(60HZ)"
+          "BC2(60Hz)"
         ],
-        "path_key": "开合性能型式试验 > 开合性能型式试验 > BC2(60HZ)",
+        "path_key": "开合性能型式试验 > 开合性能型式试验 > BC2(60Hz)",
         "skip": false,
-        "note": "【contains \"额定电容器组电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】and 额定频率 ==60HZ",
+        "note": "【contains \"额定电容器组电流\" 】 and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -14198,19 +13464,19 @@
         "remove_rules": []
       }
     ],
-    "CC1(60HZ)": [
+    "CC1(60Hz)": [
       {
-        "test_name": "CC1(60HZ)",
+        "test_name": "CC1(60Hz)",
         "report_type": "开合性能型式试验",
         "category": "开合性能型式试验",
         "path_parts": [
           "型式试验",
           "开合性能型式试验",
-          "CC1(60HZ)"
+          "CC1(60Hz)"
         ],
-        "path_key": "型式试验 > 开合性能型式试验 > CC1(60HZ)",
+        "path_key": "型式试验 > 开合性能型式试验 > CC1(60Hz)",
         "skip": false,
-        "note": "【contains \"额定电缆充电电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 额定频率==60Hz",
+        "note": "【contains \"额定电缆充电电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -14327,17 +13593,17 @@
         "remove_rules": []
       },
       {
-        "test_name": "CC1(60HZ)",
+        "test_name": "CC1(60Hz)",
         "report_type": "开合性能型式试验",
         "category": "开合性能型式试验",
         "path_parts": [
           "型式试验",
           "开合性能型式试验",
-          "CC1(60HZ)"
+          "CC1(60Hz)"
         ],
-        "path_key": "开合性能型式试验 > 开合性能型式试验 > CC1(60HZ)",
+        "path_key": "开合性能型式试验 > 开合性能型式试验 > CC1(60Hz)",
         "skip": false,
-        "note": "【contains \"额定电缆充电电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 额定频率==60Hz",
+        "note": "【contains \"额定电缆充电电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -14454,19 +13720,19 @@
         "remove_rules": []
       }
     ],
-    "CC2(60HZ)": [
+    "CC2(60Hz)": [
       {
-        "test_name": "CC2(60HZ)",
+        "test_name": "CC2(60Hz)",
         "report_type": "开合性能型式试验",
         "category": "开合性能型式试验",
         "path_parts": [
           "型式试验",
           "开合性能型式试验",
-          "CC2(60HZ)"
+          "CC2(60Hz)"
         ],
-        "path_key": "型式试验 > 开合性能型式试验 > CC2(60HZ)",
+        "path_key": "型式试验 > 开合性能型式试验 > CC2(60Hz)",
         "skip": false,
-        "note": "contains [\"额定电缆充电开断电流\",\"电缆充电开断电流\",\"额定电缆充电开合电流\"] 其中之一\nand 额定频率==60Hz",
+        "note": "【contains \"额定电缆充电电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -14583,17 +13849,17 @@
         "remove_rules": []
       },
       {
-        "test_name": "CC2(60HZ)",
+        "test_name": "CC2(60Hz)",
         "report_type": "开合性能型式试验",
         "category": "开合性能型式试验",
         "path_parts": [
           "型式试验",
           "开合性能型式试验",
-          "CC2(60HZ)"
+          "CC2(60Hz)"
         ],
-        "path_key": "开合性能型式试验 > 开合性能型式试验 > CC2(60HZ)",
+        "path_key": "开合性能型式试验 > 开合性能型式试验 > CC2(60Hz)",
         "skip": false,
-        "note": "contains [\"额定电缆充电开断电流\",\"电缆充电开断电流\",\"额定电缆充电开合电流\"] 其中之一\nand 额定频率==60Hz",
+        "note": "【contains \"额定电缆充电电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -14710,19 +13976,19 @@
         "remove_rules": []
       }
     ],
-    "L75(60HZ)": [
+    "L75(60Hz)": [
       {
-        "test_name": "L75(60HZ)",
+        "test_name": "L75(60Hz)",
         "report_type": "短路性能型式试验",
         "category": "短路性能型式试验",
         "path_parts": [
           "型式试验",
           "短路性能型式试验",
-          "L75(60HZ)"
+          "L75(60Hz)"
         ],
-        "path_key": "型式试验 > 短路性能型式试验 > L75(60HZ)",
+        "path_key": "型式试验 > 短路性能型式试验 > L75(60Hz)",
         "skip": false,
-        "note": "断路器等级==S2（or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA and 额定频率==60HZ",
+        "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 【额定频率 == 60Hz or 额定频率 == 50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -14819,17 +14085,17 @@
         "remove_rules": []
       },
       {
-        "test_name": "L75(60HZ)",
+        "test_name": "L75(60Hz)",
         "report_type": "短路性能型式试验",
         "category": "短路性能型式试验",
         "path_parts": [
           "型式试验",
           "短路性能型式试验",
-          "L75(60HZ)"
+          "L75(60Hz)"
         ],
-        "path_key": "短路性能型式试验 > 短路性能型式试验 > L75(60HZ)",
+        "path_key": "短路性能型式试验 > 短路性能型式试验 > L75(60Hz)",
         "skip": false,
-        "note": "断路器等级==S2（or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA and 额定频率==60HZ",
+        "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 【额定频率 == 60Hz or 额定频率 == 50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -14926,19 +14192,19 @@
         "remove_rules": []
       }
     ],
-    "L90(60HZ)": [
+    "L90(60Hz)": [
       {
-        "test_name": "L90(60HZ)",
+        "test_name": "L90(60Hz)",
         "report_type": "短路性能型式试验",
         "category": "短路性能型式试验",
         "path_parts": [
           "型式试验",
           "短路性能型式试验",
-          "L90(60HZ)"
+          "L90(60Hz)"
         ],
-        "path_key": "型式试验 > 短路性能型式试验 > L90(60HZ)",
+        "path_key": "型式试验 > 短路性能型式试验 > L90(60Hz)",
         "skip": false,
-        "note": "断路器等级==S2（额定电压>72.5kV视为S2） and 额定电压≥24kV and 额定短路开断电流＞12.5kA and 额定频率==60HZ",
+        "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 【额定频率 == 60Hz or 额定频率 == 50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -15035,17 +14301,17 @@
         "remove_rules": []
       },
       {
-        "test_name": "L90(60HZ)",
+        "test_name": "L90(60Hz)",
         "report_type": "短路性能型式试验",
         "category": "短路性能型式试验",
         "path_parts": [
           "型式试验",
           "短路性能型式试验",
-          "L90(60HZ)"
+          "L90(60Hz)"
         ],
-        "path_key": "短路性能型式试验 > 短路性能型式试验 > L90(60HZ)",
+        "path_key": "短路性能型式试验 > 短路性能型式试验 > L90(60Hz)",
         "skip": false,
-        "note": "断路器等级==S2（额定电压>72.5kV视为S2） and 额定电压≥24kV and 额定短路开断电流＞12.5kA and 额定频率==60HZ",
+        "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 【额定频率 == 60Hz or 额定频率 == 50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -15142,19 +14408,19 @@
         "remove_rules": []
       }
     ],
-    "LC1(60HZ)": [
+    "LC1(60Hz)": [
       {
-        "test_name": "LC1(60HZ)",
+        "test_name": "LC1(60Hz)",
         "report_type": "开合性能型式试验",
         "category": "开合性能型式试验",
         "path_parts": [
           "型式试验",
           "开合性能型式试验",
-          "LC1(60HZ)"
+          "LC1(60Hz)"
         ],
-        "path_key": "型式试验 > 开合性能型式试验 > LC1(60HZ)",
+        "path_key": "型式试验 > 开合性能型式试验 > LC1(60Hz)",
         "skip": false,
-        "note": "contains \"额定线路充电电流\" and 额定频率==60Hz",
+        "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -15271,17 +14537,17 @@
         "remove_rules": []
       },
       {
-        "test_name": "LC1(60HZ)",
+        "test_name": "LC1(60Hz)",
         "report_type": "开合性能型式试验",
         "category": "开合性能型式试验",
         "path_parts": [
           "型式试验",
           "开合性能型式试验",
-          "LC1(60HZ)"
+          "LC1(60Hz)"
         ],
-        "path_key": "开合性能型式试验 > 开合性能型式试验 > LC1(60HZ)",
+        "path_key": "开合性能型式试验 > 开合性能型式试验 > LC1(60Hz)",
         "skip": false,
-        "note": "contains \"额定线路充电电流\" and 额定频率==60Hz",
+        "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -15398,19 +14664,19 @@
         "remove_rules": []
       }
     ],
-    "LC2(60HZ)": [
+    "LC2(60Hz)": [
       {
-        "test_name": "LC2(60HZ)",
+        "test_name": "LC2(60Hz)",
         "report_type": "开合性能型式试验",
         "category": "开合性能型式试验",
         "path_parts": [
           "型式试验",
           "开合性能型式试验",
-          "LC2(60HZ)"
+          "LC2(60Hz)"
         ],
-        "path_key": "型式试验 > 开合性能型式试验 > LC2(60HZ)",
+        "path_key": "型式试验 > 开合性能型式试验 > LC2(60Hz)",
         "skip": false,
-        "note": "contains \"额定线路充电电流\" and 额定频率==60Hz",
+        "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -15527,17 +14793,17 @@
         "remove_rules": []
       },
       {
-        "test_name": "LC2(60HZ)",
+        "test_name": "LC2(60Hz)",
         "report_type": "开合性能型式试验",
         "category": "开合性能型式试验",
         "path_parts": [
           "型式试验",
           "开合性能型式试验",
-          "LC2(60HZ)"
+          "LC2(60Hz)"
         ],
-        "path_key": "开合性能型式试验 > 开合性能型式试验 > LC2(60HZ)",
+        "path_key": "开合性能型式试验 > 开合性能型式试验 > LC2(60Hz)",
         "skip": false,
-        "note": "contains \"额定线路充电电流\" and 额定频率==60Hz",
+        "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -15719,36 +14985,6 @@
             "derive_from_rated": "用户输入额定电压值"
           },
           {
-            "param_name": "额定频率",
-            "value_text": "用户录入额定频率，用户未录入默认50Hz Hz",
-            "value_expr": "用户录入额定频率，用户未录入默认50Hz Hz",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "用户录入额定频率，用户未录入默认50Hz Hz",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "发电机额定容量",
-            "value_text": "按系统配置确定",
-            "value_expr": "按系统配置确定",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "按系统配置确定",
-            "calc_rule": "",
-            "derive_from_rated": "按系统配置确定"
-          },
-          {
-            "param_name": "故障类型",
-            "value_text": "失步故障",
-            "value_expr": "失步故障",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "失步故障",
-            "calc_rule": "",
-            "derive_from_rated": "失步故障"
-          },
-          {
             "param_name": "试验次数",
             "value_text": "1次",
             "value_expr": "",
@@ -15866,36 +15102,6 @@
             "derive_from_rated": "用户输入额定电压值"
           },
           {
-            "param_name": "额定频率",
-            "value_text": "用户录入额定频率，用户未录入默认50Hz Hz",
-            "value_expr": "用户录入额定频率，用户未录入默认50Hz Hz",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "用户录入额定频率，用户未录入默认50Hz Hz",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "发电机额定容量",
-            "value_text": "按系统配置确定",
-            "value_expr": "按系统配置确定",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "按系统配置确定",
-            "calc_rule": "",
-            "derive_from_rated": "按系统配置确定"
-          },
-          {
-            "param_name": "故障类型",
-            "value_text": "失步故障",
-            "value_expr": "失步故障",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "失步故障",
-            "calc_rule": "",
-            "derive_from_rated": "失步故障"
-          },
-          {
             "param_name": "试验次数",
             "value_text": "1次",
             "value_expr": "",
@@ -15950,295 +15156,19 @@
         "remove_rules": []
       }
     ],
-    "T10(60Hz)": [
+    "T100A(60Hz)": [
       {
-        "test_name": "T10(60Hz)",
+        "test_name": "T100A(60Hz)",
         "report_type": "短路性能型式试验",
         "category": "短路性能型式试验",
         "path_parts": [
           "型式试验",
           "短路性能型式试验",
-          "T10(60Hz)"
+          "T100A(60Hz)"
         ],
-        "path_key": "型式试验 > 短路性能型式试验 > T10(60Hz)",
+        "path_key": "型式试验 > 短路性能型式试验 > T100A(60Hz)",
         "skip": false,
-        "note": "额定频率==60HZ",
-        "parameters": [
-          {
-            "param_name": "SF6气体的最低功能压力(20℃表压)",
-            "value_text": "用户输入，未输入默认取值\"--\"",
-            "value_expr": "用户输入，未输入默认取值\"--\"",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户输入，未输入默认取值\"--\"",
-            "calc_rule": "",
-            "derive_from_rated": "用户输入，未输入默认取值\"--\""
-          },
-          {
-            "param_name": "不均匀系数",
-            "value_text": "用户输入多断口则取值1.05，输入单断口取值为1，其他情况默认取值为1",
-            "value_expr": "用户输入多断口则取值1.05，输入单断口取值为1，其他情况默认取值为1",
-            "value_source": "formula",
-            "value_type": "formula",
-            "constraints": "用户输入多断口则取值1.05，输入单断口取值为1，其他情况默认取值为1",
-            "calc_rule": "用户输入多断口则取值1.05，输入单断口取值为1，其他情况默认取值为1",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "操作顺序",
-            "value_text": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-            "value_expr": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "断路器等级",
-            "value_text": "40.5kv及以下默认S1，72.5kv以上按照用户输入，未输入默认按S2进行试验,但最终取值输出为\"--\"；\n①40.5kv及以下默认S1，若用户输入则按照用户输入进行试验；\n②72.5kv无默认值，按照用户输入进行试验；\n③72.5kV以上无断路器等级概念，但最终取值输出为\"--\"。",
-            "value_expr": "40.5kv及以下默认S1，72.5kv以上按照用户输入，未输入默认按S2进行试验,但最终取值输出为\"--\"；\n①40.5kv及以下默认S1，若用户输入则按照用户输入进行试验；\n②72.5kv无默认值，按照用户输入进行试验；\n③72.5kV以上无断路器等级概念，但最终取值输出为\"--\"。",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "40.5kv及以下默认S1，72.5kv以上按照用户输入，未输入默认按S2进行试验,但最终取值输出为\"--\"；\n①40.5kv及以下默认S1，若用户输入则按照用户输入进行试验；\n②72.5kv无默认值，按照用户输入进行试验；\n③72.5kV以上无断路器等级概念，但最终取值输出为\"--\"。",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "额定电压",
-            "value_text": "额定电压（用户录入）",
-            "value_expr": "额定电压（用户录入）",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "额定电压（用户录入）",
-            "calc_rule": "",
-            "derive_from_rated": "额定电压（用户录入）"
-          },
-          {
-            "param_name": "失败次数",
-            "value_text": "0次",
-            "value_expr": "0次",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "0次",
-            "calc_rule": "",
-            "derive_from_rated": "0次"
-          },
-          {
-            "param_name": "试验次数",
-            "value_text": "1次",
-            "value_expr": "1次",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "1次",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "试验电流kA",
-            "value_text": "用户输入额定短路开断电流*10%",
-            "value_expr": "用户输入额定短路开断电流*10%",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户输入额定短路开断电流*10%",
-            "calc_rule": "",
-            "derive_from_rated": "用户输入额定短路开断电流*10%"
-          },
-          {
-            "param_name": "试验电压",
-            "value_text": "40.5kV及以下为额定电压，72.5kV及以上为额定电压/根3*首开极系数/断口数量*不均匀系数",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "40.5kV及以下为额定电压，72.5kV及以上为额定电压/根3*首开极系数/断口数量*不均匀系数",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "试验相数",
-            "value_text": "40.5kV及以下默认为三相，72.5kv以上默认单相",
-            "value_expr": "40.5kV及以下默认为三相，72.5kv以上默认单相",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "40.5kV及以下默认为三相，72.5kv以上默认单相",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "首开极系数",
-            "value_text": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-            "value_expr": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "外壳是否带电",
-            "value_text": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-            "value_expr": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-            "calc_rule": "",
-            "derive_from_rated": "用户输入(判断取值是或者否)，未输入默认取值\"--\""
-          }
-        ],
-        "remove_parameters": [],
-        "remove_rules": []
-      },
-      {
-        "test_name": "T10(60Hz)",
-        "report_type": "短路性能型式试验",
-        "category": "短路性能型式试验",
-        "path_parts": [
-          "型式试验",
-          "短路性能型式试验",
-          "T10(60Hz)"
-        ],
-        "path_key": "短路性能型式试验 > 短路性能型式试验 > T10(60Hz)",
-        "skip": false,
-        "note": "额定频率==60HZ",
-        "parameters": [
-          {
-            "param_name": "SF6气体的最低功能压力(20℃表压)",
-            "value_text": "用户输入，未输入默认取值\"--\"",
-            "value_expr": "用户输入，未输入默认取值\"--\"",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户输入，未输入默认取值\"--\"",
-            "calc_rule": "",
-            "derive_from_rated": "用户输入，未输入默认取值\"--\""
-          },
-          {
-            "param_name": "不均匀系数",
-            "value_text": "用户输入多断口则取值1.05，输入单断口取值为1，其他情况默认取值为1",
-            "value_expr": "用户输入多断口则取值1.05，输入单断口取值为1，其他情况默认取值为1",
-            "value_source": "formula",
-            "value_type": "formula",
-            "constraints": "用户输入多断口则取值1.05，输入单断口取值为1，其他情况默认取值为1",
-            "calc_rule": "用户输入多断口则取值1.05，输入单断口取值为1，其他情况默认取值为1",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "操作顺序",
-            "value_text": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-            "value_expr": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "断路器等级",
-            "value_text": "40.5kv及以下默认S1，72.5kv以上按照用户输入，未输入默认按S2进行试验,但最终取值输出为\"--\"；\n①40.5kv及以下默认S1，若用户输入则按照用户输入进行试验；\n②72.5kv无默认值，按照用户输入进行试验；\n③72.5kV以上无断路器等级概念，但最终取值输出为\"--\"。",
-            "value_expr": "40.5kv及以下默认S1，72.5kv以上按照用户输入，未输入默认按S2进行试验,但最终取值输出为\"--\"；\n①40.5kv及以下默认S1，若用户输入则按照用户输入进行试验；\n②72.5kv无默认值，按照用户输入进行试验；\n③72.5kV以上无断路器等级概念，但最终取值输出为\"--\"。",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "40.5kv及以下默认S1，72.5kv以上按照用户输入，未输入默认按S2进行试验,但最终取值输出为\"--\"；\n①40.5kv及以下默认S1，若用户输入则按照用户输入进行试验；\n②72.5kv无默认值，按照用户输入进行试验；\n③72.5kV以上无断路器等级概念，但最终取值输出为\"--\"。",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "额定电压",
-            "value_text": "额定电压（用户录入）",
-            "value_expr": "额定电压（用户录入）",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "额定电压（用户录入）",
-            "calc_rule": "",
-            "derive_from_rated": "额定电压（用户录入）"
-          },
-          {
-            "param_name": "失败次数",
-            "value_text": "0次",
-            "value_expr": "0次",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "0次",
-            "calc_rule": "",
-            "derive_from_rated": "0次"
-          },
-          {
-            "param_name": "试验次数",
-            "value_text": "1次",
-            "value_expr": "1次",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "1次",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "试验电流kA",
-            "value_text": "用户输入额定短路开断电流*10%",
-            "value_expr": "用户输入额定短路开断电流*10%",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户输入额定短路开断电流*10%",
-            "calc_rule": "",
-            "derive_from_rated": "用户输入额定短路开断电流*10%"
-          },
-          {
-            "param_name": "试验电压",
-            "value_text": "40.5kV及以下为额定电压，72.5kV及以上为额定电压/根3*首开极系数/断口数量*不均匀系数",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "40.5kV及以下为额定电压，72.5kV及以上为额定电压/根3*首开极系数/断口数量*不均匀系数",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "试验相数",
-            "value_text": "40.5kV及以下默认为三相，72.5kv以上默认单相",
-            "value_expr": "40.5kV及以下默认为三相，72.5kv以上默认单相",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "40.5kV及以下默认为三相，72.5kv以上默认单相",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "首开极系数",
-            "value_text": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-            "value_expr": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "外壳是否带电",
-            "value_text": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-            "value_expr": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-            "calc_rule": "",
-            "derive_from_rated": "用户输入(判断取值是或者否)，未输入默认取值\"--\""
-          }
-        ],
-        "remove_parameters": [],
-        "remove_rules": []
-      }
-    ],
-    "T100A(60HZ)": [
-      {
-        "test_name": "T100A(60HZ)",
-        "report_type": "短路性能型式试验",
-        "category": "短路性能型式试验",
-        "path_parts": [
-          "型式试验",
-          "短路性能型式试验",
-          "T100A(60HZ)"
-        ],
-        "path_key": "型式试验 > 短路性能型式试验 > T100A(60HZ)",
-        "skip": false,
-        "note": "额定频率==60Hz",
+        "note": "额定频率==60Hz or 额定频率==50/60Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -16415,17 +15345,17 @@
         "remove_rules": []
       },
       {
-        "test_name": "T100A(60HZ)",
+        "test_name": "T100A(60Hz)",
         "report_type": "短路性能型式试验",
         "category": "短路性能型式试验",
         "path_parts": [
           "型式试验",
           "短路性能型式试验",
-          "T100A(60HZ)"
+          "T100A(60Hz)"
         ],
-        "path_key": "短路性能型式试验 > 短路性能型式试验 > T100A(60HZ)",
+        "path_key": "短路性能型式试验 > 短路性能型式试验 > T100A(60Hz)",
         "skip": false,
-        "note": "额定频率==60Hz",
+        "note": "额定频率==60Hz or 额定频率==50/60Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -16602,19 +15532,19 @@
         "remove_rules": []
       }
     ],
-    "T100S(60HZ)": [
+    "T100S(60Hz)": [
       {
-        "test_name": "T100S(60HZ)",
+        "test_name": "T100S(60Hz)",
         "report_type": "短路性能型式试验",
         "category": "短路性能型式试验",
         "path_parts": [
           "型式试验",
           "短路性能型式试验",
-          "T100S(60HZ)"
+          "T100S(60Hz)"
         ],
-        "path_key": "型式试验 > 短路性能型式试验 > T100S(60HZ)",
+        "path_key": "型式试验 > 短路性能型式试验 > T100S(60Hz)",
         "skip": false,
-        "note": "额定电压<40.5kv and 额定频率==60Hz\n（验证100%对称短路开断电流）",
+        "note": "额定电压<=40.5kv & 【额定频率==60Hz or 额定频率==50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -16687,26 +15617,6 @@
             "derive_from_rated": "用户录入额定短路关合电流"
           },
           {
-            "param_name": "结构特征",
-            "value_text": "40.5kV及以下不考虑",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "40.5kV及以下不考虑",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "失败次数",
-            "value_text": "0次",
-            "value_expr": "0次",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "0次",
-            "calc_rule": "",
-            "derive_from_rated": "0次"
-          },
-          {
             "param_name": "试验次数",
             "value_text": "1次",
             "value_expr": "1次",
@@ -16743,16 +15653,6 @@
             "value_source": "standard",
             "value_type": "standard",
             "constraints": "额定电压40.5kv以下默认三相",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "首开极系数",
-            "value_text": "40.5kV及以下默认为1.5",
-            "value_expr": "40.5kV及以下默认为1.5",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "40.5kV及以下默认为1.5",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -16771,17 +15671,17 @@
         "remove_rules": []
       },
       {
-        "test_name": "T100S(60HZ)",
+        "test_name": "T100S(60Hz)",
         "report_type": "短路性能型式试验",
         "category": "短路性能型式试验",
         "path_parts": [
           "型式试验",
           "短路性能型式试验",
-          "T100S(60HZ)"
+          "T100S(60Hz)"
         ],
-        "path_key": "短路性能型式试验 > 短路性能型式试验 > T100S(60HZ)",
+        "path_key": "短路性能型式试验 > 短路性能型式试验 > T100S(60Hz)",
         "skip": false,
-        "note": "额定电压<40.5kv and 额定频率==60Hz\n（验证100%对称短路开断电流）",
+        "note": "额定电压<=40.5kv & 【额定频率==60Hz or 额定频率==50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -16854,26 +15754,6 @@
             "derive_from_rated": "用户录入额定短路关合电流"
           },
           {
-            "param_name": "结构特征",
-            "value_text": "40.5kV及以下不考虑",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "40.5kV及以下不考虑",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "失败次数",
-            "value_text": "0次",
-            "value_expr": "0次",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "0次",
-            "calc_rule": "",
-            "derive_from_rated": "0次"
-          },
-          {
             "param_name": "试验次数",
             "value_text": "1次",
             "value_expr": "1次",
@@ -16910,16 +15790,6 @@
             "value_source": "standard",
             "value_type": "standard",
             "constraints": "额定电压40.5kv以下默认三相",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "首开极系数",
-            "value_text": "40.5kV及以下默认为1.5",
-            "value_expr": "40.5kV及以下默认为1.5",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "40.5kV及以下默认为1.5",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -16950,7 +15820,7 @@
         ],
         "path_key": "型式试验 > 短路性能型式试验 > T100s(a)",
         "skip": false,
-        "note": "额定电压>=72.5  & 额定频率≠60HZ,（注意：当为三相分箱共机构的时候，需要在原基础上在执行一次，试验相数为三相，其余不变）",
+        "note": "额定电压>=72.5kV  & 【额定频率==50HZ or 额定频率==50/60Hz】（注意：当为三相分箱共机构的时候，需要在原基础上在执行一次，试验相数为三相，其余不变）",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -17003,16 +15873,6 @@
             "derive_from_rated": "用户录入）"
           },
           {
-            "param_name": "额定频率",
-            "value_text": "用户录入额定频率，用户未录入默认50Hz Hz",
-            "value_expr": "用户录入额定频率，用户未录入默认50Hz Hz",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户录入额定频率，用户未录入默认50Hz Hz",
-            "calc_rule": "",
-            "derive_from_rated": "用户录入额定频率，用户未录入默认50Hz Hz"
-          },
-          {
             "param_name": "关合电流",
             "value_text": "用户录入，额定短路关合电流",
             "value_expr": "用户录入，额定短路关合电流",
@@ -17021,26 +15881,6 @@
             "constraints": "用户录入，额定短路关合电流",
             "calc_rule": "",
             "derive_from_rated": "用户录入，额定短路关合电流"
-          },
-          {
-            "param_name": "结构特征",
-            "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "金短时间",
-            "value_text": "默认60ms",
-            "value_expr": "默认60ms",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "默认60ms",
-            "calc_rule": "",
-            "derive_from_rated": ""
           },
           {
             "param_name": "试验次数",
@@ -17107,7 +15947,7 @@
         ],
         "path_key": "短路性能型式试验 > 短路性能型式试验 > T100s(a)",
         "skip": false,
-        "note": "额定电压>=72.5  & 额定频率≠60HZ,（注意：当为三相分箱共机构的时候，需要在原基础上在执行一次，试验相数为三相，其余不变）",
+        "note": "额定电压>=72.5kV  & 【额定频率==50HZ or 额定频率==50/60Hz】（注意：当为三相分箱共机构的时候，需要在原基础上在执行一次，试验相数为三相，其余不变）",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -17160,16 +16000,6 @@
             "derive_from_rated": "用户录入）"
           },
           {
-            "param_name": "额定频率",
-            "value_text": "用户录入额定频率，用户未录入默认50Hz Hz",
-            "value_expr": "用户录入额定频率，用户未录入默认50Hz Hz",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户录入额定频率，用户未录入默认50Hz Hz",
-            "calc_rule": "",
-            "derive_from_rated": "用户录入额定频率，用户未录入默认50Hz Hz"
-          },
-          {
             "param_name": "关合电流",
             "value_text": "用户录入，额定短路关合电流",
             "value_expr": "用户录入，额定短路关合电流",
@@ -17178,26 +16008,6 @@
             "constraints": "用户录入，额定短路关合电流",
             "calc_rule": "",
             "derive_from_rated": "用户录入，额定短路关合电流"
-          },
-          {
-            "param_name": "结构特征",
-            "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "金短时间",
-            "value_text": "默认60ms",
-            "value_expr": "默认60ms",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "默认60ms",
-            "calc_rule": "",
-            "derive_from_rated": ""
           },
           {
             "param_name": "试验次数",
@@ -17266,7 +16076,7 @@
         ],
         "path_key": "型式试验 > 短路性能型式试验 > T100s(a)(60Hz)",
         "skip": false,
-        "note": "额定电压>=72.5  & 额定频率=60HZ",
+        "note": "额定电压>=72.5kV  & 额定频率==60Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -17327,26 +16137,6 @@
             "constraints": "用户录入，额定短路关合电流",
             "calc_rule": "",
             "derive_from_rated": "用户录入，额定短路关合电流"
-          },
-          {
-            "param_name": "结构特征",
-            "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "金短时间",
-            "value_text": "默认60ms",
-            "value_expr": "默认60ms",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "默认60ms",
-            "calc_rule": "",
-            "derive_from_rated": ""
           },
           {
             "param_name": "试验次数",
@@ -17413,7 +16203,7 @@
         ],
         "path_key": "短路性能型式试验 > 短路性能型式试验 > T100s(a)(60Hz)",
         "skip": false,
-        "note": "额定电压>=72.5  & 额定频率=60HZ",
+        "note": "额定电压>=72.5kV  & 额定频率==60Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -17474,26 +16264,6 @@
             "constraints": "用户录入，额定短路关合电流",
             "calc_rule": "",
             "derive_from_rated": "用户录入，额定短路关合电流"
-          },
-          {
-            "param_name": "结构特征",
-            "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "金短时间",
-            "value_text": "默认60ms",
-            "value_expr": "默认60ms",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "默认60ms",
-            "calc_rule": "",
-            "derive_from_rated": ""
           },
           {
             "param_name": "试验次数",
@@ -17562,7 +16332,7 @@
         ],
         "path_key": "型式试验 > 短路性能型式试验 > T100s(b)",
         "skip": false,
-        "note": "额定电压>=72.5  & 额定频率≠60HZ",
+        "note": "额定电压>=72.5kV  & 【额定频率==50HZ or 额定频率==50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -17623,16 +16393,6 @@
             "constraints": "用户录入，额定短路关合电流",
             "calc_rule": "",
             "derive_from_rated": "用户录入，额定短路关合电流"
-          },
-          {
-            "param_name": "结构特征",
-            "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-            "calc_rule": "",
-            "derive_from_rated": ""
           },
           {
             "param_name": "金短时间",
@@ -17719,7 +16479,7 @@
         ],
         "path_key": "短路性能型式试验 > 短路性能型式试验 > T100s(b)",
         "skip": false,
-        "note": "额定电压>=72.5  & 额定频率≠60HZ",
+        "note": "额定电压>=72.5kV  & 【额定频率==50HZ or 额定频率==50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -17780,16 +16540,6 @@
             "constraints": "用户录入，额定短路关合电流",
             "calc_rule": "",
             "derive_from_rated": "用户录入，额定短路关合电流"
-          },
-          {
-            "param_name": "结构特征",
-            "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-            "calc_rule": "",
-            "derive_from_rated": ""
           },
           {
             "param_name": "金短时间",
@@ -17878,7 +16628,7 @@
         ],
         "path_key": "型式试验 > 短路性能型式试验 > T100s(b)(60Hz)",
         "skip": false,
-        "note": "额定电压>=72.5  & 额定频率=60HZ",
+        "note": "额定电压>=72.5kV  & 【额定频率==60Hz or 额定频率==50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -17939,16 +16689,6 @@
             "constraints": "用户录入，额定短路关合电流",
             "calc_rule": "",
             "derive_from_rated": "用户录入，额定短路关合电流"
-          },
-          {
-            "param_name": "结构特征",
-            "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-            "calc_rule": "",
-            "derive_from_rated": ""
           },
           {
             "param_name": "金短时间",
@@ -18035,7 +16775,7 @@
         ],
         "path_key": "短路性能型式试验 > 短路性能型式试验 > T100s(b)(60Hz)",
         "skip": false,
-        "note": "额定电压>=72.5  & 额定频率=60HZ",
+        "note": "额定电压>=72.5kV  & 【额定频率==60Hz or 额定频率==50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -18096,16 +16836,6 @@
             "constraints": "用户录入，额定短路关合电流",
             "calc_rule": "",
             "derive_from_rated": "用户录入，额定短路关合电流"
-          },
-          {
-            "param_name": "结构特征",
-            "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-            "calc_rule": "",
-            "derive_from_rated": ""
           },
           {
             "param_name": "金短时间",
@@ -18358,19 +17088,19 @@
         "remove_rules": []
       }
     ],
-    "T60(60HZ)": [
+    "T60(60Hz)": [
       {
-        "test_name": "T60(60HZ)",
+        "test_name": "T60(60Hz)",
         "report_type": "短路性能型式试验",
         "category": "短路性能型式试验",
         "path_parts": [
           "型式试验",
           "短路性能型式试验",
-          "T60(60HZ)"
+          "T60(60Hz)"
         ],
-        "path_key": "型式试验 > 短路性能型式试验 > T60(60HZ)",
+        "path_key": "型式试验 > 短路性能型式试验 > T60(60Hz)",
         "skip": false,
-        "note": "额定频率==60Hz",
+        "note": "额定频率==60Hz or 额定频率==50/60Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -18477,17 +17207,17 @@
         "remove_rules": []
       },
       {
-        "test_name": "T60(60HZ)",
+        "test_name": "T60(60Hz)",
         "report_type": "短路性能型式试验",
         "category": "短路性能型式试验",
         "path_parts": [
           "型式试验",
           "短路性能型式试验",
-          "T60(60HZ)"
+          "T60(60Hz)"
         ],
-        "path_key": "短路性能型式试验 > 短路性能型式试验 > T60(60HZ)",
+        "path_key": "短路性能型式试验 > 短路性能型式试验 > T60(60Hz)",
         "skip": false,
-        "note": "额定频率==60Hz",
+        "note": "额定频率==60Hz or 额定频率==50/60Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -18885,16 +17615,6 @@
             "derive_from_rated": ""
           },
           {
-            "param_name": "试验电压",
-            "value_text": "GBT11022-2020表4查询",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "GBT11022-2020表4查询",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
             "param_name": "试验相数",
             "value_text": "72.5kv及以上需要判断断路器结构，用户声明共箱结构或三相共箱的以三相试验来做，分箱结构或三相分箱的以单相试验来做。",
             "value_expr": "72.5kv及以上需要判断断路器结构，用户声明共箱结构或三相共箱的以三相试验来做，分箱结构或三相分箱的以单相试验来做。",
@@ -19032,16 +17752,6 @@
             "derive_from_rated": ""
           },
           {
-            "param_name": "试验电压",
-            "value_text": "GBT11022-2020表4查询",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "GBT11022-2020表4查询",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
             "param_name": "试验相数",
             "value_text": "72.5kv及以上需要判断断路器结构，用户声明共箱结构或三相共箱的以三相试验来做，分箱结构或三相分箱的以单相试验来做。",
             "value_expr": "72.5kv及以上需要判断断路器结构，用户声明共箱结构或三相共箱的以三相试验来做，分箱结构或三相分箱的以单相试验来做。",
@@ -19151,16 +17861,6 @@
             "derive_from_rated": ""
           },
           {
-            "param_name": "额定频率",
-            "value_text": "用户录入额定频率，用户未录入默认50Hz",
-            "value_expr": "用户录入额定频率，用户未录入默认50Hz",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "用户录入额定频率，用户未录入默认50Hz",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
             "param_name": "试验次数",
             "value_text": "1次",
             "value_expr": "",
@@ -19264,16 +17964,6 @@
             "value_source": "standard",
             "value_type": "standard",
             "constraints": "用户录入）",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "额定频率",
-            "value_text": "用户录入额定频率，用户未录入默认50Hz",
-            "value_expr": "用户录入额定频率，用户未录入默认50Hz",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "用户录入额定频率，用户未录入默认50Hz",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -19650,7 +18340,7 @@
         ],
         "path_key": "型式试验 > 短路性能型式试验 > 短路开断试验(T10)",
         "skip": false,
-        "note": "额定频率≠60HZ",
+        "note": "额定频率==50Hz or 额定频率==50/60Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -19749,16 +18439,6 @@
             "value_source": "default",
             "value_type": "default",
             "constraints": "40.5kV及以下默认为三相，72.5kv以上默认单相",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "首开极系数",
-            "value_text": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-            "value_expr": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -19787,7 +18467,7 @@
         ],
         "path_key": "短路性能型式试验 > 短路性能型式试验 > 短路开断试验(T10)",
         "skip": false,
-        "note": "额定频率≠60HZ",
+        "note": "额定频率==50Hz or 额定频率==50/60Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -19886,16 +18566,6 @@
             "value_source": "default",
             "value_type": "default",
             "constraints": "40.5kV及以下默认为三相，72.5kv以上默认单相",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "首开极系数",
-            "value_text": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-            "value_expr": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -19926,7 +18596,7 @@
         ],
         "path_key": "型式试验 > 短路性能型式试验 > 短路开断试验(T100A)",
         "skip": false,
-        "note": "额定频率≠60HZ",
+        "note": "额定频率==50Hz or 额定频率==50/60Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -19989,16 +18659,6 @@
             "derive_from_rated": "端子故障"
           },
           {
-            "param_name": "结构特征",
-            "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-            "value_expr": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
             "param_name": "失败次数",
             "value_text": "0次",
             "value_expr": "0次",
@@ -20055,16 +18715,6 @@
             "value_source": "standard",
             "value_type": "standard",
             "constraints": "40.5kV及以下固定3相；72.5kV及以上默认单相，当结构特征为三相共箱共机构试验相数为三相",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "首开极系数",
-            "value_text": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若用户录入按照用户录入进行试验",
-            "value_expr": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若用户录入按照用户录入进行试验",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若用户录入按照用户录入进行试验",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -20113,7 +18763,7 @@
         ],
         "path_key": "短路性能型式试验 > 短路性能型式试验 > 短路开断试验(T100A)",
         "skip": false,
-        "note": "额定频率≠60HZ",
+        "note": "额定频率==50Hz or 额定频率==50/60Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -20176,16 +18826,6 @@
             "derive_from_rated": "端子故障"
           },
           {
-            "param_name": "结构特征",
-            "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-            "value_expr": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
             "param_name": "失败次数",
             "value_text": "0次",
             "value_expr": "0次",
@@ -20242,16 +18882,6 @@
             "value_source": "standard",
             "value_type": "standard",
             "constraints": "40.5kV及以下固定3相；72.5kV及以上默认单相，当结构特征为三相共箱共机构试验相数为三相",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "首开极系数",
-            "value_text": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若用户录入按照用户录入进行试验",
-            "value_expr": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若用户录入按照用户录入进行试验",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若用户录入按照用户录入进行试验",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -20302,7 +18932,7 @@
         ],
         "path_key": "型式试验 > 短路性能型式试验 > 短路开断试验(T100S)",
         "skip": false,
-        "note": "额定电压<=40.5kv & 额定频率≠60HZ",
+        "note": "额定电压<=40.5kv & 【额定频率==50HZ or 额定频率==50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -20375,16 +19005,6 @@
             "derive_from_rated": "用户录入额定短路关合电流"
           },
           {
-            "param_name": "结构特征",
-            "value_text": "40.5kV及以下不考虑",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "40.5kV及以下不考虑",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
             "param_name": "失败次数",
             "value_text": "0次",
             "value_expr": "0次",
@@ -20431,16 +19051,6 @@
             "value_source": "standard",
             "value_type": "standard",
             "constraints": "40.5kv一下默认三相",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "首开极系数",
-            "value_text": "40.5kV及以下默认为1.5",
-            "value_expr": "40.5kV及以下默认为1.5",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "40.5kV及以下默认为1.5",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -20469,7 +19079,7 @@
         ],
         "path_key": "短路性能型式试验 > 短路性能型式试验 > 短路开断试验(T100S)",
         "skip": false,
-        "note": "额定电压<=40.5kv & 额定频率≠60HZ",
+        "note": "额定电压<=40.5kv & 【额定频率==50HZ or 额定频率==50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -20542,16 +19152,6 @@
             "derive_from_rated": "用户录入额定短路关合电流"
           },
           {
-            "param_name": "结构特征",
-            "value_text": "40.5kV及以下不考虑",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "40.5kV及以下不考虑",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
             "param_name": "失败次数",
             "value_text": "0次",
             "value_expr": "0次",
@@ -20598,16 +19198,6 @@
             "value_source": "standard",
             "value_type": "standard",
             "constraints": "40.5kv一下默认三相",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "首开极系数",
-            "value_text": "40.5kV及以下默认为1.5",
-            "value_expr": "40.5kV及以下默认为1.5",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "40.5kV及以下默认为1.5",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -20638,7 +19228,7 @@
         ],
         "path_key": "型式试验 > 短路性能型式试验 > 短路开断试验(T30)",
         "skip": false,
-        "note": "短路性能型式试验类型下必须执行",
+        "note": "额定频率==50Hz or 额定频率==50/60Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -20691,16 +19281,6 @@
             "derive_from_rated": "额定电压（用户录入）"
           },
           {
-            "param_name": "额定频率",
-            "value_text": "用户录入额定频率，用户未录入默认50Hz",
-            "value_expr": "用户录入额定频率，用户未录入默认50Hz",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户录入额定频率，用户未录入默认50Hz",
-            "calc_rule": "",
-            "derive_from_rated": "用户录入额定频率，用户未录入默认50Hz"
-          },
-          {
             "param_name": "失败次数",
             "value_text": "0次",
             "value_expr": "0次",
@@ -20747,16 +19327,6 @@
             "value_source": "default",
             "value_type": "default",
             "constraints": "72.5及以上为单相，40.5及以下三相",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "首开极系数kpp",
-            "value_text": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
-            "value_expr": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -20785,7 +19355,7 @@
         ],
         "path_key": "短路性能型式试验 > 短路性能型式试验 > 短路开断试验(T30)",
         "skip": false,
-        "note": "短路性能型式试验类型下必须执行",
+        "note": "额定频率==50Hz or 额定频率==50/60Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -20838,16 +19408,6 @@
             "derive_from_rated": "额定电压（用户录入）"
           },
           {
-            "param_name": "额定频率",
-            "value_text": "用户录入额定频率，用户未录入默认50Hz",
-            "value_expr": "用户录入额定频率，用户未录入默认50Hz",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户录入额定频率，用户未录入默认50Hz",
-            "calc_rule": "",
-            "derive_from_rated": "用户录入额定频率，用户未录入默认50Hz"
-          },
-          {
             "param_name": "失败次数",
             "value_text": "0次",
             "value_expr": "0次",
@@ -20894,16 +19454,6 @@
             "value_source": "default",
             "value_type": "default",
             "constraints": "72.5及以上为单相，40.5及以下三相",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
-            "param_name": "首开极系数kpp",
-            "value_text": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
-            "value_expr": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -20934,7 +19484,7 @@
         ],
         "path_key": "型式试验 > 短路性能型式试验 > 短路开断试验(T60)",
         "skip": false,
-        "note": "额定频率≠60HZ",
+        "note": "额定频率==50Hz or 额定频率==50/60Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -21081,7 +19631,7 @@
         ],
         "path_key": "短路性能型式试验 > 短路性能型式试验 > 短路开断试验(T60)",
         "skip": false,
-        "note": "额定频率≠60HZ",
+        "note": "额定频率==50Hz or 额定频率==50/60Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -21459,16 +20009,6 @@
             "derive_from_rated": "额定电压（用户录入）"
           },
           {
-            "param_name": "峰值电流kA",
-            "value_text": "用户录入的额定峰值耐受电流 kA",
-            "value_expr": "用户录入的额定峰值耐受电流 kA",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户录入的额定峰值耐受电流 kA",
-            "calc_rule": "",
-            "derive_from_rated": "用户录入的额定峰值耐受电流 kA"
-          },
-          {
             "param_name": "回路电阻(μΩ)",
             "value_text": "用户输入，未输入默认实测 μΩ",
             "value_expr": "",
@@ -21556,16 +20096,6 @@
             "derive_from_rated": "额定电压（用户录入）"
           },
           {
-            "param_name": "峰值电流kA",
-            "value_text": "用户录入的额定峰值耐受电流 kA",
-            "value_expr": "用户录入的额定峰值耐受电流 kA",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户录入的额定峰值耐受电流 kA",
-            "calc_rule": "",
-            "derive_from_rated": "用户录入的额定峰值耐受电流 kA"
-          },
-          {
             "param_name": "回路电阻(μΩ)",
             "value_text": "用户输入，未输入默认实测 μΩ",
             "value_expr": "",
@@ -21624,16 +20154,6 @@
         "skip": false,
         "note": "额定峰值电流/额定短时耐受电流≥2.6",
         "parameters": [
-          {
-            "param_name": "短路持续时间",
-            "value_text": "用户录入的额定短路持续时间，取值需要满足≤5S,>0.3S",
-            "value_expr": "用户录入的额定短路持续时间，取值需要满足≤5S,>0.3S",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户录入的额定短路持续时间，取值需要满足≤5S,>0.3S",
-            "calc_rule": "",
-            "derive_from_rated": "用户录入的额定短路持续时间，取值需要满足≤5S,>0.3S"
-          },
           {
             "param_name": "短时耐受电流",
             "value_text": "用户录入的额定短时耐受电流 kA",
@@ -21712,16 +20232,6 @@
         "note": "额定峰值电流/额定短时耐受电流≥2.6",
         "parameters": [
           {
-            "param_name": "短路持续时间",
-            "value_text": "用户录入的额定短路持续时间，取值需要满足≤5S,>0.3S",
-            "value_expr": "用户录入的额定短路持续时间，取值需要满足≤5S,>0.3S",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户录入的额定短路持续时间，取值需要满足≤5S,>0.3S",
-            "calc_rule": "",
-            "derive_from_rated": "用户录入的额定短路持续时间，取值需要满足≤5S,>0.3S"
-          },
-          {
             "param_name": "短时耐受电流",
             "value_text": "用户录入的额定短时耐受电流 kA",
             "value_expr": "用户录入的额定短时耐受电流 kA",
@@ -21778,82 +20288,6 @@
             "value_source": "standard",
             "value_type": "standard",
             "constraints": "1次",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          }
-        ],
-        "remove_parameters": [],
-        "remove_rules": []
-      }
-    ],
-    "辅助和控制回路温升试验": [
-      {
-        "test_name": "辅助和控制回路温升试验",
-        "report_type": "温升性能型式试验",
-        "category": "温升性能型式试验",
-        "path_parts": [
-          "型式试验",
-          "温升性能型式试验",
-          "辅助和控制回路温升试验"
-        ],
-        "path_key": "型式试验 > 温升性能型式试验 > 辅助和控制回路温升试验",
-        "skip": false,
-        "note": "温升性能型式试验类型下必须执行",
-        "parameters": [
-          {
-            "param_name": "机构是否带合分闸线圈",
-            "value_text": "客户选择是或否；是则必做，否则可不做",
-            "value_expr": "客户选择是或否；是则必做，否则可不做",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "客户选择是或否；是则必做，否则可不做",
-            "calc_rule": "",
-            "derive_from_rated": "客户选择是或否；是则必做，否则可不做"
-          },
-          {
-            "param_name": "试验次数",
-            "value_text": "默认为1次",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "默认为1次",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          }
-        ],
-        "remove_parameters": [],
-        "remove_rules": []
-      },
-      {
-        "test_name": "辅助和控制回路温升试验",
-        "report_type": "温升性能型式试验",
-        "category": "温升性能型式试验",
-        "path_parts": [
-          "型式试验",
-          "温升性能型式试验",
-          "辅助和控制回路温升试验"
-        ],
-        "path_key": "温升性能型式试验 > 温升性能型式试验 > 辅助和控制回路温升试验",
-        "skip": false,
-        "note": "温升性能型式试验类型下必须执行",
-        "parameters": [
-          {
-            "param_name": "机构是否带合分闸线圈",
-            "value_text": "客户选择是或否；是则必做，否则可不做",
-            "value_expr": "客户选择是或否；是则必做，否则可不做",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "客户选择是或否；是则必做，否则可不做",
-            "calc_rule": "",
-            "derive_from_rated": "客户选择是或否；是则必做，否则可不做"
-          },
-          {
-            "param_name": "试验次数",
-            "value_text": "默认为1次",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "默认为1次",
             "calc_rule": "",
             "derive_from_rated": ""
           }
@@ -22130,7 +20564,7 @@
         ],
         "path_key": "型式试验 > 短路性能型式试验 > 近区故障试验(L75)",
         "skip": false,
-        "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 额定频率≠60HZ",
+        "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 【额定频率 == 50Hz or 额定频率 == 50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -22237,7 +20671,7 @@
         ],
         "path_key": "短路性能型式试验 > 短路性能型式试验 > 近区故障试验(L75)",
         "skip": false,
-        "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 额定频率≠60HZ",
+        "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 【额定频率 == 50Hz or 额定频率 == 50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -22346,7 +20780,7 @@
         ],
         "path_key": "型式试验 > 短路性能型式试验 > 近区故障试验(L90)",
         "skip": false,
-        "note": "断路器等级==S2（or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 额定频率≠60HZ",
+        "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压＞40.5kV & 额定短路开断电流＞12.5kA & 【额定频率 == 50Hz or 额定频率 == 50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -22453,7 +20887,7 @@
         ],
         "path_key": "短路性能型式试验 > 短路性能型式试验 > 近区故障试验(L90)",
         "skip": false,
-        "note": "断路器等级==S2（or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 额定频率≠60HZ",
+        "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压＞40.5kV & 额定短路开断电流＞12.5kA & 【额定频率 == 50Hz or 额定频率 == 50/60Hz】",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -22798,7 +21232,7 @@
         ],
         "path_key": "型式试验 > 短路性能型式试验 > 空载特性测量",
         "skip": false,
-        "note": "额定电压<72.5kV or contains_any [\"发电机断路器\", \"限流电抗器\"]",
+        "note": "额定电压<72.5kV",
         "parameters": [
           {
             "param_name": "试验次数",
@@ -22825,7 +21259,7 @@
         ],
         "path_key": "短路性能型式试验 > 短路性能型式试验 > 空载特性测量",
         "skip": false,
-        "note": "额定电压<72.5kV or contains_any [\"发电机断路器\", \"限流电抗器\"]",
+        "note": "额定电压<72.5kV",
         "parameters": [
           {
             "param_name": "试验次数",
@@ -23320,7 +21754,7 @@
         ],
         "path_key": "型式试验 > 温升性能型式试验 > 温升试验",
         "skip": false,
-        "note": "额定频率!=60Hz",
+        "note": "额定频率 == 50Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -23417,7 +21851,7 @@
         ],
         "path_key": "温升性能型式试验 > 温升性能型式试验 > 温升试验",
         "skip": false,
-        "note": "额定频率!=60Hz",
+        "note": "额定频率 == 50Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -23504,19 +21938,19 @@
         "remove_rules": []
       }
     ],
-    "温升试验(60HZ)": [
+    "温升试验(60Hz)": [
       {
-        "test_name": "温升试验(60HZ)",
+        "test_name": "温升试验(60Hz)",
         "report_type": "温升性能型式试验",
         "category": "温升性能型式试验",
         "path_parts": [
           "型式试验",
           "温升性能型式试验",
-          "温升试验(60HZ)"
+          "温升试验(60Hz)"
         ],
-        "path_key": "型式试验 > 温升性能型式试验 > 温升试验(60HZ)",
+        "path_key": "型式试验 > 温升性能型式试验 > 温升试验(60Hz)",
         "skip": false,
-        "note": "额定频率==60Hz",
+        "note": "额定频率 == 50/60Hz or 额定频率 == 60Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -23577,33 +22011,23 @@
             "constraints": "40.5kV及以下默认三相，72.5kv及以上需要判断断路器结构，用户声明共箱结构或三相共箱的以三相试验来做，分箱结构或三相分箱的以单相试验来做。",
             "calc_rule": "",
             "derive_from_rated": ""
-          },
-          {
-            "param_name": "是否所配元件",
-            "value_text": "是/否",
-            "value_expr": "是/否",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "是/否",
-            "calc_rule": "",
-            "derive_from_rated": "是/否"
           }
         ],
         "remove_parameters": [],
         "remove_rules": []
       },
       {
-        "test_name": "温升试验(60HZ)",
+        "test_name": "温升试验(60Hz)",
         "report_type": "温升性能型式试验",
         "category": "温升性能型式试验",
         "path_parts": [
           "型式试验",
           "温升性能型式试验",
-          "温升试验(60HZ)"
+          "温升试验(60Hz)"
         ],
-        "path_key": "温升性能型式试验 > 温升性能型式试验 > 温升试验(60HZ)",
+        "path_key": "温升性能型式试验 > 温升性能型式试验 > 温升试验(60Hz)",
         "skip": false,
-        "note": "额定频率==60Hz",
+        "note": "额定频率 == 50/60Hz or 额定频率 == 60Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -23664,16 +22088,6 @@
             "constraints": "40.5kV及以下默认三相，72.5kv及以上需要判断断路器结构，用户声明共箱结构或三相共箱的以三相试验来做，分箱结构或三相分箱的以单相试验来做。",
             "calc_rule": "",
             "derive_from_rated": ""
-          },
-          {
-            "param_name": "是否所配元件",
-            "value_text": "是/否",
-            "value_expr": "是/否",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "是/否",
-            "calc_rule": "",
-            "derive_from_rated": "是/否"
           }
         ],
         "remove_parameters": [],
@@ -23888,7 +22302,7 @@
         ],
         "path_key": "型式试验 > 开合性能型式试验 > 容性电流开断试验(BC1)",
         "skip": false,
-        "note": "【contains \"额定电容器组电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率!=60Hz",
+        "note": "【contains \"额定电容器组电流\"】and 额定频率== 50Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -24045,7 +22459,7 @@
         ],
         "path_key": "开合性能型式试验 > 开合性能型式试验 > 容性电流开断试验(BC1)",
         "skip": false,
-        "note": "【contains \"额定电容器组电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率!=60Hz",
+        "note": "【contains \"额定电容器组电流\"】and 额定频率== 50Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -24204,7 +22618,7 @@
         ],
         "path_key": "型式试验 > 开合性能型式试验 > 容性电流开断试验(BC2)",
         "skip": false,
-        "note": "【contains \"额定电容器组电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 额定频率!=60Hz",
+        "note": "【contains \"额定电容器组电流\"】and 额定频率== 50Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -24361,7 +22775,7 @@
         ],
         "path_key": "开合性能型式试验 > 开合性能型式试验 > 容性电流开断试验(BC2)",
         "skip": false,
-        "note": "【contains \"额定电容器组电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 额定频率!=60Hz",
+        "note": "【contains \"额定电容器组电流\"】and 额定频率== 50Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -24520,7 +22934,7 @@
         ],
         "path_key": "型式试验 > 开合性能型式试验 > 容性电流开断试验(CC1)",
         "skip": false,
-        "note": "【contains \"额定电缆充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】 and 额定频率!=60Hz",
+        "note": "【contains \"额定电缆充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】 and 额定频率==50Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -24647,7 +23061,7 @@
         ],
         "path_key": "开合性能型式试验 > 开合性能型式试验 > 容性电流开断试验(CC1)",
         "skip": false,
-        "note": "【contains \"额定电缆充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】 and 额定频率!=60Hz",
+        "note": "【contains \"额定电缆充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】 and 额定频率==50Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -24776,7 +23190,7 @@
         ],
         "path_key": "型式试验 > 开合性能型式试验 > 容性电流开断试验(CC2)",
         "skip": false,
-        "note": "【contains [\"额定电缆充电开断电流\",\"电缆充电开断电流\",\"额定电缆充电开合电流\",\"电缆充电开合电流\"] 其中之一 or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】 and 额定频率!=60Hz",
+        "note": "【contains \"额定电缆充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】 and 额定频率==50Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -24903,7 +23317,7 @@
         ],
         "path_key": "开合性能型式试验 > 开合性能型式试验 > 容性电流开断试验(CC2)",
         "skip": false,
-        "note": "【contains [\"额定电缆充电开断电流\",\"电缆充电开断电流\",\"额定电缆充电开合电流\",\"电缆充电开合电流\"] 其中之一 or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】 and 额定频率!=60Hz",
+        "note": "【contains \"额定电缆充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】 and 额定频率==50Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -25032,7 +23446,7 @@
         ],
         "path_key": "型式试验 > 开合性能型式试验 > 容性电流开断试验(LC1)",
         "skip": false,
-        "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率!=60Hz",
+        "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率==50Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -25159,7 +23573,7 @@
         ],
         "path_key": "开合性能型式试验 > 开合性能型式试验 > 容性电流开断试验(LC1)",
         "skip": false,
-        "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率!=60Hz",
+        "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率==50Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -25288,7 +23702,7 @@
         ],
         "path_key": "型式试验 > 开合性能型式试验 > 容性电流开断试验(LC2)",
         "skip": false,
-        "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率!=60Hz",
+        "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率==50Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -25415,7 +23829,7 @@
         ],
         "path_key": "开合性能型式试验 > 开合性能型式试验 > 容性电流开断试验(LC2)",
         "skip": false,
-        "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率!=60Hz",
+        "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率==50Hz",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -25941,16 +24355,6 @@
             "constraints": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
             "calc_rule": "",
             "derive_from_rated": "用户输入(判断取值是或者否)，未输入默认取值\"--\""
-          },
-          {
-            "param_name": "额定频率",
-            "value_text": "用户录入额定频率，用户未录入默认50Hz Hz",
-            "value_expr": "用户录入额定频率，用户未录入默认50Hz Hz",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "用户录入额定频率，用户未录入默认50Hz Hz",
-            "calc_rule": "",
-            "derive_from_rated": ""
           }
         ],
         "remove_parameters": [],
@@ -26088,16 +24492,6 @@
             "constraints": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
             "calc_rule": "",
             "derive_from_rated": "用户输入(判断取值是或者否)，未输入默认取值\"--\""
-          },
-          {
-            "param_name": "额定频率",
-            "value_text": "用户录入额定频率，用户未录入默认50Hz Hz",
-            "value_expr": "用户录入额定频率，用户未录入默认50Hz Hz",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "用户录入额定频率，用户未录入默认50Hz Hz",
-            "calc_rule": "",
-            "derive_from_rated": ""
           }
         ],
         "remove_parameters": [],
@@ -26169,16 +24563,6 @@
             "derive_from_rated": ""
           },
           {
-            "param_name": "额定频率",
-            "value_text": "用户录入额定频率，用户未录入默认50Hz",
-            "value_expr": "用户录入额定频率，用户未录入默认50Hz",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "用户录入额定频率，用户未录入默认50Hz",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
             "param_name": "试验次数",
             "value_text": "1次",
             "value_expr": "",
@@ -26217,16 +24601,6 @@
             "constraints": "单相",
             "calc_rule": "",
             "derive_from_rated": ""
-          },
-          {
-            "param_name": "外壳是否带电",
-            "value_text": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-            "value_expr": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-            "calc_rule": "",
-            "derive_from_rated": "用户输入(判断取值是或者否)，未输入默认取值\"--\""
           }
         ],
         "remove_parameters": [],
@@ -26296,16 +24670,6 @@
             "derive_from_rated": ""
           },
           {
-            "param_name": "额定频率",
-            "value_text": "用户录入额定频率，用户未录入默认50Hz",
-            "value_expr": "用户录入额定频率，用户未录入默认50Hz",
-            "value_source": "default",
-            "value_type": "default",
-            "constraints": "用户录入额定频率，用户未录入默认50Hz",
-            "calc_rule": "",
-            "derive_from_rated": ""
-          },
-          {
             "param_name": "试验次数",
             "value_text": "1次",
             "value_expr": "",
@@ -26344,16 +24708,6 @@
             "constraints": "单相",
             "calc_rule": "",
             "derive_from_rated": ""
-          },
-          {
-            "param_name": "外壳是否带电",
-            "value_text": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-            "value_expr": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-            "calc_rule": "",
-            "derive_from_rated": "用户输入(判断取值是或者否)，未输入默认取值\"--\""
           }
         ],
         "remove_parameters": [],
@@ -27235,16 +25589,192 @@
         "remove_parameters": [],
         "remove_rules": []
       }
+    ],
+    "作为状态检查的T10试验": [
+      {
+        "test_name": "作为状态检查的T10试验",
+        "report_type": "短路性能型式试验",
+        "category": "短路性能型式试验",
+        "path_parts": [
+          "型式试验",
+          "短路性能型式试验",
+          "作为状态检查的T10试验"
+        ],
+        "path_key": "型式试验 > 短路性能型式试验 > 作为状态检查的T10试验",
+        "skip": false,
+        "note": "真空断路器 and contain【SF6气体的额定压力(20℃表压)】",
+        "parameters": [
+          {
+            "param_name": "额定电压",
+            "value_text": "用户输入",
+            "value_expr": "用户输入",
+            "value_source": "user_input",
+            "value_type": "user_input",
+            "constraints": "用户输入",
+            "calc_rule": "",
+            "derive_from_rated": "用户输入"
+          },
+          {
+            "param_name": "试验电压",
+            "value_text": "40.5kV及以下：额定电压/2；72.5kv及以上：额定电压/根3/2",
+            "value_expr": "",
+            "value_source": "fomula",
+            "value_type": "fomula",
+            "constraints": "40.5kV及以下：额定电压/2；72.5kv及以上：额定电压/根3/2",
+            "calc_rule": "",
+            "derive_from_rated": ""
+          },
+          {
+            "param_name": "试验电流kA",
+            "value_text": "额定短路开断电流*10%",
+            "value_expr": "",
+            "value_source": "fomula",
+            "value_type": "fomula",
+            "constraints": "额定短路开断电流*10%",
+            "calc_rule": "",
+            "derive_from_rated": ""
+          },
+          {
+            "param_name": "试验相数",
+            "value_text": "40.5kV及以下默认为三相、72.5kv及以上默认为单相",
+            "value_expr": "",
+            "value_source": "standard",
+            "value_type": "standard",
+            "constraints": "40.5kV及以下默认为三相、72.5kv及以上默认为单相",
+            "calc_rule": "",
+            "derive_from_rated": ""
+          },
+          {
+            "param_name": "操作顺序",
+            "value_text": "O",
+            "value_expr": "",
+            "value_source": "standard",
+            "value_type": "standard",
+            "constraints": "O",
+            "calc_rule": "",
+            "derive_from_rated": ""
+          },
+          {
+            "param_name": "SF6气体的最低功能压力(20℃表压)",
+            "value_text": "用户输入",
+            "value_expr": "用户输入",
+            "value_source": "user_input",
+            "value_type": "user_input",
+            "constraints": "用户输入",
+            "calc_rule": "",
+            "derive_from_rated": "用户输入"
+          },
+          {
+            "param_name": "试验次数",
+            "value_text": "1次",
+            "value_expr": "",
+            "value_source": "standard",
+            "value_type": "standard",
+            "constraints": "1次",
+            "calc_rule": "",
+            "derive_from_rated": ""
+          }
+        ],
+        "remove_parameters": [],
+        "remove_rules": []
+      },
+      {
+        "test_name": "作为状态检查的T10试验",
+        "report_type": "短路性能型式试验",
+        "category": "短路性能型式试验",
+        "path_parts": [
+          "型式试验",
+          "短路性能型式试验",
+          "作为状态检查的T10试验"
+        ],
+        "path_key": "短路性能型式试验 > 短路性能型式试验 > 作为状态检查的T10试验",
+        "skip": false,
+        "note": "真空断路器 and contain【SF6气体的额定压力(20℃表压)】",
+        "parameters": [
+          {
+            "param_name": "额定电压",
+            "value_text": "用户输入",
+            "value_expr": "用户输入",
+            "value_source": "user_input",
+            "value_type": "user_input",
+            "constraints": "用户输入",
+            "calc_rule": "",
+            "derive_from_rated": "用户输入"
+          },
+          {
+            "param_name": "试验电压",
+            "value_text": "40.5kV及以下：额定电压/2；72.5kv及以上：额定电压/根3/2",
+            "value_expr": "",
+            "value_source": "fomula",
+            "value_type": "fomula",
+            "constraints": "40.5kV及以下：额定电压/2；72.5kv及以上：额定电压/根3/2",
+            "calc_rule": "",
+            "derive_from_rated": ""
+          },
+          {
+            "param_name": "试验电流kA",
+            "value_text": "额定短路开断电流*10%",
+            "value_expr": "",
+            "value_source": "fomula",
+            "value_type": "fomula",
+            "constraints": "额定短路开断电流*10%",
+            "calc_rule": "",
+            "derive_from_rated": ""
+          },
+          {
+            "param_name": "试验相数",
+            "value_text": "40.5kV及以下默认为三相、72.5kv及以上默认为单相",
+            "value_expr": "",
+            "value_source": "standard",
+            "value_type": "standard",
+            "constraints": "40.5kV及以下默认为三相、72.5kv及以上默认为单相",
+            "calc_rule": "",
+            "derive_from_rated": ""
+          },
+          {
+            "param_name": "操作顺序",
+            "value_text": "O",
+            "value_expr": "",
+            "value_source": "standard",
+            "value_type": "standard",
+            "constraints": "O",
+            "calc_rule": "",
+            "derive_from_rated": ""
+          },
+          {
+            "param_name": "SF6气体的最低功能压力(20℃表压)",
+            "value_text": "用户输入",
+            "value_expr": "用户输入",
+            "value_source": "user_input",
+            "value_type": "user_input",
+            "constraints": "用户输入",
+            "calc_rule": "",
+            "derive_from_rated": "用户输入"
+          },
+          {
+            "param_name": "试验次数",
+            "value_text": "1次",
+            "value_expr": "",
+            "value_source": "standard",
+            "value_type": "standard",
+            "constraints": "1次",
+            "calc_rule": "",
+            "derive_from_rated": ""
+          }
+        ],
+        "remove_parameters": [],
+        "remove_rules": []
+      }
     ]
   },
   "add_test_items": [
     {
-      "test_item": "BC1(60HZ)",
+      "test_item": "BC1(60Hz)",
       "category": "开合性能型式试验",
       "report_type": "开合性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "【contains \"额定电容器组电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 额定频率==60Hz",
+      "note": "【contains \"额定电容器组电流\" 】 and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -27398,12 +25928,12 @@
       "rules": []
     },
     {
-      "test_item": "BC2(60HZ)",
+      "test_item": "BC2(60Hz)",
       "category": "开合性能型式试验",
       "report_type": "开合性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "【contains \"额定电容器组电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】and 额定频率 ==60HZ",
+      "note": "【contains \"额定电容器组电流\" 】 and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -27557,12 +26087,12 @@
       "rules": []
     },
     {
-      "test_item": "CC1(60HZ)",
+      "test_item": "CC1(60Hz)",
       "category": "开合性能型式试验",
       "report_type": "开合性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "【contains \"额定电缆充电电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 额定频率==60Hz",
+      "note": "【contains \"额定电缆充电电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -27686,12 +26216,12 @@
       "rules": []
     },
     {
-      "test_item": "CC2(60HZ)",
+      "test_item": "CC2(60Hz)",
       "category": "开合性能型式试验",
       "report_type": "开合性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "contains [\"额定电缆充电开断电流\",\"电缆充电开断电流\",\"额定电缆充电开合电流\"] 其中之一\nand 额定频率==60Hz",
+      "note": "【contains \"额定电缆充电电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -27815,12 +26345,12 @@
       "rules": []
     },
     {
-      "test_item": "L75(60HZ)",
+      "test_item": "L75(60Hz)",
       "category": "短路性能型式试验",
       "report_type": "短路性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "断路器等级==S2（or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA and 额定频率==60HZ",
+      "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 【额定频率 == 60Hz or 额定频率 == 50/60Hz】",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -27924,12 +26454,12 @@
       "rules": []
     },
     {
-      "test_item": "L90(60HZ)",
+      "test_item": "L90(60Hz)",
       "category": "短路性能型式试验",
       "report_type": "短路性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "断路器等级==S2（额定电压>72.5kV视为S2） and 额定电压≥24kV and 额定短路开断电流＞12.5kA and 额定频率==60HZ",
+      "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 【额定频率 == 60Hz or 额定频率 == 50/60Hz】",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -28033,12 +26563,12 @@
       "rules": []
     },
     {
-      "test_item": "LC1(60HZ)",
+      "test_item": "LC1(60Hz)",
       "category": "开合性能型式试验",
       "report_type": "开合性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "contains \"额定线路充电电流\" and 额定频率==60Hz",
+      "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -28162,12 +26692,12 @@
       "rules": []
     },
     {
-      "test_item": "LC2(60HZ)",
+      "test_item": "LC2(60Hz)",
       "category": "开合性能型式试验",
       "report_type": "开合性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "contains \"额定线路充电电流\" and 额定频率==60Hz",
+      "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 【额定频率==60Hz or 额定频率 == 50/60Hz】",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -28357,36 +26887,6 @@
           "derive_from_rated": "用户输入额定电压值"
         },
         {
-          "param_name": "额定频率",
-          "value_text": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "value_expr": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "发电机额定容量",
-          "value_text": "按系统配置确定",
-          "value_expr": "按系统配置确定",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "按系统配置确定",
-          "calc_rule": "",
-          "derive_from_rated": "按系统配置确定"
-        },
-        {
-          "param_name": "故障类型",
-          "value_text": "失步故障",
-          "value_expr": "失步故障",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "失步故障",
-          "calc_rule": "",
-          "derive_from_rated": "失步故障"
-        },
-        {
           "param_name": "试验次数",
           "value_text": "1次",
           "value_expr": "",
@@ -28440,151 +26940,12 @@
       "rules": []
     },
     {
-      "test_item": "T10(60Hz)",
+      "test_item": "T100A(60Hz)",
       "category": "短路性能型式试验",
       "report_type": "短路性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "额定频率==60HZ",
-      "confidence": 1.0,
-      "required_reports": [
-        {
-          "report_type": "短路性能型式试验",
-          "is_required": true,
-          "condition": ""
-        }
-      ],
-      "parameters": [
-        {
-          "param_name": "SF6气体的最低功能压力(20℃表压)",
-          "value_text": "用户输入，未输入默认取值\"--\"",
-          "value_expr": "用户输入，未输入默认取值\"--\"",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户输入，未输入默认取值\"--\"",
-          "calc_rule": "",
-          "derive_from_rated": "用户输入，未输入默认取值\"--\""
-        },
-        {
-          "param_name": "不均匀系数",
-          "value_text": "用户输入多断口则取值1.05，输入单断口取值为1，其他情况默认取值为1",
-          "value_expr": "用户输入多断口则取值1.05，输入单断口取值为1，其他情况默认取值为1",
-          "value_source": "formula",
-          "value_type": "formula",
-          "constraints": "用户输入多断口则取值1.05，输入单断口取值为1，其他情况默认取值为1",
-          "calc_rule": "用户输入多断口则取值1.05，输入单断口取值为1，其他情况默认取值为1",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "操作顺序",
-          "value_text": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-          "value_expr": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "断路器等级",
-          "value_text": "40.5kv及以下默认S1，72.5kv以上按照用户输入，未输入默认按S2进行试验,但最终取值输出为\"--\"；\n①40.5kv及以下默认S1，若用户输入则按照用户输入进行试验；\n②72.5kv无默认值，按照用户输入进行试验；\n③72.5kV以上无断路器等级概念，但最终取值输出为\"--\"。",
-          "value_expr": "40.5kv及以下默认S1，72.5kv以上按照用户输入，未输入默认按S2进行试验,但最终取值输出为\"--\"；\n①40.5kv及以下默认S1，若用户输入则按照用户输入进行试验；\n②72.5kv无默认值，按照用户输入进行试验；\n③72.5kV以上无断路器等级概念，但最终取值输出为\"--\"。",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kv及以下默认S1，72.5kv以上按照用户输入，未输入默认按S2进行试验,但最终取值输出为\"--\"；\n①40.5kv及以下默认S1，若用户输入则按照用户输入进行试验；\n②72.5kv无默认值，按照用户输入进行试验；\n③72.5kV以上无断路器等级概念，但最终取值输出为\"--\"。",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "额定电压",
-          "value_text": "额定电压（用户录入）",
-          "value_expr": "额定电压（用户录入）",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "额定电压（用户录入）",
-          "calc_rule": "",
-          "derive_from_rated": "额定电压（用户录入）"
-        },
-        {
-          "param_name": "失败次数",
-          "value_text": "0次",
-          "value_expr": "0次",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "0次",
-          "calc_rule": "",
-          "derive_from_rated": "0次"
-        },
-        {
-          "param_name": "试验次数",
-          "value_text": "1次",
-          "value_expr": "1次",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "1次",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "试验电流kA",
-          "value_text": "用户输入额定短路开断电流*10%",
-          "value_expr": "用户输入额定短路开断电流*10%",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户输入额定短路开断电流*10%",
-          "calc_rule": "",
-          "derive_from_rated": "用户输入额定短路开断电流*10%"
-        },
-        {
-          "param_name": "试验电压",
-          "value_text": "40.5kV及以下为额定电压，72.5kV及以上为额定电压/根3*首开极系数/断口数量*不均匀系数",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "40.5kV及以下为额定电压，72.5kV及以上为额定电压/根3*首开极系数/断口数量*不均匀系数",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "试验相数",
-          "value_text": "40.5kV及以下默认为三相，72.5kv以上默认单相",
-          "value_expr": "40.5kV及以下默认为三相，72.5kv以上默认单相",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kV及以下默认为三相，72.5kv以上默认单相",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "首开极系数",
-          "value_text": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-          "value_expr": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "外壳是否带电",
-          "value_text": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-          "value_expr": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-          "calc_rule": "",
-          "derive_from_rated": "用户输入(判断取值是或者否)，未输入默认取值\"--\""
-        }
-      ],
-      "rules": []
-    },
-    {
-      "test_item": "T100A(60HZ)",
-      "category": "短路性能型式试验",
-      "report_type": "短路性能型式试验",
-      "aliases": [],
-      "acceptance_criteria": "",
-      "note": "额定频率==60Hz",
+      "note": "额定频率==60Hz or 额定频率==50/60Hz",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -28768,12 +27129,12 @@
       "rules": []
     },
     {
-      "test_item": "T100S(60HZ)",
+      "test_item": "T100S(60Hz)",
       "category": "短路性能型式试验",
       "report_type": "短路性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "额定电压<40.5kv and 额定频率==60Hz\n（验证100%对称短路开断电流）",
+      "note": "额定电压<=40.5kv & 【额定频率==60Hz or 额定频率==50/60Hz】",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -28854,26 +27215,6 @@
           "derive_from_rated": "用户录入额定短路关合电流"
         },
         {
-          "param_name": "结构特征",
-          "value_text": "40.5kV及以下不考虑",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "40.5kV及以下不考虑",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "失败次数",
-          "value_text": "0次",
-          "value_expr": "0次",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "0次",
-          "calc_rule": "",
-          "derive_from_rated": "0次"
-        },
-        {
           "param_name": "试验次数",
           "value_text": "1次",
           "value_expr": "1次",
@@ -28914,16 +27255,6 @@
           "derive_from_rated": ""
         },
         {
-          "param_name": "首开极系数",
-          "value_text": "40.5kV及以下默认为1.5",
-          "value_expr": "40.5kV及以下默认为1.5",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kV及以下默认为1.5",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
           "param_name": "外壳是否带电",
           "value_text": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
           "value_expr": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
@@ -28942,7 +27273,7 @@
       "report_type": "短路性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "额定电压>=72.5  & 额定频率≠60HZ,（注意：当为三相分箱共机构的时候，需要在原基础上在执行一次，试验相数为三相，其余不变）",
+      "note": "额定电压>=72.5kV  & 【额定频率==50HZ or 额定频率==50/60Hz】（注意：当为三相分箱共机构的时候，需要在原基础上在执行一次，试验相数为三相，其余不变）",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -29003,16 +27334,6 @@
           "derive_from_rated": "用户录入）"
         },
         {
-          "param_name": "额定频率",
-          "value_text": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "value_expr": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "calc_rule": "",
-          "derive_from_rated": "用户录入额定频率，用户未录入默认50Hz Hz"
-        },
-        {
           "param_name": "关合电流",
           "value_text": "用户录入，额定短路关合电流",
           "value_expr": "用户录入，额定短路关合电流",
@@ -29021,26 +27342,6 @@
           "constraints": "用户录入，额定短路关合电流",
           "calc_rule": "",
           "derive_from_rated": "用户录入，额定短路关合电流"
-        },
-        {
-          "param_name": "结构特征",
-          "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "金短时间",
-          "value_text": "默认60ms",
-          "value_expr": "默认60ms",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "默认60ms",
-          "calc_rule": "",
-          "derive_from_rated": ""
         },
         {
           "param_name": "试验次数",
@@ -29101,7 +27402,7 @@
       "report_type": "短路性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "额定电压>=72.5  & 额定频率=60HZ",
+      "note": "额定电压>=72.5kV  & 额定频率==60Hz",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -29172,26 +27473,6 @@
           "derive_from_rated": "用户录入，额定短路关合电流"
         },
         {
-          "param_name": "结构特征",
-          "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "金短时间",
-          "value_text": "默认60ms",
-          "value_expr": "默认60ms",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "默认60ms",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
           "param_name": "试验次数",
           "value_text": "1次",
           "value_expr": "1次",
@@ -29250,7 +27531,7 @@
       "report_type": "短路性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "额定电压>=72.5  & 额定频率≠60HZ",
+      "note": "额定电压>=72.5kV  & 【额定频率==50HZ or 额定频率==50/60Hz】",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -29319,16 +27600,6 @@
           "constraints": "用户录入，额定短路关合电流",
           "calc_rule": "",
           "derive_from_rated": "用户录入，额定短路关合电流"
-        },
-        {
-          "param_name": "结构特征",
-          "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "calc_rule": "",
-          "derive_from_rated": ""
         },
         {
           "param_name": "金短时间",
@@ -29409,7 +27680,7 @@
       "report_type": "短路性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "额定电压>=72.5  & 额定频率=60HZ",
+      "note": "额定电压>=72.5kV  & 【额定频率==60Hz or 额定频率==50/60Hz】",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -29478,16 +27749,6 @@
           "constraints": "用户录入，额定短路关合电流",
           "calc_rule": "",
           "derive_from_rated": "用户录入，额定短路关合电流"
-        },
-        {
-          "param_name": "结构特征",
-          "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "calc_rule": "",
-          "derive_from_rated": ""
         },
         {
           "param_name": "金短时间",
@@ -29652,12 +27913,12 @@
       "rules": []
     },
     {
-      "test_item": "T60(60HZ)",
+      "test_item": "T60(60Hz)",
       "category": "短路性能型式试验",
       "report_type": "短路性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "额定频率==60Hz",
+      "note": "额定频率==60Hz or 额定频率==50/60Hz",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -29966,16 +28227,6 @@
           "derive_from_rated": ""
         },
         {
-          "param_name": "试验电压",
-          "value_text": "GBT11022-2020表4查询",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "GBT11022-2020表4查询",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
           "param_name": "试验相数",
           "value_text": "72.5kv及以上需要判断断路器结构，用户声明共箱结构或三相共箱的以三相试验来做，分箱结构或三相分箱的以单相试验来做。",
           "value_expr": "72.5kv及以上需要判断断路器结构，用户声明共箱结构或三相共箱的以三相试验来做，分箱结构或三相分箱的以单相试验来做。",
@@ -30081,16 +28332,6 @@
           "value_source": "standard",
           "value_type": "standard",
           "constraints": "用户录入）",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
-          "param_name": "额定频率",
-          "value_text": "用户录入额定频率，用户未录入默认50Hz",
-          "value_expr": "用户录入额定频率，用户未录入默认50Hz",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "用户录入额定频率，用户未录入默认50Hz",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -30302,7 +28543,7 @@
       "report_type": "短路性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "额定频率≠60HZ",
+      "note": "额定频率==50Hz or 额定频率==50/60Hz",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -30413,16 +28654,6 @@
           "derive_from_rated": ""
         },
         {
-          "param_name": "首开极系数",
-          "value_text": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-          "value_expr": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若用户输入首开极系数则按照用户录入进行试验",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
           "param_name": "外壳是否带电",
           "value_text": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
           "value_expr": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
@@ -30441,7 +28672,7 @@
       "report_type": "短路性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "额定频率≠60HZ",
+      "note": "额定频率==50Hz or 额定频率==50/60Hz",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -30512,16 +28743,6 @@
           "derive_from_rated": "端子故障"
         },
         {
-          "param_name": "结构特征",
-          "value_text": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "value_expr": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "用户录入，三相分箱分机构、三相分箱共机构、三相共箱共机构，单相分箱分机构",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
           "param_name": "失败次数",
           "value_text": "0次",
           "value_expr": "0次",
@@ -30582,16 +28803,6 @@
           "derive_from_rated": ""
         },
         {
-          "param_name": "首开极系数",
-          "value_text": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若用户录入按照用户录入进行试验",
-          "value_expr": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若用户录入按照用户录入进行试验",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若用户录入按照用户录入进行试验",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
           "param_name": "外壳是否带电",
           "value_text": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
           "value_expr": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
@@ -30630,7 +28841,7 @@
       "report_type": "短路性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "额定电压<=40.5kv & 额定频率≠60HZ",
+      "note": "额定电压<=40.5kv & 【额定频率==50HZ or 额定频率==50/60Hz】",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -30711,16 +28922,6 @@
           "derive_from_rated": "用户录入额定短路关合电流"
         },
         {
-          "param_name": "结构特征",
-          "value_text": "40.5kV及以下不考虑",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "40.5kV及以下不考虑",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
           "param_name": "失败次数",
           "value_text": "0次",
           "value_expr": "0次",
@@ -30771,16 +28972,6 @@
           "derive_from_rated": ""
         },
         {
-          "param_name": "首开极系数",
-          "value_text": "40.5kV及以下默认为1.5",
-          "value_expr": "40.5kV及以下默认为1.5",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kV及以下默认为1.5",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
           "param_name": "外壳是否带电",
           "value_text": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
           "value_expr": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
@@ -30799,7 +28990,7 @@
       "report_type": "短路性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "短路性能型式试验类型下必须执行",
+      "note": "额定频率==50Hz or 额定频率==50/60Hz",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -30860,16 +29051,6 @@
           "derive_from_rated": "额定电压（用户录入）"
         },
         {
-          "param_name": "额定频率",
-          "value_text": "用户录入额定频率，用户未录入默认50Hz",
-          "value_expr": "用户录入额定频率，用户未录入默认50Hz",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户录入额定频率，用户未录入默认50Hz",
-          "calc_rule": "",
-          "derive_from_rated": "用户录入额定频率，用户未录入默认50Hz"
-        },
-        {
           "param_name": "失败次数",
           "value_text": "0次",
           "value_expr": "0次",
@@ -30920,16 +29101,6 @@
           "derive_from_rated": ""
         },
         {
-          "param_name": "首开极系数kpp",
-          "value_text": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
-          "value_expr": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
           "param_name": "外壳是否带电",
           "value_text": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
           "value_expr": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
@@ -30948,7 +29119,7 @@
       "report_type": "短路性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "额定频率≠60HZ",
+      "note": "额定频率==50Hz or 额定频率==50/60Hz",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -31237,16 +29408,6 @@
           "derive_from_rated": "额定电压（用户录入）"
         },
         {
-          "param_name": "峰值电流kA",
-          "value_text": "用户录入的额定峰值耐受电流 kA",
-          "value_expr": "用户录入的额定峰值耐受电流 kA",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户录入的额定峰值耐受电流 kA",
-          "calc_rule": "",
-          "derive_from_rated": "用户录入的额定峰值耐受电流 kA"
-        },
-        {
           "param_name": "回路电阻(μΩ)",
           "value_text": "用户输入，未输入默认实测 μΩ",
           "value_expr": "",
@@ -31306,16 +29467,6 @@
       ],
       "parameters": [
         {
-          "param_name": "短路持续时间",
-          "value_text": "用户录入的额定短路持续时间，取值需要满足≤5S,>0.3S",
-          "value_expr": "用户录入的额定短路持续时间，取值需要满足≤5S,>0.3S",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户录入的额定短路持续时间，取值需要满足≤5S,>0.3S",
-          "calc_rule": "",
-          "derive_from_rated": "用户录入的额定短路持续时间，取值需要满足≤5S,>0.3S"
-        },
-        {
           "param_name": "短时耐受电流",
           "value_text": "用户录入的额定短时耐受电流 kA",
           "value_expr": "用户录入的额定短时耐受电流 kA",
@@ -31372,45 +29523,6 @@
           "value_source": "standard",
           "value_type": "standard",
           "constraints": "1次",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        }
-      ],
-      "rules": []
-    },
-    {
-      "test_item": "辅助和控制回路温升试验",
-      "category": "温升性能型式试验",
-      "report_type": "温升性能型式试验",
-      "aliases": [],
-      "acceptance_criteria": "",
-      "note": "温升性能型式试验类型下必须执行",
-      "confidence": 1.0,
-      "required_reports": [
-        {
-          "report_type": "温升性能型式试验",
-          "is_required": true,
-          "condition": ""
-        }
-      ],
-      "parameters": [
-        {
-          "param_name": "机构是否带合分闸线圈",
-          "value_text": "客户选择是或否；是则必做，否则可不做",
-          "value_expr": "客户选择是或否；是则必做，否则可不做",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "客户选择是或否；是则必做，否则可不做",
-          "calc_rule": "",
-          "derive_from_rated": "客户选择是或否；是则必做，否则可不做"
-        },
-        {
-          "param_name": "试验次数",
-          "value_text": "默认为1次",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "默认为1次",
           "calc_rule": "",
           "derive_from_rated": ""
         }
@@ -31552,7 +29664,7 @@
       "report_type": "短路性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 额定频率≠60HZ",
+      "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 【额定频率 == 50Hz or 额定频率 == 50/60Hz】",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -31661,7 +29773,7 @@
       "report_type": "短路性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "断路器等级==S2（or 额定电压>72.5kV视为S2） & 额定电压≥24kV & 额定短路开断电流＞12.5kA & 额定频率≠60HZ",
+      "note": "断路器等级==S2（ or 额定电压>72.5kV视为S2） & 额定电压＞40.5kV & 额定短路开断电流＞12.5kA & 【额定频率 == 50Hz or 额定频率 == 50/60Hz】",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -31889,7 +30001,7 @@
       "report_type": "短路性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "额定电压<72.5kV or contains_any [\"发电机断路器\", \"限流电抗器\"]",
+      "note": "额定电压<72.5kV",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -32155,7 +30267,7 @@
       "report_type": "温升性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "额定频率!=60Hz",
+      "note": "额定频率 == 50Hz",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -32249,12 +30361,12 @@
       "rules": []
     },
     {
-      "test_item": "温升试验(60HZ)",
+      "test_item": "温升试验(60Hz)",
       "category": "温升性能型式试验",
       "report_type": "温升性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "额定频率==60Hz",
+      "note": "额定频率 == 50/60Hz or 额定频率 == 60Hz",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -32323,16 +30435,6 @@
           "constraints": "40.5kV及以下默认三相，72.5kv及以上需要判断断路器结构，用户声明共箱结构或三相共箱的以三相试验来做，分箱结构或三相分箱的以单相试验来做。",
           "calc_rule": "",
           "derive_from_rated": ""
-        },
-        {
-          "param_name": "是否所配元件",
-          "value_text": "是/否",
-          "value_expr": "是/否",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "是/否",
-          "calc_rule": "",
-          "derive_from_rated": "是/否"
         }
       ],
       "rules": []
@@ -32442,7 +30544,7 @@
       "report_type": "开合性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "【contains \"额定电容器组电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率!=60Hz",
+      "note": "【contains \"额定电容器组电流\"】and 额定频率== 50Hz",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -32601,7 +30703,7 @@
       "report_type": "开合性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "【contains \"额定电容器组电流\"  or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"]】 and 额定频率!=60Hz",
+      "note": "【contains \"额定电容器组电流\"】and 额定频率== 50Hz",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -32760,7 +30862,7 @@
       "report_type": "开合性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "【contains \"额定电缆充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】 and 额定频率!=60Hz",
+      "note": "【contains \"额定电缆充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】 and 额定频率==50Hz",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -32889,7 +30991,7 @@
       "report_type": "开合性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "【contains [\"额定电缆充电开断电流\",\"电缆充电开断电流\",\"额定电缆充电开合电流\",\"电缆充电开合电流\"] 其中之一 or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】 and 额定频率!=60Hz",
+      "note": "【contains \"额定电缆充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】 and 额定频率==50Hz",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -33018,7 +31120,7 @@
       "report_type": "开合性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率!=60Hz",
+      "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率==50Hz",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -33147,7 +31249,7 @@
       "report_type": "开合性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率!=60Hz",
+      "note": "【contains \"额定线路充电电流\" or not contains [\"额定电缆充电电流\",\"额定线路充电电流\",\"额定电容器组电流\"] 】and 额定频率==50Hz",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -33544,16 +31646,6 @@
           "constraints": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
           "calc_rule": "",
           "derive_from_rated": "用户输入(判断取值是或者否)，未输入默认取值\"--\""
-        },
-        {
-          "param_name": "额定频率",
-          "value_text": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "value_expr": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "用户录入额定频率，用户未录入默认50Hz Hz",
-          "calc_rule": "",
-          "derive_from_rated": ""
         }
       ],
       "rules": []
@@ -33625,16 +31717,6 @@
           "derive_from_rated": ""
         },
         {
-          "param_name": "额定频率",
-          "value_text": "用户录入额定频率，用户未录入默认50Hz",
-          "value_expr": "用户录入额定频率，用户未录入默认50Hz",
-          "value_source": "default",
-          "value_type": "default",
-          "constraints": "用户录入额定频率，用户未录入默认50Hz",
-          "calc_rule": "",
-          "derive_from_rated": ""
-        },
-        {
           "param_name": "试验次数",
           "value_text": "1次",
           "value_expr": "",
@@ -33673,16 +31755,6 @@
           "constraints": "单相",
           "calc_rule": "",
           "derive_from_rated": ""
-        },
-        {
-          "param_name": "外壳是否带电",
-          "value_text": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-          "value_expr": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户输入(判断取值是或者否)，未输入默认取值\"--\"",
-          "calc_rule": "",
-          "derive_from_rated": "用户输入(判断取值是或者否)，未输入默认取值\"--\""
         }
       ],
       "rules": []
@@ -34126,6 +32198,95 @@
           "value_source": "default",
           "value_type": "default",
           "constraints": "6次",
+          "calc_rule": "",
+          "derive_from_rated": ""
+        }
+      ],
+      "rules": []
+    },
+    {
+      "test_item": "作为状态检查的T10试验",
+      "category": "短路性能型式试验",
+      "report_type": "短路性能型式试验",
+      "aliases": [],
+      "acceptance_criteria": "",
+      "note": "真空断路器 and contain【SF6气体的额定压力(20℃表压)】",
+      "confidence": 1.0,
+      "required_reports": [
+        {
+          "report_type": "短路性能型式试验",
+          "is_required": true,
+          "condition": ""
+        }
+      ],
+      "parameters": [
+        {
+          "param_name": "额定电压",
+          "value_text": "用户输入",
+          "value_expr": "用户输入",
+          "value_source": "user_input",
+          "value_type": "user_input",
+          "constraints": "用户输入",
+          "calc_rule": "",
+          "derive_from_rated": "用户输入"
+        },
+        {
+          "param_name": "试验电压",
+          "value_text": "40.5kV及以下：额定电压/2；72.5kv及以上：额定电压/根3/2",
+          "value_expr": "",
+          "value_source": "fomula",
+          "value_type": "fomula",
+          "constraints": "40.5kV及以下：额定电压/2；72.5kv及以上：额定电压/根3/2",
+          "calc_rule": "",
+          "derive_from_rated": ""
+        },
+        {
+          "param_name": "试验电流kA",
+          "value_text": "额定短路开断电流*10%",
+          "value_expr": "",
+          "value_source": "fomula",
+          "value_type": "fomula",
+          "constraints": "额定短路开断电流*10%",
+          "calc_rule": "",
+          "derive_from_rated": ""
+        },
+        {
+          "param_name": "试验相数",
+          "value_text": "40.5kV及以下默认为三相、72.5kv及以上默认为单相",
+          "value_expr": "",
+          "value_source": "standard",
+          "value_type": "standard",
+          "constraints": "40.5kV及以下默认为三相、72.5kv及以上默认为单相",
+          "calc_rule": "",
+          "derive_from_rated": ""
+        },
+        {
+          "param_name": "操作顺序",
+          "value_text": "O",
+          "value_expr": "",
+          "value_source": "standard",
+          "value_type": "standard",
+          "constraints": "O",
+          "calc_rule": "",
+          "derive_from_rated": ""
+        },
+        {
+          "param_name": "SF6气体的最低功能压力(20℃表压)",
+          "value_text": "用户输入",
+          "value_expr": "用户输入",
+          "value_source": "user_input",
+          "value_type": "user_input",
+          "constraints": "用户输入",
+          "calc_rule": "",
+          "derive_from_rated": "用户输入"
+        },
+        {
+          "param_name": "试验次数",
+          "value_text": "1次",
+          "value_expr": "",
+          "value_source": "standard",
+          "value_type": "standard",
+          "constraints": "1次",
           "calc_rule": "",
           "derive_from_rated": ""
         }

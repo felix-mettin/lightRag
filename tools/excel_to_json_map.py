@@ -133,7 +133,7 @@ def parse_excel_to_json(excel_path, sheet_name=0, required_cols=None, allowed_ca
 
         remove_parameters = list(remove_params_set)
         remove_rules = list(remove_rules_set)
-
+        
         # 新增：如果没有需要输出的参数，跳过该测试项
         if not has_required_params:
             continue
@@ -213,7 +213,7 @@ def parse_excel_to_json(excel_path, sheet_name=0, required_cols=None, allowed_ca
         # 检查该测试项是否有需要输出的参数
         has_required_params_for_test = False
         param_names_for_test = []
-
+        
         for row in rows:
             need = str(row['是否需要输出在试验参数中']).strip()
             if need in ('是', 'true', '1', 'True'):
@@ -221,9 +221,9 @@ def parse_excel_to_json(excel_path, sheet_name=0, required_cols=None, allowed_ca
                 param_name = row['特性名称']
                 if param_name and param_name not in param_names_for_test:
                     param_names_for_test.append(param_name)
-
+                
                 chu_fa_tiao_jian[row["型式试验的小类"]][row["实际试验名称"]]=row["触发条件"]
-
+        
         # 只有有需要输出的参数时，才添加到test_params
         if has_required_params_for_test and param_names_for_test:
             test_params[test_name] = param_names_for_test
@@ -296,7 +296,7 @@ if __name__ == "__main__":
     pare_english(excel_path=input_file,sheet_name="参数中英文最终版")
 
     # # 处理 GBT
-    # output_file_gb = f"annotation_memory.gb_gy_{time_str}.json"
+    # output_file_gb = f"{time_str}_annotation_memory.gb_gy.json"
     # sheet_name_gb = "GBT"
     # result_gb = parse_excel_to_json(excel_path=input_file, sheet_name=sheet_name_gb, required_cols=required_cols, allowed_categories=allowed_categories)
     #
@@ -306,22 +306,22 @@ if __name__ == "__main__":
     # print(f"转换完成，结果已保存至 {output_file_gb}")
 
 
-    # 处理 DLT
-    output_file_dlt = f"annotation_memory.dlt_gy_{time_str}.json"
-    sheet_name_dlt = "DLT"
-    result_dlt = parse_excel_to_json(input_file, sheet_name=sheet_name_dlt, required_cols=required_cols, allowed_categories=allowed_categories)
-
-    with open(output_file_dlt, 'w', encoding='utf-8') as f:
-        json.dump(result_dlt, f, ensure_ascii=False, indent=2)
-
-    print(f"转换完成，结果已保存至 {output_file_dlt}")
-
-    # # 处理 IEC
-    # output_file_iec = f"annotation_memory.iec_gy_{time_str}.json"
-    # sheet_name_iec = "IEC"
-    # result_iec = parse_excel_to_json(input_file, sheet_name=sheet_name_iec, required_cols=required_cols, allowed_categories=allowed_categories)
+    # # 处理 DLT
+    # output_file_dlt = f"{time_str}_annotation_memory.dlt_gy.json"
+    # sheet_name_dlt = "DLT"
+    # result_dlt = parse_excel_to_json(input_file, sheet_name=sheet_name_dlt, required_cols=required_cols, allowed_categories=allowed_categories)
     #
-    # with open(output_file_iec, 'w', encoding='utf-8') as f:
-    #     json.dump(result_iec, f, ensure_ascii=False, indent=2)
+    # with open(output_file_dlt, 'w', encoding='utf-8') as f:
+    #     json.dump(result_dlt, f, ensure_ascii=False, indent=2)
     #
-    # print(f"转换完成，结果已保存至 {output_file_iec}")
+    # print(f"转换完成，结果已保存至 {output_file_dlt}")
+
+    # 处理 IEC
+    output_file_iec = f"{time_str}_annotation_memory.iec_gy.json"
+    sheet_name_iec = "IEC"
+    result_iec = parse_excel_to_json(input_file, sheet_name=sheet_name_iec, required_cols=required_cols, allowed_categories=allowed_categories)
+
+    with open(output_file_iec, 'w', encoding='utf-8') as f:
+        json.dump(result_iec, f, ensure_ascii=False, indent=2)
+
+    print(f"转换完成，结果已保存至 {output_file_iec}")
