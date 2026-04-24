@@ -33,9 +33,12 @@
       },
       "split_output": [
         {
-          "test_item": "工频耐受电压试验",
+          "test_item": "工频耐受电压试验(相间及对地)",
           "inherits_from": "工频耐受电压试验",
-          "parameter_overrides": {}
+          "parameter_overrides": {
+            "试验部位": "相间及对地",
+            "试验状态": "干"
+          }
         },
         {
           "test_item": "工频耐受电压试验(断口)",
@@ -191,7 +194,7 @@
       "standard": "dlt",
       "test_item": "雷电冲击耐受电压试验",
       "status": "active",
-      "remove_original": false,
+      "remove_original": true,
       "inputs": {
         "base_voltage_labels": [
           "额定雷电冲击耐受电压"
@@ -524,13 +527,6 @@
             },
             {
               "source": "query",
-              "type": "less_numeric",
-              "label": "额定电压",
-              "value": 72.5,
-              "unit": "kV"
-            },
-            {
-              "source": "query",
               "type": "contains",
               "label": "额定失步开断电流"
             }
@@ -697,7 +693,7 @@
       "domain": "switching",
       "kind": "applicability",
       "standard": "dlt",
-      "test_item": "状态检查试验（T10）",
+      "test_item": "状态检查试验(T10)",
       "status": "active",
       "allow_when_any": [
         {
@@ -1639,7 +1635,7 @@
       },
       "split_output": [
         {
-          "test_item": "操作冲击耐受电压试验",
+          "test_item": "操作冲击耐受电压试验(干)",
           "inherits_from": "操作冲击耐受电压试验",
           "parameter_overrides": {
             "试验状态": "干",
@@ -1738,9 +1734,6 @@
               "source": "query",
               "type": "contains_any",
               "labels": [
-                "短路",
-                "容性",
-                "电寿命",
                 "真空"
               ]
             }
@@ -1853,7 +1846,7 @@
                 "电容器组电流",
                 "电容器组开断电流",
                 "额定背对背电容器组开断电流",
-                "背对背电容器组开断电流"
+                "背对背电容器组开断电流",
               ]
             }
           ]
