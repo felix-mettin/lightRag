@@ -5459,22 +5459,27 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
     }
 
 
-def _get_report_scope_test_whitelist() -> dict[str, set[str]]:
+def _get_report_scope_test_whitelist(stand_type: str | None = None) -> dict[str, set[str]]:
+    normalized = _normalize_operate_standard_type(stand_type)
+    insulation_tests = {
+        "工频耐受电压试验",
+        "工频耐受电压试验(断口)",
+        "工频耐受电压试验(相间及对地)",
+        "工频耐受电压试验(干)",
+        "工频耐受电压试验(湿)",
+        "雷电冲击耐受电压试验",
+        "雷电冲击耐受电压试验(断口)",
+        "雷电冲击耐受电压试验(相间及对地)",
+        "控制和辅助回路的绝缘试验",
+        "操作冲击耐受电压试验",
+        "局部放电试验",
+        "全套绝缘型式试验",
+    }
+    # IEC 标准不包含局部放电试验
+    if normalized == "IEC":
+        insulation_tests = insulation_tests - {"局部放电试验"}
     return {
-        "绝缘性能型式试验": {
-            "工频耐受电压试验",
-            "工频耐受电压试验(断口)",
-            "工频耐受电压试验(相间及对地)",
-            "工频耐受电压试验(干)",
-            "工频耐受电压试验(湿)",
-            "雷电冲击耐受电压试验",
-            "雷电冲击耐受电压试验(断口)",
-            "雷电冲击耐受电压试验(相间及对地)",
-            "控制和辅助回路的绝缘试验",
-            "操作冲击耐受电压试验",
-            "局部放电试验",
-            "全套绝缘型式试验",
-        },
+        "绝缘性能型式试验": insulation_tests,
         "温升性能型式试验": {
             "回路电阻测量",
             "辅助和控制回路温升试验",
@@ -5679,11 +5684,12 @@ def _filter_project_context_by_report_scope(
         project_param_value_map: dict[str, dict[str, dict[str, str]]],
         current_report_scopes: list[str],
         domain_rule_decisions: dict[str, Any] | None = None,
+        stand_type: str | None = None,
 ) -> tuple[dict[str, list[str]], dict[str, dict[str, dict[str, str]]]]:
     if not current_report_scopes:
         return project_param_map, project_param_value_map
 
-    whitelist_map = _get_report_scope_test_whitelist()
+    whitelist_map = _get_report_scope_test_whitelist(stand_type)
     allowed_tests: set[str] = set()
     for scope in current_report_scopes:
         allowed_tests.update(whitelist_map.get(str(scope).strip(), set()))
@@ -13186,9 +13192,7 @@ async def _build_context_str(
         li_split_rule = domain_rule_decisions.get("insulation.gb.lightning_impulse_split", {}) or domain_rule_decisions.get(
             "insulation.gb.lightning_impulse_joint_voltage_split", {}
         )
-        # pd_app_rule = domain_rule_decisions.get(
-        #     "insulation.gb.partial_discharge_applicability", {}
-        # )
+        pd_app_rule = None
     else:
         pf_split_rule = domain_rule_decisions.get("insulation.gb.power_frequency_split", {}) or domain_rule_decisions.get(
             "insulation.gb.power_frequency_joint_voltage_split", {}
@@ -13289,7 +13293,7 @@ async def _build_context_str(
 
         current_report_scopes = _extract_current_report_scopes(rule_query_text, schema_cfg)
         if current_report_scopes:
-            whitelist_map = _get_report_scope_test_whitelist()
+            whitelist_map = _get_report_scope_test_whitelist(normalized_stand_type)
             scoped_test_items: set[str] = set()
             for scope in current_report_scopes:
                 scoped_test_items.update(whitelist_map.get(str(scope).strip(), set()))
@@ -13433,6 +13437,7 @@ async def _build_context_str(
             project_param_value_map,
             current_report_scopes,
             domain_rule_decisions,
+            stand_type=normalized_stand_type,
         )
         post_scope_test_items = {
             str(test_name).strip()
