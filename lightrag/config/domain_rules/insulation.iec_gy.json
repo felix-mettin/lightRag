@@ -2023,60 +2023,6 @@
       ],
       "deny_when_no_match": true
     },
-//    {
-//      "rule_id": "insulation.iec.partial_discharge_applicability",
-//      "domain": "insulation",
-//      "kind": "applicability",
-//      "standard": "iec",
-//      "test_item": "局部放电试验",
-//      "status": "active",
-//      "allow_when_any": [
-//        {
-//          "source": "query",
-//          "type": "contains_any",
-//          "labels": [
-//            "GIS",
-//            "外壳不带电",
-//            "固封极柱"
-//          ]
-//        }
-//      ],
-//      "deny_when_no_match": true
-//    },
-//    {
-//      "rule_id": "insulation.gb.partial_discharge_count",
-//      "domain": "insulation",
-//      "kind": "count",
-//      "standard": "gb",
-//      "test_item": "局部放电试验",
-//      "status": "active",
-//      "inputs": {
-//        "power_frequency_base_labels": [
-//          "额定短时工频耐受电压",
-//          "额定工频耐受电压"
-//        ],
-//        "power_frequency_fracture_labels": [
-//          "额定短时工频耐受电压(断口)",
-//          "额定工频耐受电压(断口)"
-//        ],
-//        "lightning_base_labels": [
-//          "额定雷电冲击耐受电压"
-//        ],
-//        "lightning_fracture_labels": [
-//          "额定雷电冲击耐受电压(断口)"
-//        ]
-//      },
-//      "decision": {
-//        "count_when_fracture_strictly_greater": "9次",
-//        "count_otherwise": "3次",
-//        "special_priority": [
-//          {
-//            "when": "断口值未严格大于本体值",
-//            "count": "3次"
-//          }
-//        ]
-//      }
-//    },
     {
       "rule_id": "switching.gb.bc1_60hz_applicability",
       "domain": "switching",
