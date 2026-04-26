@@ -7,7 +7,7 @@
       "standard": "gb",
       "test_item": "工频耐受电压试验",
       "status": "active",
-      "remove_original": true,
+      "remove_original": false,
       "inputs": {
         "base_voltage_labels": [
           "额定短时工频耐受电压",
@@ -764,7 +764,7 @@
             {
               "source": "query",
               "type": "equals_numeric",
-              "label": "首开极系数kpp",
+              "label": "首开极系数",
               "value": 1.3,
               "unit": ""
             },

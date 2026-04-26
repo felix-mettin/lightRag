@@ -1984,7 +1984,7 @@ def _evaluate_domain_rule_decisions(
                 normalized_stand_type = _normalize_operate_standard_type(stand_type)
                 expected_rule_id = rule_id
                 if normalized_stand_type == "DLT":
-                    expected_rule_id = "insulation.dlt.power_frequency_outdoor_state_split"
+                    expected_rule_id = "insulation.gb.power_frequency_outdoor_state_split"
                 elif normalized_stand_type == "IEC":
                     expected_rule_id = "insulation.gb.power_frequency_outdoor_state_split"
                 else:
@@ -2105,7 +2105,7 @@ def _evaluate_domain_rule_decisions(
                     reason_text = "额定电压高于252kV且命中户外条件时，操作冲击耐受电压试验拆分为相间及对地(干)、相间及对地(湿)和联合电压(干)，并移除原项。"
                 switching_wet_rule_id = rule_id
                 if normalized_stand_type == "DLT":
-                    switching_wet_rule_id = "insulation.dlt.switching_impulse_wet_split"
+                    switching_wet_rule_id = "insulation.gb.switching_impulse_wet_split"
                 elif normalized_stand_type == "IEC":
                     switching_wet_rule_id = "insulation.iec.switching_impulse_wet_split"
                 else:
@@ -2164,7 +2164,7 @@ def _evaluate_domain_rule_decisions(
                 normalized_stand_type = _normalize_operate_standard_type(stand_type)
                 expected_rule_id = rule_id
                 if normalized_stand_type == "DLT":
-                    expected_rule_id = "insulation.dlt.power_frequency_split"
+                    expected_rule_id = "insulation.gb.power_frequency_split"
                 elif normalized_stand_type == "IEC":
                     expected_rule_id = "insulation.gb.power_frequency_split"
                 else:
@@ -3318,15 +3318,20 @@ def _apply_domain_rule_decisions_to_project_context(
         for test_name in (
             "L75(60Hz)",
             "L90(60Hz)",
-            "T100A(60Hz)",
             "T100S(60Hz)",
             "近区故障试验(L75)",
             "近区故障试验(L90)",
-            "短路开断试验(T100A)",
             "短路开断试验(T100S)",
         ):
             resolved[test_name] = {
                 "操作顺序": (operation_sequence_text, operation_sequence_rule),
+            }
+        for test_name in (
+            "T100A(60Hz)",
+            "短路开断试验(T100A)",
+        ):
+            resolved[test_name] = {
+                "操作顺序": ("O", "T100A 试验操作顺序为O，无需 CO 循环。"),
             }
 
         if rated_voltage_kv is not None:
@@ -5359,7 +5364,7 @@ def _should_bypass_query_cache(global_config: dict[str, Any] | None) -> bool:
 def _get_display_param_suppressions() -> dict[str, set[str]]:
     # return {}
     return {
-        "回路电阻测量": {"回路电阻", "辅助和控制设备的电阻"},
+        "回路电阻测量": {"回路电阻", "辅助和控制设备的电阻","回路电阻(μΩ)"},
         "工频耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
         "工频耐受电压试验(干)":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
         "工频耐受电压试验(湿)":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
@@ -5475,18 +5480,7 @@ def _get_report_scope_test_whitelist(stand_type: str | None = None) -> dict[str,
         "局部放电试验",
         "全套绝缘型式试验",
     }
-    # IEC 标准不包含局部放电试验
-    if normalized == "IEC":
-        insulation_tests = insulation_tests - {"局部放电试验"}
-    return {
-        "绝缘性能型式试验": insulation_tests,
-        "温升性能型式试验": {
-            "回路电阻测量",
-            "辅助和控制回路温升试验",
-            "温升试验",
-            "温升试验(60Hz)",
-        },
-        "开合性能型式试验": {
+    switching_tests = {
             "容性电流开断试验(LC1)",
             "容性电流开断试验(LC2)",
             "容性电流开断试验(CC1)",
@@ -5505,8 +5499,8 @@ def _get_report_scope_test_whitelist(stand_type: str | None = None) -> dict[str,
             "CC2(60Hz)",
             "LC1(60Hz)",
             "LC2(60Hz)",
-        },
-        "短路性能型式试验": {
+        }
+    short_tests = {
             "短时耐受电流试验",
             "峰值耐受电流试验",
             "短时耐受电流和峰值耐受电流试验",
@@ -5542,7 +5536,26 @@ def _get_report_scope_test_whitelist(stand_type: str | None = None) -> dict[str,
             "T100s(a)(60Hz)",
             "T100s(b)(60Hz)",
             "T100s(三相共机构的验证试验)",
+        }
+    # IEC DLT 标准不包含局部放电试验
+    # NOTE: set.discard() and set.add() are in-place operations returning None,
+    # so do NOT reassign the variable.
+    if normalized in "IEC":
+        insulation_tests.discard("局部放电试验")
+    elif normalized in "DLT":
+        insulation_tests.discard("局部放电试验")
+        short_tests.add("作为状态检查的雷电冲击耐受电压试验")
+        switching_tests.add("作为状态检查的雷电冲击耐受电压试验")
+    return {
+        "绝缘性能型式试验": insulation_tests,
+        "温升性能型式试验": {
+            "回路电阻测量",
+            "辅助和控制回路温升试验",
+            "温升试验",
+            "温升试验(60Hz)",
         },
+        "开合性能型式试验": switching_tests,
+        "短路性能型式试验": short_tests,
     }
 
 
@@ -11950,7 +11963,7 @@ async def kg_query(
         chunks_vdb,
         stand_type=stand_type
     )
-
+    # logger.info(f"context_result:{context_result}")
     if context_result is None:
         logger.info("[kg_query] No query context could be built; returning no-result.")
         return None
@@ -13180,10 +13193,10 @@ async def _build_context_str(
     domain_rule_decisions = _evaluate_domain_rule_decisions(rule_query_text, schema_cfg, stand_type=stand_type)
     normalized_stand_type = _normalize_operate_standard_type(stand_type)
     if normalized_stand_type == "DLT":
-        pf_split_rule = domain_rule_decisions.get("insulation.dlt.power_frequency_split", {})
-        li_split_rule = domain_rule_decisions.get("insulation.dlt.lightning_impulse_split", {})
+        pf_split_rule = domain_rule_decisions.get("insulation.gb.power_frequency_split", {})
+        li_split_rule = domain_rule_decisions.get("insulation.gb.lightning_impulse_split", {})
         pd_app_rule = domain_rule_decisions.get(
-            "insulation.dlt.partial_discharge_applicability", {}
+            "insulation.gb.partial_discharge_applicability", {}
         )
     elif normalized_stand_type == "IEC":
         pf_split_rule = domain_rule_decisions.get("insulation.gb.power_frequency_split", {}) or domain_rule_decisions.get(

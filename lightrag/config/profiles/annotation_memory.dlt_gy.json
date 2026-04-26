@@ -7346,6 +7346,60 @@
       "remove_parameters": [],
       "remove_rules": []
     },
+    "型式试验 > 温升性能型式试验 > 辅助和控制回路温升试验": {
+      "test_name": "辅助和控制回路温升试验",
+      "report_type": "温升性能型式试验",
+      "category": "温升性能型式试验",
+      "path_parts": [
+        "型式试验",
+        "温升性能型式试验",
+        "辅助和控制回路温升试验"
+      ],
+      "path_key": "型式试验 > 温升性能型式试验 > 辅助和控制回路温升试验",
+      "skip": false,
+      "note": "温升性能型式试验类型下必须执行",
+      "parameters": [
+        {
+          "param_name": "试验次数",
+          "value_text": "默认为1次",
+          "value_expr": "",
+          "value_source": "standard",
+          "value_type": "standard",
+          "constraints": "默认为1次",
+          "calc_rule": "",
+          "derive_from_rated": ""
+        }
+      ],
+      "remove_parameters": [],
+      "remove_rules": []
+    },
+    "温升性能型式试验 > 温升性能型式试验 > 辅助和控制回路温升试验": {
+      "test_name": "辅助和控制回路温升试验",
+      "report_type": "温升性能型式试验",
+      "category": "温升性能型式试验",
+      "path_parts": [
+        "型式试验",
+        "温升性能型式试验",
+        "辅助和控制回路温升试验"
+      ],
+      "path_key": "温升性能型式试验 > 温升性能型式试验 > 辅助和控制回路温升试验",
+      "skip": false,
+      "note": "温升性能型式试验类型下必须执行",
+      "parameters": [
+        {
+          "param_name": "试验次数",
+          "value_text": "默认为1次",
+          "value_expr": "",
+          "value_source": "standard",
+          "value_type": "standard",
+          "constraints": "默认为1次",
+          "calc_rule": "",
+          "derive_from_rated": ""
+        }
+      ],
+      "remove_parameters": [],
+      "remove_rules": []
+    },
     "型式试验 > 绝缘性能型式试验 > 工频耐受电压试验": {
       "test_name": "工频耐受电压试验",
       "report_type": "绝缘性能型式试验",
@@ -20404,6 +20458,62 @@
         "remove_rules": []
       }
     ],
+    "辅助和控制回路温升试验": [
+      {
+        "test_name": "辅助和控制回路温升试验",
+        "report_type": "温升性能型式试验",
+        "category": "温升性能型式试验",
+        "path_parts": [
+          "型式试验",
+          "温升性能型式试验",
+          "辅助和控制回路温升试验"
+        ],
+        "path_key": "型式试验 > 温升性能型式试验 > 辅助和控制回路温升试验",
+        "skip": false,
+        "note": "温升性能型式试验类型下必须执行",
+        "parameters": [
+          {
+            "param_name": "试验次数",
+            "value_text": "默认为1次",
+            "value_expr": "",
+            "value_source": "standard",
+            "value_type": "standard",
+            "constraints": "默认为1次",
+            "calc_rule": "",
+            "derive_from_rated": ""
+          }
+        ],
+        "remove_parameters": [],
+        "remove_rules": []
+      },
+      {
+        "test_name": "辅助和控制回路温升试验",
+        "report_type": "温升性能型式试验",
+        "category": "温升性能型式试验",
+        "path_parts": [
+          "型式试验",
+          "温升性能型式试验",
+          "辅助和控制回路温升试验"
+        ],
+        "path_key": "温升性能型式试验 > 温升性能型式试验 > 辅助和控制回路温升试验",
+        "skip": false,
+        "note": "温升性能型式试验类型下必须执行",
+        "parameters": [
+          {
+            "param_name": "试验次数",
+            "value_text": "默认为1次",
+            "value_expr": "",
+            "value_source": "standard",
+            "value_type": "standard",
+            "constraints": "默认为1次",
+            "calc_rule": "",
+            "derive_from_rated": ""
+          }
+        ],
+        "remove_parameters": [],
+        "remove_rules": []
+      }
+    ],
     "工频耐受电压试验": [
       {
         "test_name": "工频耐受电压试验",
@@ -29829,6 +29939,35 @@
           "value_source": "standard",
           "value_type": "standard",
           "constraints": "1次",
+          "calc_rule": "",
+          "derive_from_rated": ""
+        }
+      ],
+      "rules": []
+    },
+    {
+      "test_item": "辅助和控制回路温升试验",
+      "category": "温升性能型式试验",
+      "report_type": "温升性能型式试验",
+      "aliases": [],
+      "acceptance_criteria": "",
+      "note": "温升性能型式试验类型下必须执行",
+      "confidence": 1.0,
+      "required_reports": [
+        {
+          "report_type": "温升性能型式试验",
+          "is_required": true,
+          "condition": ""
+        }
+      ],
+      "parameters": [
+        {
+          "param_name": "试验次数",
+          "value_text": "默认为1次",
+          "value_expr": "",
+          "value_source": "standard",
+          "value_type": "standard",
+          "constraints": "默认为1次",
           "calc_rule": "",
           "derive_from_rated": ""
         }

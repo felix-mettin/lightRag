@@ -1,10 +1,10 @@
 {
   "rules": [
     {
-      "rule_id": "insulation.dlt.power_frequency_split",
+      "rule_id": "insulation.gb.power_frequency_split",
       "domain": "insulation",
       "kind": "split",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "工频耐受电压试验",
       "status": "active",
       "remove_original": false,
@@ -51,10 +51,10 @@
       ]
     },
     {
-      "rule_id": "insulation.dlt.power_frequency_joint_voltage_split",
+      "rule_id": "insulation.gb.power_frequency_joint_voltage_split",
       "domain": "insulation",
       "kind": "split",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "工频耐受电压试验",
       "status": "active",
       "remove_original": false,
@@ -98,10 +98,10 @@
       ]
     },
     {
-      "rule_id": "insulation.dlt.power_frequency_outdoor_state_split",
+      "rule_id": "insulation.gb.power_frequency_outdoor_state_split",
       "domain": "insulation",
       "kind": "split",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "工频耐受电压试验",
       "status": "active",
       "inputs": {
@@ -140,10 +140,10 @@
       ]
     },
     {
-      "rule_id": "switching.dlt.no_load_applicability",
+      "rule_id": "switching.gb.no_load_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "空载特性测量",
       "status": "active",
       "allow_when_any": [
@@ -188,10 +188,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "insulation.dlt.lightning_impulse_split",
+      "rule_id": "insulation.gb.lightning_impulse_split",
       "domain": "insulation",
       "kind": "split",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "雷电冲击耐受电压试验",
       "status": "active",
       "remove_original": true,
@@ -236,10 +236,10 @@
       ]
     },
     {
-      "rule_id": "insulation.dlt.lightning_impulse_joint_voltage_split",
+      "rule_id": "insulation.gb.lightning_impulse_joint_voltage_split",
       "domain": "insulation",
       "kind": "split",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "雷电冲击耐受电压试验",
       "status": "active",
       "remove_original": false,
@@ -278,10 +278,10 @@
       ]
     },
     {
-      "rule_id": "short_circuit.dlt.electrical_life_applicability",
+      "rule_id": "short_circuit.gb.electrical_life_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "电寿命试验",
       "status": "active",
       "allow_when_any": [
@@ -307,10 +307,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.electrical_life_split_30",
+      "rule_id": "short_circuit.gb.electrical_life_split_30",
       "domain": "short_circuit",
       "kind": "split",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "电寿命试验",
       "status": "active",
       "inputs": {
@@ -371,10 +371,10 @@
       ]
     },
     {
-      "rule_id": "short_circuit.dlt.electrical_life_split_50",
+      "rule_id": "short_circuit.gb.electrical_life_split_50",
       "domain": "short_circuit",
       "kind": "split",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "电寿命试验",
       "status": "active",
       "inputs": {
@@ -435,10 +435,10 @@
       ]
     },
     {
-      "rule_id": "short_circuit.dlt.electrical_life_split",
+      "rule_id": "short_circuit.gb.electrical_life_split",
       "domain": "short_circuit",
       "kind": "split",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "电寿命试验",
       "status": "active",
       "inputs": {
@@ -509,10 +509,10 @@
       ]
     },
     {
-      "rule_id": "short_circuit.dlt.op1_applicability",
+      "rule_id": "short_circuit.gb.op1_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "失步关合和开断试验(OP1)",
       "status": "active",
       "allow_when_any": [
@@ -536,10 +536,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.op2_applicability",
+      "rule_id": "short_circuit.gb.op2_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "失步关合和开断试验(OP2)",
       "status": "active",
       "allow_when_any": [
@@ -567,10 +567,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.t10_applicability",
+      "rule_id": "short_circuit.gb.t10_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "短路开断试验(T10)",
       "status": "active",
       "allow_when_any": [
@@ -583,10 +583,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.t30_applicability",
+      "rule_id": "short_circuit.gb.t30_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "短路开断试验(T30)",
       "status": "active",
       "allow_when_any": [
@@ -599,12 +599,19 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.t60_applicability",
+      "rule_id": "short_circuit.gb.t60_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "短路开断试验(T60)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -615,12 +622,19 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.t100s_applicability",
+      "rule_id": "short_circuit.gb.t100s_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "短路开断试验(T100S)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -637,13 +651,6 @@
               "label": "额定电压",
               "value": 40.5,
               "unit": "kV"
-            },
-            {
-              "source": "query",
-              "type": "not_equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         }
@@ -651,11 +658,11 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.state_check_t10_applicability",
+      "rule_id": "short_circuit.gb.state_check_t10_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
-      "test_item": "状态检查试验（T10）",
+      "standard": "gb",
+      "test_item": "状态检查试验(T10)",
       "status": "active",
       "allow_when_any": [
         {
@@ -689,10 +696,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.dlt.state_check_t10_applicability",
+      "rule_id": "switching.gb.state_check_t10_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "状态检查试验(T10)",
       "status": "active",
       "allow_when_any": [
@@ -727,10 +734,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.single_phase_ground_fault_applicability",
+      "rule_id": "short_circuit.gb.single_phase_ground_fault_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "单相接地故障试验",
       "status": "active",
       "allow_when_any": [
@@ -769,15 +776,33 @@
               "unit": ""
             }
           ]
+        },
+         {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "短路性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "equals_numeric",
+              "label": "kpp",
+              "value": 1.3,
+              "unit": ""
+            }
+          ]
         }
       ],
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.phase_to_ground_fault_applicability",
+      "rule_id": "short_circuit.gb.phase_to_ground_fault_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "异相接地故障试验",
       "status": "active",
       "allow_when_any": [
@@ -798,17 +823,60 @@
               "unit": ""
             }
           ]
+        },
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "短路性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "equals_numeric",
+              "label": "首开极系数kpp",
+              "value": 1.5,
+              "unit": ""
+            }
+          ]
+        },
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "短路性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "equals_numeric",
+              "label": "kpp",
+              "value": 1.5,
+              "unit": ""
+            }
+          ]
         }
       ],
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.l90_applicability",
+      "rule_id": "short_circuit.gb.l90_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "近区故障试验(L90)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -944,10 +1012,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.l75_applicability",
+      "rule_id": "short_circuit.gb.l75_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "近区故障试验(L75)",
       "status": "active",
       "allow_when_any": [
@@ -1085,10 +1153,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.dlt.lc1_applicability",
+      "rule_id": "switching.gb.lc1_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "容性电流开断试验(LC1)",
       "status": "active",
       "deny_when_any": [
@@ -1198,10 +1266,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.dlt.lc2_applicability",
+      "rule_id": "switching.gb.lc2_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "容性电流开断试验(LC2)",
       "status": "active",
       "deny_when_any": [
@@ -1302,10 +1370,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.dlt.cc1_applicability",
+      "rule_id": "switching.gb.cc1_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "容性电流开断试验(CC1)",
       "status": "active",
       "deny_when_any": [
@@ -1332,11 +1400,7 @@
                 "额定电缆充电开断电流",
                 "电缆充电开断电流",
                 "额定电缆充电开合电流",
-                "电缆充电开合电流",
-                "额定短路关合电流",
-                "短路关合电流",
-                "额定关合电流",
-                "关合电流"
+                "电缆充电开合电流"
               ]
             }
           ]
@@ -1345,10 +1409,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.dlt.cc2_applicability",
+      "rule_id": "switching.gb.cc2_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "容性电流开断试验(CC2)",
       "status": "active",
       "deny_when_any": [
@@ -1449,12 +1513,19 @@
       "deny_when_no_match": true
     },
       {
-        "rule_id": "switching.dlt.cc2_final_split",
+        "rule_id": "switching.gb.cc2_final_split",
         "domain": "switching",
         "kind": "split",
-        "standard": "dlt",
+        "standard": "gb",
         "test_item": "容性电流开断试验(CC2)",
         "status": "active",
+        "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+        }
+       ],
         "inputs": {
           "trigger_when_any": [
             {
@@ -1491,10 +1562,10 @@
         ]
       },
       {
-        "rule_id": "switching.dlt.lc2_final_split",
+        "rule_id": "switching.gb.lc2_final_split",
         "domain": "switching",
         "kind": "split",
-        "standard": "dlt",
+        "standard": "gb",
         "test_item": "容性电流开断试验(LC2)",
         "status": "active",
         "inputs": {
@@ -1533,10 +1604,10 @@
         ]
       },
     {
-      "rule_id": "insulation.dlt.lightning_impulse_applicability",
+      "rule_id": "insulation.gb.lightning_impulse_applicability",
       "domain": "insulation",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "雷电冲击耐受电压试验",
       "status": "active",
       "allow_when_any": [
@@ -1552,13 +1623,13 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "insulation.dlt.switching_impulse_joint_voltage_split",
+      "rule_id": "insulation.gb.switching_impulse_joint_voltage_split",
       "domain": "insulation",
       "kind": "split",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "操作冲击耐受电压试验",
       "status": "active",
-      "remove_original": false,
+      "remove_original": true,
       "inputs": {
         "trigger_when_any": [
           {
@@ -1598,10 +1669,10 @@
       ]
     },
     {
-      "rule_id": "insulation.dlt.switching_impulse_wet_split",
+      "rule_id": "insulation.gb.switching_impulse_wet_split",
       "domain": "insulation",
       "kind": "split",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "操作冲击耐受电压试验",
       "status": "active",
       "remove_original": false,
@@ -1653,10 +1724,10 @@
       ]
     },
     {
-      "rule_id": "insulation.dlt.switching_impulse_applicability",
+      "rule_id": "insulation.gb.switching_impulse_applicability",
       "domain": "insulation",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "操作冲击耐受电压试验",
       "status": "active",
       "allow_when_any": [
@@ -1671,10 +1742,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.state_check_pf_applicability",
+      "rule_id": "short_circuit.gb.state_check_pf_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "作为状态检查的工频耐受电压试验",
       "status": "active",
       "allow_when_any": [
@@ -1707,10 +1778,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.dlt.state_check_pf_applicability",
+      "rule_id": "switching.gb.state_check_pf_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "作为状态检查的工频耐受电压试验",
       "status": "active",
       "allow_when_any": [
@@ -1743,10 +1814,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.lei_dian_chong_ji_state",
+      "rule_id": "short_circuit.gb.lei_dian_chong_ji_state",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "作为状态检查的雷电冲击耐受电压试验",
       "status": "active",
       "allow_when_any": [
@@ -1779,10 +1850,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.dlt.lei_dian_chong_ji_state",
+      "rule_id": "switching.gb.lei_dian_chong_ji_state",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "作为状态检查的雷电冲击耐受电压试验",
       "status": "active",
       "allow_when_any": [
@@ -1815,117 +1886,11 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.dlt.bc1_applicability",
+      "rule_id": "switching.gb.bc1_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "容性电流开断试验(BC1)",
-      "status": "active",
-      "deny_when_any": [
-        {
-          "source": "query",
-          "type": "regex_match",
-          "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
-        }
-      ],
-      "allow_when_any": [
-        {
-          "source": "query",
-          "type": "all",
-          "conditions": [
-            {
-              "source": "query",
-              "type": "contains",
-              "label": "开合性能型式试验"
-            },
-            {
-              "source": "query",
-              "type": "contains_any",
-              "labels": [
-                "额定电容器组电流",
-                "电容器组电流",
-                "电容器组开断电流",
-                "额定背对背电容器组开断电流",
-                "背对背电容器组开断电流",
-              ]
-            }
-          ]
-        },
-        {
-          "source": "query",
-          "type": "all",
-          "conditions": [
-            {
-              "source": "query",
-              "type": "contains",
-              "label": "开合性能型式试验"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定电缆充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电缆充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电缆充电"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定线路充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "线路充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "线路充电"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定电容器组电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电容器组电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定背对背电容器组开断电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "背对背电容器组开断电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电容器组开断电流"
-            }
-          ]
-        }
-      ],
-      "deny_when_no_match": true
-    },
-    {
-      "rule_id": "switching.dlt.bc2_applicability",
-      "domain": "switching",
-      "kind": "applicability",
-      "standard": "dlt",
-      "test_item": "容性电流开断试验(BC2)",
       "status": "active",
       "deny_when_any": [
         {
@@ -2027,10 +1992,50 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.no_load_applicability",
+      "rule_id": "switching.gb.bc2_applicability",
+      "domain": "switching",
+      "kind": "applicability",
+      "standard": "gb",
+      "test_item": "容性电流开断试验(BC2)",
+      "status": "active",
+      "deny_when_any": [
+        {
+          "source": "query",
+          "type": "regex_match",
+          "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
+        }
+      ],
+      "allow_when_any": [
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "开合性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "contains_any",
+              "labels": [
+                "额定电容器组电流",
+                "电容器组电流",
+                "电容器组开断电流",
+                "额定背对背电容器组开断电流",
+                "背对背电容器组开断电流"
+              ]
+            }
+          ]
+        }
+      ],
+      "deny_when_no_match": true
+    },
+    {
+      "rule_id": "short_circuit.gb.no_load_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "空载特性测量",
       "status": "active",
       "allow_when_any": [
@@ -2075,11 +2080,11 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "insulation.dlt.loop_resistance_applicability",
-      "domain": "insulation",
+      "rule_id": "insulation.gb.loop_resistance_applicability",
+      "domain": "temperature_rise",
       "kind": "applicability",
-      "standard": "dlt",
-      "test_item": "前后回路电阻测量试验",
+      "standard": "gb",
+      "test_item": "回路电阻测量",
       "status": "active",
       "allow_when_any": [
         {
@@ -2091,66 +2096,19 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "insulation.dlt.partial_discharge_applicability",
-      "domain": "insulation",
-      "kind": "applicability",
-      "standard": "dlt",
-      "test_item": "局部放电试验",
-      "status": "active",
-      "allow_when_any": [
-        {
-          "source": "query",
-          "type": "contains_any",
-          "labels": [
-            "GIS",
-            "外壳不带电",
-            "固封极柱"
-          ]
-        }
-      ],
-      "deny_when_no_match": true
-    },
-    {
-      "rule_id": "insulation.dlt.partial_discharge_count",
-      "domain": "insulation",
-      "kind": "count",
-      "standard": "dlt",
-      "test_item": "局部放电试验",
-      "status": "active",
-      "inputs": {
-        "power_frequency_base_labels": [
-          "额定短时工频耐受电压",
-          "额定工频耐受电压"
-        ],
-        "power_frequency_fracture_labels": [
-          "额定短时工频耐受电压(断口)",
-          "额定工频耐受电压(断口)"
-        ],
-        "lightning_base_labels": [
-          "额定雷电冲击耐受电压"
-        ],
-        "lightning_fracture_labels": [
-          "额定雷电冲击耐受电压(断口)"
-        ]
-      },
-      "decision": {
-        "count_when_fracture_strictly_greater": "9次",
-        "count_otherwise": "3次",
-        "special_priority": [
-          {
-            "when": "断口值未严格大于本体值",
-            "count": "3次"
-          }
-        ]
-      }
-    },
-    {
-      "rule_id": "switching.dlt.bc1_60hz_applicability",
+      "rule_id": "switching.gb.bc1_60hz_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "BC1(60HZ)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -2171,82 +2129,6 @@
                 "额定背对背电容器组开断电流",
                 "背对背电容器组开断电流"
               ]
-            },
-            {
-              "source": "query",
-              "type": "regex_match",
-              "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
-            }
-          ]
-        },
-        {
-          "source": "query",
-          "type": "all",
-          "conditions": [
-            {
-              "source": "query",
-              "type": "contains",
-              "label": "开合性能型式试验"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定电缆充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电缆充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电缆充电"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定线路充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "线路充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "线路充电"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定电容器组电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电容器组电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定背对背电容器组开断电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "背对背电容器组开断电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电容器组开断电流"
-            },
-            {
-              "source": "query",
-              "type": "regex_match",
-              "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
             }
           ]
         }
@@ -2254,12 +2136,19 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.dlt.bc2_60hz_applicability",
+      "rule_id": "switching.gb.bc2_60hz_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "BC2(60HZ)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -2280,86 +2169,6 @@
                 "额定背对背电容器组开断电流",
                 "背对背电容器组开断电流"
               ]
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
-            }
-          ]
-        },
-        {
-          "source": "query",
-          "type": "all",
-          "conditions": [
-            {
-              "source": "query",
-              "type": "contains",
-              "label": "开合性能型式试验"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定电缆充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电缆充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电缆充电"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定线路充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "线路充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "线路充电"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定电容器组电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电容器组电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定背对背电容器组开断电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "背对背电容器组开断电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电容器组开断电流"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         }
@@ -2367,12 +2176,19 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.dlt.cc1_60hz_applicability",
+      "rule_id": "switching.gb.cc1_60hz_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "CC1(60HZ)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -2391,11 +2207,6 @@
                 "电缆充电电流",
                 "电缆充电"
               ]
-            },
-            {
-              "source": "query",
-              "type": "regex_match",
-              "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
             }
           ]
         },
@@ -2462,11 +2273,6 @@
               "source": "query",
               "type": "not_contains",
               "label": "电容器组开断电流"
-            },
-            {
-              "source": "query",
-              "type": "regex_match",
-              "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
             }
           ]
         }
@@ -2474,12 +2280,19 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.dlt.cc2_60hz_applicability",
+      "rule_id": "switching.gb.cc2_60hz_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "CC2(60HZ)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -2494,11 +2307,6 @@
               "source": "query",
               "type": "contains",
               "label": "额定电缆充电电流"
-            },
-            {
-              "source": "query",
-              "type": "regex_match",
-              "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
             }
           ]
         },
@@ -2525,13 +2333,6 @@
               "source": "query",
               "type": "not_contains",
               "label": "额定电容器组电流"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         }
@@ -2539,12 +2340,19 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.l75_60hz_applicability",
+      "rule_id": "short_circuit.gb.l75_60hz_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "L75(60HZ)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -2573,13 +2381,6 @@
               "label": "额定短路开断电流",
               "value": 12.5,
               "unit": "kA"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "HZ"
             }
           ]
         },
@@ -2610,13 +2411,6 @@
               "label": "短路开断电流",
               "value": 12.5,
               "unit": "kA"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "HZ"
             }
           ]
         },
@@ -2652,13 +2446,6 @@
               "label": "额定短路开断电流",
               "value": 12.5,
               "unit": "kA"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "HZ"
             }
           ]
         },
@@ -2694,13 +2481,6 @@
               "label": "短路开断电流",
               "value": 12.5,
               "unit": "kA"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "HZ"
             }
           ]
         }
@@ -2708,12 +2488,19 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.l90_60hz_applicability",
+      "rule_id": "short_circuit.gb.l90_60hz_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "L90(60HZ)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -2742,13 +2529,6 @@
               "label": "额定短路开断电流",
               "value": 12.5,
               "unit": "kA"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "HZ"
             }
           ]
         },
@@ -2779,13 +2559,6 @@
               "label": "短路开断电流",
               "value": 12.5,
               "unit": "kA"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "HZ"
             }
           ]
         },
@@ -2821,13 +2594,6 @@
               "label": "额定短路开断电流",
               "value": 12.5,
               "unit": "kA"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "HZ"
             }
           ]
         },
@@ -2863,13 +2629,6 @@
               "label": "短路开断电流",
               "value": 12.5,
               "unit": "kA"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "HZ"
             }
           ]
         }
@@ -2877,12 +2636,19 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.dlt.lc1_60hz_applicability",
+      "rule_id": "switching.gb.lc1_60hz_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "LC1(60HZ)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -2901,13 +2667,6 @@
                 "电缆充电电流",
                 "电缆充电"
               ]
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         },
@@ -2988,12 +2747,19 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.dlt.lc2_60hz_applicability",
+      "rule_id": "switching.gb.lc2_60hz_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "LC2(60HZ)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -3012,13 +2778,6 @@
                 "线路充电电流",
                 "线路充电"
               ]
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         },
@@ -3085,13 +2844,6 @@
               "source": "query",
               "type": "not_contains",
               "label": "电容器组开断电流"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         }
@@ -3099,10 +2851,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.op2_making_applicability",
+      "rule_id": "short_circuit.gb.op2_making_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "OP2关合",
       "status": "active",
       "allow_when_any": [
@@ -3133,10 +2885,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.t10_60hz_applicability",
+      "rule_id": "short_circuit.gb.t10_60hz_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "T10(60Hz)",
       "status": "active",
       "allow_when_any": [
@@ -3162,12 +2914,19 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.t100a_60hz_applicability",
+      "rule_id": "short_circuit.gb.t100a_60hz_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "T100A(60HZ)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -3177,13 +2936,6 @@
               "source": "query",
               "type": "contains",
               "label": "短路性能型式试验"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         }
@@ -3191,12 +2943,19 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.t100s_60hz_applicability",
+      "rule_id": "short_circuit.gb.t100s_60hz_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "T100S(60HZ)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -3213,13 +2972,6 @@
               "label": "额定电压",
               "value": 40.5,
               "unit": "kv"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         }
@@ -3227,11 +2979,11 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.t100s_a_applicability",
+      "rule_id": "short_circuit.gb.t100s_a_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
-      "test_item": "T100s（a）",
+      "standard": "gb",
+      "test_item": "T100s(a)",
       "status": "active",
       "allow_when_any": [
         {
@@ -3249,25 +3001,160 @@
               "label": "额定电压",
               "value": 72.5,
               "unit": "kV"
-            },
-            {
-              "source": "query",
-              "type": "not_equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
+        }
+      ],
+      "deny_when_any": [
+            {
+              "source": "query",
+          "type": "regex_match",
+          "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
         }
       ],
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.t100s_b_applicability",
+      "rule_id": "short_circuit.gb.t100s_a_split_box_shared_mechanism_split",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "gb",
+      "test_item": "T100s(a)",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "source": "query",
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "三相"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "分箱"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共机构"
+              }
+            ]
+          }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "greater_or_equal_numeric",
+            "label": "额定电压",
+            "value": 72.5,
+            "unit": "kV"
+          },
+          {
+            "source": "query",
+            "type": "regex_match",
+            "pattern": "^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "T100s(a)",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "T100s(a)#1",
+          "inherits_from": "T100s(a)",
+          "parameter_overrides": {
+            "试验相数": "单相",
+            "操作顺序": "C",
+            "试验次数": "1次"
+          }
+        },
+        {
+          "test_item": "T100s(a)#2",
+          "inherits_from": "T100s(a)",
+          "parameter_overrides": {
+            "试验相数": "三相",
+            "操作顺序": "C",
+            "试验次数": "1次"
+          }
+        }
+      ]
+    },
+    {
+      "rule_id": "short_circuit.gb.t100s_a_common_tank_shared_mechanism_split",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "gb",
+      "test_item": "T100s(a)",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "source": "query",
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "三相"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共箱"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共机构"
+              }
+            ]
+          }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "greater_or_equal_numeric",
+            "label": "额定电压",
+            "value": 72.5,
+            "unit": "kV"
+          },
+          {
+            "source": "query",
+            "type": "regex_match",
+            "pattern": "^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "T100s(a)",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "T100s(a)#共箱共机构",
+          "inherits_from": "T100s(a)",
+          "parameter_overrides": {
+            "试验相数": "三相",
+            "操作顺序": "C",
+            "试验次数": "1次"
+          }
+        }
+      ]
+    },
+    {
+      "rule_id": "short_circuit.gb.t100s_b_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
-      "test_item": "T100s（b）",
+      "standard": "gb",
+      "test_item": "T100s(b)",
       "status": "active",
       "allow_when_any": [
         {
@@ -3285,24 +3172,150 @@
               "label": "额定电压",
               "value": 72.5,
               "unit": "kV"
-            },
-            {
-              "source": "query",
-              "type": "not_equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
+        }
+      ],
+      "deny_when_any": [
+            {
+              "source": "query",
+          "type": "regex_match",
+          "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
         }
       ],
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.t100s_a_60hz_applicability",
+      "rule_id": "short_circuit.gb.t100s_b_split_box_shared_mechanism_split",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "gb",
+      "test_item": "T100s(b)",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "source": "query",
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "三相"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "分箱"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共机构"
+              }
+            ]
+          }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "greater_or_equal_numeric",
+            "label": "额定电压",
+            "value": 72.5,
+            "unit": "kV"
+          },
+          {
+            "source": "query",
+            "type": "regex_match",
+            "pattern": "^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "T100s(b)",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "T100s(b)#共机构",
+          "inherits_from": "T100s(b)",
+          "parameter_overrides": {
+            "试验相数": "三相",
+            "操作顺序": "C",
+            "试验次数": "1次"
+          }
+        }
+      ]
+    },
+    {
+      "rule_id": "short_circuit.gb.t100s_b_common_tank_shared_mechanism_split",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "gb",
+      "test_item": "T100s(b)",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "source": "query",
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "三相"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共箱"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共机构"
+              }
+            ]
+          }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "greater_or_equal_numeric",
+            "label": "额定电压",
+            "value": 72.5,
+            "unit": "kV"
+          },
+          {
+            "source": "query",
+            "type": "regex_match",
+            "pattern": "^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "T100s(b)",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "T100s(b)#共箱共机构",
+          "inherits_from": "T100s(b)",
+          "parameter_overrides": {
+            "试验相数": "三相",
+            "操作顺序": "0-0.3-CO-180s-CO",
+            "试验次数": "1次"
+          }
+        }
+      ]
+    },
+    {
+      "rule_id": "short_circuit.gb.t100s_a_60hz_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "T100s(a)(60Hz)",
       "status": "active",
       "allow_when_any": [
@@ -3335,12 +3348,158 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.t100s_b_60hz_applicability",
+      "rule_id": "short_circuit.gb.t100s_a_60hz_split_box_shared_mechanism_split",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "gb",
+      "test_item": "T100s(a)(60Hz)",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "source": "query",
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "三相"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "分箱"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共机构"
+              }
+            ]
+          }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "greater_or_equal_numeric",
+            "label": "额定电压",
+            "value": 72.5,
+            "unit": "kV"
+          },
+          {
+            "source": "query",
+            "type": "equals_numeric",
+            "label": "额定频率",
+            "value": 60.0,
+            "unit": "Hz"
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "T100s(a)(60Hz)",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "T100s(a)(60Hz)#1",
+          "inherits_from": "T100s(a)(60Hz)",
+          "parameter_overrides": {
+            "试验相数": "单相",
+            "操作顺序": "C",
+            "试验次数": "1次"
+          }
+        },
+        {
+          "test_item": "T100s(a)(60Hz)#2",
+          "inherits_from": "T100s(a)(60Hz)",
+          "parameter_overrides": {
+            "试验相数": "三相",
+            "操作顺序": "C",
+            "试验次数": "1次"
+          }
+        }
+      ]
+    },
+    {
+      "rule_id": "short_circuit.gb.t100s_a_60hz_common_tank_shared_mechanism_split",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "gb",
+      "test_item": "T100s(a)(60Hz)",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "source": "query",
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "三相"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共箱"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共机构"
+              }
+            ]
+          }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "greater_or_equal_numeric",
+            "label": "额定电压",
+            "value": 72.5,
+            "unit": "kV"
+          },
+          {
+            "source": "query",
+            "type": "equals_numeric",
+            "label": "额定频率",
+            "value": 60.0,
+            "unit": "Hz"
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "T100s(a)(60Hz)",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "T100s(a)(60Hz)#共箱共机构",
+          "inherits_from": "T100s(a)(60Hz)",
+          "parameter_overrides": {
+            "试验相数": "三相",
+            "操作顺序": "C",
+            "试验次数": "1次"
+          }
+        }
+      ]
+    },
+    {
+      "rule_id": "short_circuit.gb.t100s_b_60hz_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "T100s(b)(60Hz)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -3357,13 +3516,6 @@
               "label": "额定电压",
               "value": 72.5,
               "unit": "kV"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         }
@@ -3371,12 +3523,149 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.t60_60hz_applicability",
+      "rule_id": "short_circuit.gb.t100s_b_60hz_split_box_shared_mechanism_split",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "gb",
+      "test_item": "T100s(b)(60Hz)",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "source": "query",
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "三相"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "分箱"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共机构"
+              }
+            ]
+          }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "greater_or_equal_numeric",
+            "label": "额定电压",
+            "value": 72.5,
+            "unit": "kV"
+          },
+          {
+            "source": "query",
+            "type": "equals_numeric",
+            "label": "额定频率",
+            "value": 60.0,
+            "unit": "Hz"
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "T100s(b)(60Hz)",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "T100s(b)(60Hz)#共机构",
+          "inherits_from": "T100s(b)(60Hz)",
+          "parameter_overrides": {
+            "试验相数": "三相",
+            "操作顺序": "C",
+            "试验次数": "1次"
+          }
+        }
+      ]
+    },
+    {
+      "rule_id": "short_circuit.gb.t100s_b_60hz_common_tank_shared_mechanism_split",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "gb",
+      "test_item": "T100s(b)(60Hz)",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "source": "query",
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "三相"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共箱"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共机构"
+              }
+            ]
+          }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "greater_or_equal_numeric",
+            "label": "额定电压",
+            "value": 72.5,
+            "unit": "kV"
+          },
+          {
+            "source": "query",
+            "type": "equals_numeric",
+            "label": "额定频率",
+            "value": 60.0,
+            "unit": "Hz"
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "T100s(b)(60Hz)",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "T100s(b)(60Hz)#共箱共机构",
+          "inherits_from": "T100s(b)(60Hz)",
+          "parameter_overrides": {
+            "试验相数": "三相",
+            "操作顺序": "0-0.3-CO-180s-CO",
+            "试验次数": "1次"
+          }
+        }
+      ]
+    },
+    {
+      "rule_id": "short_circuit.gb.t60_60hz_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "T60(60HZ)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -3386,13 +3675,6 @@
               "source": "query",
               "type": "contains",
               "label": "短路性能型式试验"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         }
@@ -3400,10 +3682,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "switching.dlt.t60_preparatory_applicability",
+      "rule_id": "switching.gb.t60_preparatory_applicability",
       "domain": "switching",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "T60(预备试验)",
       "status": "active",
       "allow_when_any": [
@@ -3423,11 +3705,11 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.three_phase_mechanism_verify_applicability",
+      "rule_id": "short_circuit.gb.three_phase_mechanism_verify_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
-      "test_item": "三相共机构验证",
+      "standard": "gb",
+      "test_item": "T100s(三相共机构的验证试验)",
       "status": "active",
       "allow_when_any": [
         {
@@ -3449,7 +3731,17 @@
             {
               "source": "query",
               "type": "contains",
-              "label": "三相分箱共机构"
+              "label": "三相"
+            },
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "分箱"
+            },
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "共机构"
             }
           ]
         }
@@ -3457,10 +3749,124 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "insulation.dlt.full_insulation_type_test_applicability",
+      "rule_id": "short_circuit.gb.t100a_shared_mechanism_split",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "gb",
+      "test_item": "短路开断试验(T100A)",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "source": "query",
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "50Hz"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共箱"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共机构"
+              }
+            ]
+          }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "regex_match",
+            "pattern": "^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "短路开断试验(T100A)",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "短路开断试验(T100A)#共箱共机构",
+          "inherits_from": "短路开断试验(T100A)",
+          "parameter_overrides": {
+            "试验相数": "三相",
+            "操作顺序": "O",
+            "试验次数": "1次"
+          }
+        }
+      ]
+    },
+    {
+      "rule_id": "short_circuit.gb.t100a_60hz_shared_mechanism_split",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "gb",
+      "test_item": "T100A(60HZ)",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "source": "query",
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "三相"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共箱"
+              },
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "共机构"
+              }
+            ]
+          }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "equals_numeric",
+            "label": "额定频率",
+            "value": 60.0,
+            "unit": "Hz"
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "T100A(60HZ)",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "T100A(60HZ)#共箱共机构",
+          "inherits_from": "T100A(60HZ)",
+          "parameter_overrides": {
+            "试验相数": "三相",
+            "操作顺序": "O",
+            "试验次数": "1次"
+          }
+        }
+      ]
+    },
+    {
+      "rule_id": "insulation.gb.full_insulation_type_test_applicability",
       "domain": "insulation",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "全套绝缘型式试验",
       "status": "active",
       "allow_when_any": [
@@ -3489,10 +3895,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.short_peak_current_merge",
+      "rule_id": "short_circuit.gb.short_peak_current_merge",
       "domain": "short_circuit",
       "kind": "pair_merge",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "短时耐受电流试验",
       "secondary_test_item": "峰值耐受电流试验",
       "status": "active",
@@ -3515,10 +3921,10 @@
       }
     },
     {
-      "rule_id": "short_circuit.dlt.peak_withstand_current_applicability",
+      "rule_id": "short_circuit.gb.peak_withstand_current_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "峰值耐受电流试验",
       "status": "active",
       "allow_when_any": [
@@ -3547,10 +3953,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "insulation.dlt.control_aux_insulation_applicability",
+      "rule_id": "insulation.gb.control_aux_insulation_applicability",
       "domain": "insulation",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "控制和辅助回路的绝缘试验",
       "status": "active",
       "allow_when_any": [
@@ -3563,12 +3969,19 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.t100a_applicability",
+      "rule_id": "short_circuit.gb.t100a_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "短路开断试验(T100A)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -3578,13 +3991,6 @@
               "source": "query",
               "type": "contains",
               "label": "短路性能型式试验"
-            },
-            {
-              "source": "query",
-              "type": "not_equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         }
@@ -3592,12 +3998,19 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.dlt.t100s_sym_applicability",
+      "rule_id": "short_circuit.gb.t100s_sym_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "短路开断试验(T100S)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -3621,10 +4034,10 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "temperature_rise.dlt.aux_control_temp_rise_applicability",
+      "rule_id": "temperature_rise.gb.aux_control_temp_rise_applicability",
       "domain": "temperature_rise",
       "kind": "applicability",
-      "standard": "dlt",
+      "standard": "gb",
       "test_item": "辅助和控制回路温升试验",
       "status": "active",
       "allow_when_any": [
@@ -3637,38 +4050,11 @@
       "deny_when_no_match": true
     },
     {
-      "rule_id": "temperature_rise.dlt.continuous_current_applicability",
+      "rule_id": "temperature_rise.gb.continuous_current_applicability",
       "domain": "temperature_rise",
       "kind": "applicability",
-      "standard": "dlt",
-      "test_item": "连续电流试验",
-      "status": "active",
-      "allow_when_any": [
-        {
-          "source": "query",
-          "type": "all",
-          "conditions": [
-            {
-              "source": "query",
-              "type": "contains",
-              "label": "温升性能型式试验"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定频率60Hz"
-            }
-          ]
-        }
-      ],
-      "deny_when_no_match": true
-    },
-    {
-      "rule_id": "temperature_rise.dlt.continuous_current_60hz_applicability",
-      "domain": "temperature_rise",
-      "kind": "applicability",
-      "standard": "dlt",
-      "test_item": "连续电流试验(60HZ)",
+      "standard": "gb",
+      "test_item": "温升试验",
       "status": "active",
       "allow_when_any": [
         {
@@ -3684,8 +4070,64 @@
               "source": "query",
               "type": "equals_numeric",
               "label": "额定频率",
-              "value": 60.0,
+              "value": 50.0,
               "unit": "Hz"
+            }
+          ]
+        }
+      ],
+      "deny_when_no_match": true
+    },
+    {
+      "rule_id": "temperature_rise.gb.continuous_current_60hz_applicability",
+      "domain": "temperature_rise",
+      "kind": "applicability",
+      "standard": "gb",
+      "test_item": "温升试验(60HZ)",
+      "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+            }
+      ],
+      "allow_when_any": [
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "温升性能型式试验"
+            }
+          ]
+        }
+      ],
+      "deny_when_no_match": true
+    },
+    {
+      "rule_id": "short_circuit.gb.state_check_t10",
+      "domain": "short_circuit",
+      "kind": "applicability",
+      "standard": "gb",
+      "test_item": "作为状态检查的T10试验",
+      "status": "active",
+      "allow_when_any": [
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "真空"
+            },
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "SF6气体的额定压力(20℃表压)"
             }
           ]
         }

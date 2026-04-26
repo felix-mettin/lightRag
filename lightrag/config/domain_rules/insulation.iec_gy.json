@@ -619,7 +619,7 @@
       "domain": "short_circuit",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "短路开断试验(T100s)",
+      "test_item": "短路开断试验(T100S)",
       "status": "active",
       "allow_when_any": [
         {
@@ -3948,7 +3948,7 @@
               {
                 "source": "query",
                 "type": "contains",
-                "label": "三相"
+                "label": "50Hz"
               },
               {
                 "source": "query",
@@ -4226,52 +4226,6 @@
         }
       ],
       "deny_when_no_match": true
-    },
-    {
-      "rule_id": "insulation.iec.switching_impulse_joint_voltage_split",
-      "domain": "insulation",
-      "kind": "split",
-      "standard": "iec",
-      "test_item": "操作冲击耐受电压试验",
-      "status": "active",
-      "remove_original": false,
-      "inputs": {
-        "trigger_when_any": [
-          {
-            "type": "all",
-            "conditions": [
-              {
-                "source": "query",
-                "type": "greater_numeric",
-                "label": "额定电压",
-                "value": 245,
-                "unit": "kV"
-              }
-            ]
-          }
-        ]
-      },
-      "single_output": {
-        "test_item": "操作冲击耐受电压试验",
-        "parameter_overrides": {}
-      },
-      "split_output": [
-        {
-          "test_item": "操作冲击耐受电压试验",
-          "inherits_from": "操作冲击耐受电压试验",
-          "parameter_overrides": {
-            "试验部位": "相间及对地"
-          }
-        },
-        {
-          "test_item": "操作冲击耐受电压试验(联合电压)",
-          "inherits_from": "操作冲击耐受电压试验",
-          "parameter_overrides": {
-            "试验部位": "断口",
-            "试验状态": "干"
-          }
-        }
-      ]
     }
   ]
 }
