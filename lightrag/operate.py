@@ -2843,6 +2843,10 @@ def _apply_domain_rule_decisions_to_project_context(
             _resolve_capacitive_nonuniform_coefficient_local(query_text)
         )
         break_count, break_count_rule = _resolve_break_count_local(query_text)
+        kc_value = _extract_named_scalar_local(
+            query_text,
+            ["容性电压系数kc", "容性电压系数", "kc"],
+        )
         if rated_voltage is None:
             return None, phase_value, nonuniform_text, "未识别到额定电压，无法计算容性电流开断试验试验电压。"
         if phase_value == "三相":
@@ -2853,7 +2857,12 @@ def _apply_domain_rule_decisions_to_project_context(
                 f"{phase_rule} 三相容性电流开断试验试验电压直接取额定电压 {_format_voltage_value(rated_voltage)}。",
             )
 
-        kc_value = 1.2
+        kc_value = 1.2 if kc_value is None else kc_value
+        kc_rule = (
+            f"用户已明确给出容性电压系数 kc={str(kc_value).rstrip('0').rstrip('.')}，按该值计算。"
+            if _extract_named_scalar_local(query_text, ["容性电压系数kc", "容性电压系数", "kc"]) is not None
+            else "未明确给出容性电压系数 kc，默认按 1.2 计算。"
+        )
         computed_voltage = (
             ((kc_value * rated_voltage) / math.sqrt(3.0) / break_count)
             * nonuniform_value
@@ -2862,7 +2871,7 @@ def _apply_domain_rule_decisions_to_project_context(
             _format_voltage_value(computed_voltage),
             phase_value,
             nonuniform_text,
-            f"{phase_rule} {nonuniform_rule} {break_count_rule} 单相试验电压按 kc × 额定电压 / √3 / 断口数量 × 不均匀系数 计算，其中 kc={kc_value}，即 {kc_value} × {rated_voltage} / √3 / {break_count} × {nonuniform_text} = {_format_voltage_value(computed_voltage)}。",
+            f"{phase_rule} {nonuniform_rule} {break_count_rule} {kc_rule} 单相试验电压按 kc × 额定电压 / √3 / 断口数量 × 不均匀系数 计算，其中 kc={str(kc_value).rstrip('0').rstrip('.')}，即 {str(kc_value).rstrip('0').rstrip('.')} × {rated_voltage} / √3 / {break_count} × {nonuniform_text} = {_format_voltage_value(computed_voltage)}。",
         )
 
     def _preferred_capacitive_current_a_local(
@@ -5512,8 +5521,13 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "容性电流开断试验(BC2)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
         "容性电流开断试验(LC1)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
         "容性电流开断试验(LC2)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
+        "容性电流开断试验(LC2)#1": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
+        "容性电流开断试验(LC2)#2": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
+        
         "容性电流开断试验(CC1)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
         "容性电流开断试验(CC2)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
+        "容性电流开断试验(CC2)#1": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
+        "容性电流开断试验(CC2)#2": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
         "T100s(a)":{"金短时间","外壳是否带电","SF6气体的最低功能压力(20℃表压)","额定频率"},
         "T100s(b)":{"金短时间","外壳是否带电","SF6气体的最低功能压力(20℃表压)","额定频率","结构特征"},
         "T100s":{"SF6气体的最低功能压力(20℃表压)"},
