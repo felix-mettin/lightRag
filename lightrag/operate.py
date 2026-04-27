@@ -2626,10 +2626,11 @@ def _apply_domain_rule_decisions_to_project_context(
         return f"{text} A"
 
     def _format_current_a_local_2(value: float) -> str:
-        if float(value).is_integer():
-            return f"{int(value)*1.1} A"
-        text = f"{value:.2f}".rstrip("0").rstrip(".")
-        return f"{text*1.1} A"
+        result = value * 1.1
+        if float(result).is_integer():
+            return f"{int(result)} A"
+        text = f"{result:.2f}".rstrip("0").rstrip(".")
+        return f"{text} A"
 
     def _parse_current_amp_value(value_text: str) -> float | None:
         text = str(value_text or "").strip()
