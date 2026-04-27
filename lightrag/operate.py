@@ -1893,6 +1893,14 @@ def _evaluate_domain_rule_decisions(
     rated_voltage_kv = _extract_rated_voltage_kv(query)
     rated_current_amp = _extract_rated_current_amp(query)
     model_prefix = _extract_model_prefix(query)
+    capacitive_grade_match = re.search(
+        r"(?:容性电流开合时重击穿等级|开合容性电流能力的级别|重击穿等级|能力级别|试验级别)\s*(?:[:：=]|为|是)?\s*(C[12])",
+        query,
+        flags=re.IGNORECASE,
+    )
+    capacitive_grade = (
+        capacitive_grade_match.group(1).upper() if capacitive_grade_match else None
+    )
     explicit_solid_sealed_pole = _query_contains(query, "元件中含固封极柱")
     pf_base_for_split = _extract_named_voltage_kv(
         query,
@@ -1981,6 +1989,23 @@ def _evaluate_domain_rule_decisions(
                         split_enabled = False
                         reason_code = "split_constraints_not_met"
                         reason_text = "已命中拆分触发词，但未满足全部附加约束条件，保持未拆分。"
+                if rule_id in {"switching.gb.cc2_final_split", "switching.gb.lc2_final_split"}:
+                    if capacitive_grade == "C1":
+                        split_enabled = False
+                        reason_code = "capacitive_grade_c1_single"
+                        reason_text = "开合容性电流能力的级别为C1，CC2/LC2 不拆分，按单项 CO、24次执行。"
+                        single_output = {
+                            "test_item": test_item,
+                            "parameter_overrides": {
+                                "操作顺序": "CO",
+                                "试验次数": "24次",
+                            },
+                        }
+                    else:
+                        reason_text = (
+                            f"{reason_text} 开合容性电流能力的级别"
+                            f"{'未提供，默认按C2处理' if capacitive_grade is None else '为C2'}，保留拆分。"
+                        )
                 normalized_stand_type = _normalize_operate_standard_type(stand_type)
                 expected_rule_id = rule_id
                 if normalized_stand_type == "DLT":
@@ -3259,6 +3284,55 @@ def _apply_domain_rule_decisions_to_project_context(
                 _format_voltage_value(test_voltage),
                 f"额定电压 {rated_voltage_kv} kV 不低于 72.5 kV 且首开极系数 kpp={kpp_text} 时，失步关合和开断试验(OP2)试验电压按 {numerator_text} × 额定电压 / √3 × 不均匀系数 计算，即 {numerator_text} × {rated_voltage_kv} / √3 × {nonuniform_text} = {_format_voltage_value(test_voltage)}。",
             )
+
+        return resolved
+
+    def _resolve_op1_parameters_local() -> dict[str, tuple[str, str]]:
+        resolved: dict[str, tuple[str, str]] = {}
+        if rated_voltage_kv is None:
+            return resolved
+
+        test_voltage = round((rated_voltage_kv * 2.5) / math.sqrt(3.0), 3)
+        resolved["试验电压"] = (
+            _format_voltage_value(test_voltage),
+            f"失步关合和开断试验(OP1)试验电压按 额定电压 × 2.5 / √3 计算，即 {rated_voltage_kv} × 2.5 / √3 = {_format_voltage_value(test_voltage)}。",
+        )
+        return resolved
+
+    def _resolve_t100s_ab_parameters_local() -> dict[str, dict[str, tuple[str, str]]]:
+        resolved: dict[str, dict[str, tuple[str, str]]] = {}
+        if rated_voltage_kv is None or capacitive_nonuniform_value is None:
+            return resolved
+
+        break_count, break_count_rule = _resolve_break_count_local(query_text)
+        nonuniform_text = str(capacitive_nonuniform_value).rstrip("0").rstrip(".")
+
+        t100s_a_voltage = round(
+            ((rated_voltage_kv / math.sqrt(3.0)) / break_count)
+            * float(capacitive_nonuniform_value),
+            3,
+        )
+        t100s_a_value = (
+            _format_voltage_value(t100s_a_voltage),
+            f"T100s(a)试验电压按 额定电压 / √3 / 断口数量 × 不均匀系数 计算；{break_count_rule} 即 {rated_voltage_kv} / √3 / {break_count} × {nonuniform_text} = {_format_voltage_value(t100s_a_voltage)}。",
+        )
+        resolved["T100s(a)"] = {"试验电压": t100s_a_value}
+        resolved["T100s(a)(60Hz)"] = {"试验电压": t100s_a_value}
+
+        if first_pole_kpp is not None:
+            kpp_text = str(first_pole_kpp).rstrip("0").rstrip(".")
+            t100s_b_voltage = round(
+                (((rated_voltage_kv / math.sqrt(3.0)) / break_count)
+                * float(capacitive_nonuniform_value))
+                * float(first_pole_kpp),
+                3,
+            )
+            t100s_b_value = (
+                _format_voltage_value(t100s_b_voltage),
+                f"T100s(b)试验电压按 额定电压 / √3 / 断口数量 × 不均匀系数 × 首开极系数 计算；{break_count_rule} 即 {rated_voltage_kv} / √3 / {break_count} × {nonuniform_text} × {kpp_text} = {_format_voltage_value(t100s_b_voltage)}。",
+            )
+            resolved["T100s(b)"] = {"试验电压": t100s_b_value}
+            resolved["T100s(b)(60Hz)"] = {"试验电压": t100s_b_value}
 
         return resolved
 
@@ -4608,6 +4682,29 @@ def _apply_domain_rule_decisions_to_project_context(
             calc_rule=calc_rule,
         )
 
+    op1_parameters = _resolve_op1_parameters_local()
+    for param_name in ("试验电压",):
+        resolved_value = op1_parameters.get(param_name)
+        if not resolved_value:
+            continue
+        value_text, calc_rule = resolved_value
+        _set_if_present(
+            "失步关合和开断试验(OP1)",
+            param_name,
+            value_text,
+            calc_rule=calc_rule,
+        )
+
+    t100s_ab_parameters = _resolve_t100s_ab_parameters_local()
+    for test_name, param_values in t100s_ab_parameters.items():
+        for param_name, (value_text, calc_rule) in param_values.items():
+            _set_if_present(
+                test_name,
+                param_name,
+                value_text,
+                calc_rule=calc_rule,
+            )
+
     op2_making_parameters = _resolve_op2_making_parameters_local()
     for param_name in ("试验电压",):
         resolved_value = op2_making_parameters.get(param_name)
@@ -5411,38 +5508,12 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "近区故障试验(L90)":{"线路侧波阻抗","SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
         "辅助和控制回路温升试验": {"机构是否带合分闸线圈","辅助设备和控制设备的额定电源电压","辅助设备和控制设备的额定电流","材料绝热等级"},
         "全套绝缘型式试验":{"最大适用海拔","试验项目(全雷操工)"},
-        "容性电流开断试验(BC1)": {
-            "SF6气体的最低功能压力(20℃表压)",
-            "SF6气体的额定压力(20℃表压)",
-            "外壳是否带电",
-            "关合涌流",
-            "关合涌流的频率",
-        },
-        "容性电流开断试验(BC2)": {
-            "SF6气体的最低功能压力(20℃表压)",
-            "SF6气体的额定压力(20℃表压)",
-            "外壳是否带电",
-        },
-        "容性电流开断试验(LC1)": {
-            "SF6气体的最低功能压力(20℃表压)",
-            "SF6气体的额定压力(20℃表压)",
-            "外壳是否带电",
-        },
-        "容性电流开断试验(LC2)": {
-            "SF6气体的最低功能压力(20℃表压)",
-            "SF6气体的额定压力(20℃表压)",
-            "外壳是否带电",
-      },
-        "容性电流开断试验(CC1)": {
-            "SF6气体的最低功能压力(20℃表压)",
-            "SF6气体的额定压力(20℃表压)",
-            "外壳是否带电",
-        },
-        "容性电流开断试验(CC2)": {
-            "SF6气体的最低功能压力(20℃表压)",
-            "SF6气体的额定压力(20℃表压)",
-            "外壳是否带电",
-        },
+        "容性电流开断试验(BC1)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电","关合涌流","关合涌流的频率",},
+        "容性电流开断试验(BC2)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
+        "容性电流开断试验(LC1)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
+        "容性电流开断试验(LC2)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
+        "容性电流开断试验(CC1)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
+        "容性电流开断试验(CC2)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
         "T100s(a)":{"金短时间","外壳是否带电","SF6气体的最低功能压力(20℃表压)","额定频率"},
         "T100s(b)":{"金短时间","外壳是否带电","SF6气体的最低功能压力(20℃表压)","额定频率","结构特征"},
         "T100s":{"SF6气体的最低功能压力(20℃表压)"},
