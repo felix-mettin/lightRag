@@ -5111,12 +5111,12 @@ def _apply_domain_rule_decisions_to_project_context(
             test_name,
             "其他细则（充补套修）",
             {
-                "value_text": "充按照是否充气/充油判断，补（是否补气）默认否，套（指套管材质，陶瓷or复合）需用户输入，修（是否修正海拔系数）默认否",
+                "value_text": "默认取值为：否否否; 充按照是否充气/充油判断，补（是否补气）默认否，套（指套管材质，陶瓷or复合）需用户输入，修（是否修正海拔系数）默认否，最后仅输出判断结果，不要有其他任何多余内容，取值案例：'是否瓷否'/'是否复否'",
                 "value_source": "standard",
                 "value_expr": "",
                 "unit": "",
-                "constraints": "充按照是否充气/充油判断，补（是否补气）默认否，套（指套管材质，陶瓷or复合）需用户输入，修（是否修正海拔系数）默认否",
-                "calc_rule": "当前问题未给出可完全展开的充补套修细则时，回落到图谱默认说明。",
+                "constraints": "默认取值为：否否否;充按照是否充气/充油判断，补（是否补气）默认否，套（指套管材质，陶瓷or复合）需用户输入，修（是否修正海拔系数）默认否，最后仅输出判断结果，不要有其他任何多余内容取值案例：'是否瓷否'/'是否复否'",
+                "calc_rule": "充按照是否充气/充油判断，补（是否补气）默认否，套（指套管材质，陶瓷or复合）需用户输入，修（是否修正海拔系数）默认否，最后仅输出判断结果，不要有其他任何多余内容，取值案例：'是否瓷否'/'是否复否',当前问题未给出可完全展开的充补套修细则时，回落到图谱默认说明。",
                 "derive_from_rated": "",
                 "resolution_mode": "needs_condition",
             },
@@ -5126,17 +5126,16 @@ def _apply_domain_rule_decisions_to_project_context(
             test_name,
             "试验项目（全雷操工）",
             {
-                "value_text": "全(是)雷(否)操(否)工(否)",
+                "value_text": "是否否否",
                 "value_source": "standard",
                 "value_expr": "",
                 "unit": "",
-                "constraints": "全(是)雷(否)操(否)工(否)",
-                "calc_rule": "当前问题未提供更细的全雷操工判据时，回落到图谱默认值。",
+                "constraints": "是否否否",
+                "calc_rule": "当前问题未提供更细的全雷操工判据时，回落到图谱默认值。回复案例:'是否否否'",
                 "derive_from_rated": "",
                 "resolution_mode": "needs_condition",
             },
         )
-
         _set_entry_if_value_missing(
             test_name,
             "正常次数",
