@@ -3246,6 +3246,50 @@ def _apply_domain_rule_decisions_to_project_context(
 
         return resolved
 
+    def _resolve_as_state_t10_parameters_local() -> dict[str, tuple[str, str]]:
+        resolved: dict[str, tuple[str, str]] = {}
+        if rated_voltage_kv is not None:
+            if rated_voltage_kv <= 40.5:
+                resolved["试验相数"] = (
+                    "三相",
+                    f"额定电压 {rated_voltage_kv} kV 不高于 40.5 kV，作为状态检查的T10试验按三相。",
+                )
+                test_voltage = round(rated_voltage_kv / 2.0, 3)
+                resolved["试验电压"] = (
+                    _format_voltage_value(test_voltage),
+                    f"额定电压 {rated_voltage_kv} kV 不高于 40.5 kV 时，作为状态检查的T10试验电压取额定电压/2，即 {rated_voltage_kv} / 2 = {_format_voltage_value(test_voltage)}。",
+                )
+            elif rated_voltage_kv >= 72.5:
+                resolved["试验相数"] = (
+                    "单相",
+                    f"额定电压 {rated_voltage_kv} kV 不低于 72.5 kV，作为状态检查的T10试验按单相。",
+                )
+                test_voltage = round(rated_voltage_kv / math.sqrt(3.0) / 2.0, 3)
+                resolved["试验电压"] = (
+                    _format_voltage_value(test_voltage),
+                    f"额定电压 {rated_voltage_kv} kV 不低于 72.5 kV 时，作为状态检查的T10试验电压取额定电压/√3/2，即 {rated_voltage_kv} / √3 / 2 = {_format_voltage_value(test_voltage)}。",
+                )
+            else:
+                resolved["试验相数"] = (
+                    "单相",
+                    f"额定电压 {rated_voltage_kv} kV 未落在 40.5 kV 及以下档，作为状态检查的T10试验默认按单相。",
+                )
+                test_voltage = round(rated_voltage_kv / 2.0, 3)
+                resolved["试验电压"] = (
+                    _format_voltage_value(test_voltage),
+                    f"额定电压 {rated_voltage_kv} kV 未命中特定分段规则时，作为状态检查的T10试验电压取额定电压/2，即 {rated_voltage_kv} / 2 = {_format_voltage_value(test_voltage)}。",
+                )
+
+        if short_break_ka is not None:
+            test_current = round(short_break_ka * 0.1, 3)
+            current_text = f"{str(test_current).rstrip('0').rstrip('.')} kA"
+            resolved["试验电流kA"] = (
+                current_text,
+                f"作为状态检查的T10试验电流取额定短路开断电流的10%，即 {short_break_ka} kA × 10% = {current_text}。",
+            )
+
+        return resolved
+
     def _resolve_op2_parameters_local() -> dict[str, tuple[str, str]]:
         resolved: dict[str, tuple[str, str]] = {}
         if rated_voltage_kv is None or capacitive_nonuniform_value is None:
@@ -4678,6 +4722,38 @@ def _apply_domain_rule_decisions_to_project_context(
                 calc_rule=calc_rule,
             )
 
+    as_state_t10_parameters = _resolve_as_state_t10_parameters_local()
+    for param_name in ("试验相数", "试验电压", "试验电流kA"):
+        resolved_value = as_state_t10_parameters.get(param_name)
+        if not resolved_value:
+            continue
+        value_text, calc_rule = resolved_value
+        _set_if_present(
+            "作为状态检查的T10试验",
+            param_name,
+            value_text,
+            calc_rule=calc_rule,
+        )
+    if rated_voltage_kv is not None:
+        _set_if_present(
+            "作为状态检查的T10试验",
+            "额定电压",
+            _format_voltage_value(rated_voltage_kv),
+            calc_rule="用户已明确提供额定电压，作为状态检查的T10试验直接采用该值。",
+        )
+    _set_if_present(
+        "作为状态检查的T10试验",
+        "试验次数",
+        "1次",
+        calc_rule="作为状态检查的T10试验按1次执行。",
+    )
+    _set_if_present(
+        "作为状态检查的T10试验",
+        "操作顺序",
+        "O",
+        calc_rule="作为状态检查的T10试验操作顺序固定为O。",
+    )
+
     op2_parameters = _resolve_op2_parameters_local()
     for param_name in ("试验相数", "试验电压"):
         resolved_value = op2_parameters.get(param_name)
@@ -5637,6 +5713,7 @@ def _get_report_scope_test_whitelist(stand_type: str | None = None) -> dict[str,
             "T100s(a)(60Hz)",
             "T100s(b)(60Hz)",
             "T100s(三相共机构的验证试验)",
+            "作为状态检查的T10试验"
         }
     # IEC DLT 标准不包含局部放电试验
     # NOTE: set.discard() and set.add() are in-place operations returning None,

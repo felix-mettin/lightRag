@@ -4189,6 +4189,11 @@
             {
               "source": "query",
               "type": "contains",
+              "label": "短路性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "contains",
               "label": "真空"
             },
             {
