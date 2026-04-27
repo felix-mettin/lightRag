@@ -3389,6 +3389,24 @@ def _apply_domain_rule_decisions_to_project_context(
 
         return resolved
 
+    def _resolve_single_phase_ground_fault_parameters_local() -> dict[str, tuple[str, str]]:
+        resolved: dict[str, tuple[str, str]] = {}
+        if rated_voltage_kv is None or capacitive_nonuniform_value is None:
+            return resolved
+
+        break_count, break_count_rule = _resolve_break_count_local(query_text)
+        nonuniform_text = str(capacitive_nonuniform_value).rstrip("0").rstrip(".")
+        test_voltage = round(
+            ((rated_voltage_kv / math.sqrt(3.0)) / break_count)
+            * float(capacitive_nonuniform_value),
+            3,
+        )
+        resolved["试验电压"] = (
+            _format_voltage_value(test_voltage),
+            f"单相接地故障试验试验电压按 额定电压 / √3 / 断口数量 × 不均匀系数 计算；{break_count_rule} 即 {rated_voltage_kv} / √3 / {break_count} × {nonuniform_text} = {_format_voltage_value(test_voltage)}。",
+        )
+        return resolved
+
     def _resolve_op2_making_parameters_local() -> dict[str, tuple[str, str]]:
         resolved: dict[str, tuple[str, str]] = {}
         if rated_voltage_kv is None or capacitive_nonuniform_value is None:
@@ -4790,6 +4808,15 @@ def _apply_domain_rule_decisions_to_project_context(
                 calc_rule=calc_rule,
             )
 
+    single_phase_ground_fault_parameters = _resolve_single_phase_ground_fault_parameters_local()
+    for param_name, (value_text, calc_rule) in single_phase_ground_fault_parameters.items():
+        _set_if_present(
+            "单相接地故障试验",
+            param_name,
+            value_text,
+            calc_rule=calc_rule,
+        )
+
     op2_making_parameters = _resolve_op2_making_parameters_local()
     for param_name in ("试验电压",):
         resolved_value = op2_making_parameters.get(param_name)
@@ -5598,7 +5625,6 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "容性电流开断试验(LC2)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
         "容性电流开断试验(LC2)#1": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
         "容性电流开断试验(LC2)#2": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
-        
         "容性电流开断试验(CC1)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
         "容性电流开断试验(CC2)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
         "容性电流开断试验(CC2)#1": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
@@ -5635,7 +5661,7 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "短路开断试验(T60)": {"外壳是否带电", "失败次数","SF6气体的最低功能压力(20℃表压)","额定频率"},
         "短路开断试验(T100S)": {"外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","失败次数"},
         "短路开断试验(T100A)": {"外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","失败次数"},
-        "异相接地故障试验": {"SF6气体的最低功能压力(20℃表压)","额定频率","外壳是否带电"},
+        "异相接地故障试验": {"SF6气体的最低功能压力(20℃表压)","额定频率"},
         "单相接地故障试验": {"SF6气体的最低功能压力(20℃表压)","额定频率"},
         "近区故障试验(L60)": {"外壳是否带电"},
         "失步关合和开断试验(OP1)": {"外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","发电机额定容量"},
@@ -5679,7 +5705,7 @@ def _get_report_scope_test_whitelist(stand_type: str | None = None) -> dict[str,
             "CC2(60Hz)",
             "LC1(60Hz)",
             "LC2(60Hz)",
-            
+            "作为状态检查的T10试验"
         }
     short_tests = {
             "短时耐受电流试验",
@@ -5703,7 +5729,6 @@ def _get_report_scope_test_whitelist(stand_type: str | None = None) -> dict[str,
             "短路开断试验(T30)",
             "短路开断试验(T60)",
             "T60(60Hz)",
-            
             "T100S(60Hz)",
             "短路开断试验(T100A)",
             "T100A(60Hz)",
