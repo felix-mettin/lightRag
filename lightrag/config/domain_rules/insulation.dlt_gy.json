@@ -1400,8 +1400,75 @@
                 "额定电缆充电开断电流",
                 "电缆充电开断电流",
                 "额定电缆充电开合电流",
-                "电缆充电开合电流"
+                "电缆充电开合电流",
+                "电缆充电"
               ]
+            }
+          ]
+        },
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "开合性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "额定电缆充电电流"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "电缆充电电流"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "电缆充电"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "额定线路充电电流"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "线路充电电流"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "线路充电"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "额定电容器组电流"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "电容器组电流"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "额定背对背电容器组开断电流"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "背对背电容器组开断电流"
+            },
+            {
+              "source": "query",
+              "type": "not_contains",
+              "label": "电容器组开断电流"
             }
           ]
         }
