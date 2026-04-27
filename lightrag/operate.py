@@ -5598,7 +5598,7 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "容性电流开断试验(LC2)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
         "容性电流开断试验(LC2)#1": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
         "容性电流开断试验(LC2)#2": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
-        
+        "连续电流试验": {"SF6气体的最低功能压力(20℃表压)","是否所配元件","材料绝热等级"},
         "容性电流开断试验(CC1)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
         "容性电流开断试验(CC2)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
         "容性电流开断试验(CC2)#1": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
@@ -5632,7 +5632,7 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "短路开断试验(T60)": {"外壳是否带电", "失败次数","SF6气体的最低功能压力(20℃表压)","额定频率"},
         "短路开断试验(T100S)": {"外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","失败次数"},
         "短路开断试验(T100A)": {"外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","失败次数"},
-        "异相接地故障试验": {"SF6气体的最低功能压力(20℃表压)"},
+        "异相接地故障试验": {"SF6气体的最低功能压力(20℃表压)","额定频率","外壳是否带电"},
         "单相接地故障试验": {"SF6气体的最低功能压力(20℃表压)","额定频率"},
         "近区故障试验(L60)": {"外壳是否带电"},
         "失步关合和开断试验(OP1)": {"外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","发电机额定容量"},
@@ -6057,6 +6057,65 @@ def _postprocess_electrical_markdown_response(
                 return value_text
         return ""
 
+    lc_cc_coverage_required_items = {
+        "容性电流开断试验(LC1)",
+        "容性电流开断试验(LC2)",
+        "容性电流开断试验(CC1)",
+        "容性电流开断试验(CC2)",
+    }
+    op1_optional_required_item = "失步关合和开断试验(OP1)"
+
+    def _extract_note_rated_voltage_kv(query_text: str) -> float | None:
+        text = str(query_text or "").strip()
+        if not text:
+            return None
+        match = re.search(
+            r"额定电压\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*kV\b",
+            text,
+            flags=re.IGNORECASE,
+        )
+        return float(match.group(1)) if match else None
+
+    note_rated_voltage_kv = _extract_note_rated_voltage_kv(rule_query_text)
+
+    def _should_keep_a_section_note(line: str) -> bool:
+        stripped = str(line or "").strip()
+        if not stripped:
+            return True
+        if "LC1，LC2可被CC1、CC2覆盖" in stripped or "LC1,LC2可被CC1、CC2覆盖" in stripped:
+            return lc_cc_coverage_required_items.issubset(allowed_set)
+        if "失步关合和开断试验(OP1)试验可免做" in stripped:
+            return (
+                op1_optional_required_item in allowed_set
+                and note_rated_voltage_kv is not None
+                and note_rated_voltage_kv >= 72.5
+            )
+        return True
+
+    def _build_required_a_section_notes(existing_lines: list[str]) -> list[str]:
+        existing_text = "\n".join(
+            str(line or "").strip()
+            for line in existing_lines
+            if str(line or "").strip()
+        )
+        required_notes: list[str] = []
+
+        if lc_cc_coverage_required_items.issubset(allowed_set) and (
+            "LC1，LC2可被CC1、CC2覆盖" not in existing_text
+            and "LC1,LC2可被CC1、CC2覆盖" not in existing_text
+        ):
+            required_notes.append("LC1，LC2可被CC1、CC2覆盖")
+
+        if (
+            op1_optional_required_item in allowed_set
+            and note_rated_voltage_kv is not None
+            and note_rated_voltage_kv >= 72.5
+            and "失步关合和开断试验(OP1)试验可免做" not in existing_text
+        ):
+            required_notes.append("失步关合和开断试验(OP1)试验可免做")
+
+        return required_notes
+
     def _filter_a_section(lines: list[str]) -> list[str]:
         filtered: list[str] = []
         seen_items: set[str] = set()
@@ -6074,11 +6133,17 @@ def _postprocess_electrical_markdown_response(
                     filtered.append(f"- {display_name}")
                     seen_items.add(canonical_name or item)
             else:
-                filtered.append(line)
+                if _should_keep_a_section_note(line):
+                    filtered.append(line)
         _trim_trailing_blank_lines(filtered)
         for canonical_name, display_name in allowed_display_items:
             if canonical_name not in seen_items:
                 filtered.append(f"- {display_name}")
+        required_notes = _build_required_a_section_notes(filtered)
+        if required_notes:
+            if filtered and filtered[-1].strip():
+                filtered.append("")
+            filtered.extend(required_notes)
         return filtered
 
     def _extract_test_name(heading_line: str) -> str | None:
@@ -12359,7 +12424,13 @@ async def kg_query(
                             "second_retrieval"
                         ] = {"hints": second_hints}
                         return QueryResult(
-                            response_iterator=response_2,
+                            response_iterator=_stream_electrical_response_with_final_event(
+                                response_2,
+                                second_context_result.raw_data,
+                                sys_prompt_2,
+                                query,
+                                "second_stream",
+                            ),
                             raw_data=second_context_result.raw_data,
                             is_streaming=True,
                         )
@@ -12382,7 +12453,13 @@ async def kg_query(
         # Streaming response (AsyncIterator)
         _log_electrical_answer_debug("stream_return", context_result.raw_data)
         return QueryResult(
-            response_iterator=response,
+            response_iterator=_stream_electrical_response_with_final_event(
+                response,
+                context_result.raw_data,
+                sys_prompt,
+                query,
+                "stream",
+            ),
             raw_data=context_result.raw_data,
             is_streaming=True,
         )
@@ -14906,5 +14983,13 @@ async def naive_query(
         # Streaming response (AsyncIterator)
         _log_electrical_answer_debug("naive_stream_return", raw_data)
         return QueryResult(
-            response_iterator=response, raw_data=raw_data, is_streaming=True
+            response_iterator=_stream_electrical_response_with_final_event(
+                response,
+                raw_data,
+                sys_prompt,
+                query,
+                "naive_stream",
+            ),
+            raw_data=raw_data,
+            is_streaming=True,
         )
