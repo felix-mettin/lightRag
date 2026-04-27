@@ -364,7 +364,7 @@
           "test_item": "电寿命(循环)",
           "inherits_from": "电寿命试验",
           "parameter_overrides": {
-            "操作顺序": "O-180s-CO-180s-CO",
+            "操作顺序": "O-0.3s-CO-180s-CO",
             "试验次数": "1次"
           }
         }

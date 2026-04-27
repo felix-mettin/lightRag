@@ -364,7 +364,7 @@
           "test_item": "电寿命(循环)",
           "inherits_from": "电寿命试验",
           "parameter_overrides": {
-            "操作顺序": "O-180s-CO-180s-CO",
+            "操作顺序": "O-0.3s-CO-180s-CO",
             "试验次数": "1次"
           }
         }
@@ -609,7 +609,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
         }
       ],
       "allow_when_any": [
@@ -1175,15 +1175,6 @@
               "source": "query",
               "type": "contains",
               "label": "开合性能型式试验"
-            },
-            {
-              "source": "query",
-              "type": "contains_any",
-              "labels": [
-                "额定线路充电电流",
-                "线路充电电流",
-                "线路充电"
-              ]
             },
             {
               "source": "query",

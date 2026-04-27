@@ -4291,6 +4291,33 @@
         }
       ],
       "deny_when_no_match": true
+    },
+    {
+      "rule_id": "short_circuit.gb.state_check_t10",
+      "domain": "short_circuit",
+      "kind": "applicability",
+      "standard": "gb",
+      "test_item": "作为状态检查的T10试验",
+      "status": "active",
+      "allow_when_any": [
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "真空"
+            },
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "SF6气体的额定压力(20℃表压)"
+            }
+          ]
+        }
+      ],
+      "deny_when_no_match": true
     }
   ]
 }
