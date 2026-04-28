@@ -152,7 +152,7 @@ export type QueryResponse = {
 
 export type QueryStreamChunk = {
   response: string
-  mode: 'append' | 'replace'
+  mode: 'append' | 'replace' | 'patch_a_notes'
   event?: string
 }
 
@@ -589,7 +589,11 @@ export const queryTextStream = async (
 
     onChunk({
       response: payload.response,
-      mode: payload.event === 'final' ? 'replace' : 'append',
+      mode: payload.event === 'final'
+        ? 'replace'
+        : payload.event === 'a_section_notes'
+          ? 'patch_a_notes'
+          : 'append',
       event: typeof payload.event === 'string' ? payload.event : undefined,
     })
   }

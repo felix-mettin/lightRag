@@ -253,6 +253,44 @@ def _infer_value_source(value_text: str, note_text: str) -> str:
     return "standard"
 
 
+def _is_concrete_final_value_text(value_text: str) -> bool:
+    text = _sanitize_value_text(value_text)
+    if not text:
+        return False
+    unresolved_markers = (
+        "用户录入",
+        "用户输入",
+        "用户提供",
+        "客户录入",
+        "客户输入",
+        "客户提供",
+        "默认为",
+        "默认",
+        "优选值",
+        "取决于",
+        "根据",
+        "按表",
+        "查表",
+        "见表",
+        "见图",
+        "若",
+        "如果",
+        "则",
+        "或",
+        "和/或",
+        "范围",
+        "以上",
+        "以下",
+        "无法确定",
+        "--",
+    )
+    if any(marker in text for marker in unresolved_markers):
+        return False
+    if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_ ]*", text):
+        return False
+    return True
+
+
 def _classify_query_value_resolution_mode(
         value_text: str,
         value_source: str,
@@ -283,6 +321,11 @@ def _classify_query_value_resolution_mode(
     )
     if not merged:
         return "missing"
+
+    if value_source in {"user_input", "default", "standard", "rule"} and _is_concrete_final_value_text(
+        value_text
+    ):
+        return "graph_final"
 
     if value_source == "user_input" or any(
             token in merged
@@ -3389,6 +3432,24 @@ def _apply_domain_rule_decisions_to_project_context(
 
         return resolved
 
+    def _resolve_single_phase_ground_fault_parameters_local() -> dict[str, tuple[str, str]]:
+        resolved: dict[str, tuple[str, str]] = {}
+        if rated_voltage_kv is None or capacitive_nonuniform_value is None:
+            return resolved
+
+        break_count, break_count_rule = _resolve_break_count_local(query_text)
+        nonuniform_text = str(capacitive_nonuniform_value).rstrip("0").rstrip(".")
+        test_voltage = round(
+            ((rated_voltage_kv / math.sqrt(3.0)) / break_count)
+            * float(capacitive_nonuniform_value),
+            3,
+        )
+        resolved["试验电压"] = (
+            _format_voltage_value(test_voltage),
+            f"单相接地故障试验试验电压按 额定电压 / √3 / 断口数量 × 不均匀系数 计算；{break_count_rule} 即 {rated_voltage_kv} / √3 / {break_count} × {nonuniform_text} = {_format_voltage_value(test_voltage)}。",
+        )
+        return resolved
+
     def _resolve_op2_making_parameters_local() -> dict[str, tuple[str, str]]:
         resolved: dict[str, tuple[str, str]] = {}
         if rated_voltage_kv is None or capacitive_nonuniform_value is None:
@@ -4358,7 +4419,6 @@ def _apply_domain_rule_decisions_to_project_context(
             rated_voltage_text,
             value_source="user_input",
             calc_rule="用户已明确提供额定电压，问答阶段直接采用该值。",
-            derive_from_rated="额定电压（用户录入）",
         )
 
     if rated_voltage_kv is not None:
@@ -4374,7 +4434,6 @@ def _apply_domain_rule_decisions_to_project_context(
                 rated_voltage_text,
                 value_source="user_input",
                 calc_rule="用户已明确提供额定电压，问答阶段直接采用该值。",
-                derive_from_rated="额定电压（用户录入）",
             )
             _set_if_present(
                 test_name,
@@ -4789,6 +4848,15 @@ def _apply_domain_rule_decisions_to_project_context(
                 value_text,
                 calc_rule=calc_rule,
             )
+
+    single_phase_ground_fault_parameters = _resolve_single_phase_ground_fault_parameters_local()
+    for param_name, (value_text, calc_rule) in single_phase_ground_fault_parameters.items():
+        _set_if_present(
+            "单相接地故障试验",
+            param_name,
+            value_text,
+            calc_rule=calc_rule,
+        )
 
     op2_making_parameters = _resolve_op2_making_parameters_local()
     for param_name in ("试验电压",):
@@ -5494,18 +5562,20 @@ def _build_final_test_item_scope(
 
 def _build_test_item_display_map(project_param_map: dict[str, list[str]]) -> dict[str, str]:
     display_map: dict[str, str] = {}
-    preserve_split_display_prefixes = (
-        "T100s(a)#",
-        "T100s(b)#",
-        "T100s(a)(60Hz)#",
-        "T100s(b)(60Hz)#",
-    )
+
+    def _format_t100s_split_display_name(name: str) -> str | None:
+        match = re.match(r"^(T100s\([ab]\)(?:\(60Hz\))?)#.+$", name)
+        if match:
+            return match.group(1)
+        return None
+
     for test_name in project_param_map.keys():
         name = str(test_name or "").strip()
         if not name:
             continue
-        if name.startswith(preserve_split_display_prefixes):
-            display_map[name] = name
+        t100s_display_name = _format_t100s_split_display_name(name)
+        if t100s_display_name:
+            display_map[name] = t100s_display_name
             continue
         if name.endswith("#干"):
             display_map[name] = f"{name[:-2]}(干)"
@@ -5561,7 +5631,7 @@ def _should_bypass_query_cache(global_config: dict[str, Any] | None) -> bool:
 
 def _get_display_param_suppressions() -> dict[str, set[str]]:
     # return {}
-    return {
+    suppressions = {
         "回路电阻测量": {"回路电阻", "辅助和控制设备的电阻","回路电阻(μΩ)"},
         "工频耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
         "工频耐受电压试验(干)":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
@@ -5582,7 +5652,7 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "局部放电试验":{"辅助和控制设备的电阻","SF6气体的最低功能压力(20℃表压)","回路电阻(μΩ)","回路电阻"},
         "T60(预备试验)":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
         "作为状态检查的工频耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","放电次数"},
-        "短时耐受电流和峰值耐受电流试验":{"额定电压","回路电阻","回路电阻(μΩ)"},
+        "短时耐受电流和峰值耐受电流试验":{"回路电阻","回路电阻(μΩ)"},
         "电寿命(合分)":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电","金短时间","故障类型"},
         "电寿命(单分)":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电","金短时间","故障类型"},
         "电寿命(循环)":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电","金短时间","故障类型"},
@@ -5598,7 +5668,6 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "容性电流开断试验(LC2)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
         "容性电流开断试验(LC2)#1": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
         "容性电流开断试验(LC2)#2": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
-        
         "容性电流开断试验(CC1)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
         "容性电流开断试验(CC2)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
         "容性电流开断试验(CC2)#1": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
@@ -5635,13 +5704,32 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "短路开断试验(T60)": {"外壳是否带电", "失败次数","SF6气体的最低功能压力(20℃表压)","额定频率"},
         "短路开断试验(T100S)": {"外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","失败次数"},
         "短路开断试验(T100A)": {"外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","失败次数"},
-        "异相接地故障试验": {"SF6气体的最低功能压力(20℃表压)","额定频率","外壳是否带电"},
+        "异相接地故障试验": {"SF6气体的最低功能压力(20℃表压)","额定频率"},
         "单相接地故障试验": {"SF6气体的最低功能压力(20℃表压)","额定频率"},
         "近区故障试验(L60)": {"外壳是否带电"},
         "失步关合和开断试验(OP1)": {"外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","发电机额定容量"},
         "失步关合和开断试验(OP2)": {"额定频率","试验项数","外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","直流分量(试验)","发电机额定容量"},
         "控制和辅助回路的绝缘试验": {"额定直流电压(±)"},
     }
+
+    internal_aliases = {
+        "T100s(a)#1": "T100s(a)",
+        "T100s(a)#2": "T100s(a)",
+        "T100s(a)#共箱共机构": "T100s(a)",
+        "T100s(b)#共机构": "T100s(b)",
+        "T100s(b)#共箱共机构": "T100s(b)",
+        "T100s(a)(60Hz)#1": "T100s(a)(60Hz)",
+        "T100s(a)(60Hz)#2": "T100s(a)(60Hz)",
+        "T100s(a)(60Hz)#共箱共机构": "T100s(a)(60Hz)",
+        "T100s(b)(60Hz)#共机构": "T100s(b)(60Hz)",
+        "T100s(b)(60Hz)#共箱共机构": "T100s(b)(60Hz)",
+        "短路开断试验(T100A)#共箱共机构": "短路开断试验(T100A)",
+    }
+    for internal_name, display_name in internal_aliases.items():
+        hidden_params = suppressions.get(display_name)
+        if hidden_params:
+            suppressions[internal_name] = set(hidden_params)
+    return suppressions
 
 
 def _get_report_scope_test_whitelist(stand_type: str | None = None) -> dict[str, set[str]]:
@@ -5679,7 +5767,7 @@ def _get_report_scope_test_whitelist(stand_type: str | None = None) -> dict[str,
             "CC2(60Hz)",
             "LC1(60Hz)",
             "LC2(60Hz)",
-            
+            "作为状态检查的T10试验"
         }
     short_tests = {
             "短时耐受电流试验",
@@ -5703,7 +5791,6 @@ def _get_report_scope_test_whitelist(stand_type: str | None = None) -> dict[str,
             "短路开断试验(T30)",
             "短路开断试验(T60)",
             "T60(60Hz)",
-            
             "T100S(60Hz)",
             "短路开断试验(T100A)",
             "T100A(60Hz)",
@@ -5997,7 +6084,7 @@ def _postprocess_electrical_markdown_response(
 
     def _format_param_line(test_name: str, param_name: str, entry: dict[str, Any]) -> str:
         entry = dict(entry or {})
-        value_text = str(entry.get("value_text", "") or "").strip()
+        value_text = _sanitize_value_text(str(entry.get("value_text", "") or ""))
         if param_name == "介质性质" and not explicit_gas_or_oil:
             value_text = "正常"
             entry.update(
@@ -6008,6 +6095,9 @@ def _postprocess_electrical_markdown_response(
                 }
             )
         if not value_text:
+            return ""
+        resolution_mode = str(entry.get("resolution_mode", "") or "").strip()
+        if resolution_mode != "graph_final" and not _is_concrete_final_value_text(value_text):
             return ""
         suffix = ""
         source = str(entry.get("value_source", "") or "").strip()
@@ -6171,6 +6261,8 @@ def _postprocess_electrical_markdown_response(
             return ""
         formatted_line = _format_param_line(canonical_name, param_name, entry)
         if not formatted_line.startswith("- "):
+            if _is_concrete_final_value_text(remainder):
+                return line
             return line
         return f"{prefix or '- '}{formatted_line[2:]}"
 
@@ -6409,6 +6501,53 @@ def _has_electrical_postprocess_metadata(raw_data: dict[str, Any] | None) -> boo
     return bool(allowed_items or removed_items or domain_rule_decisions or rule_query_text)
 
 
+def _build_electrical_a_section_note_patch(
+    raw_data: dict[str, Any] | None,
+    response_text: str,
+) -> list[str]:
+    if not isinstance(raw_data, dict):
+        return []
+    metadata = raw_data.get("metadata", {}) or {}
+    allowed_items = metadata.get("allowed_final_test_items_raw") or metadata.get(
+        "allowed_final_test_items", []
+    ) or []
+    allowed_set = {str(item).strip() for item in allowed_items if str(item).strip()}
+    if not allowed_set:
+        return []
+
+    existing_text = str(response_text or "")
+    notes: list[str] = []
+    lc_cc_coverage_required_items = {
+        "容性电流开断试验(LC1)",
+        "容性电流开断试验(LC2)",
+        "容性电流开断试验(CC1)",
+        "容性电流开断试验(CC2)",
+    }
+    if lc_cc_coverage_required_items.issubset(allowed_set) and (
+        "LC1，LC2可被CC1、CC2覆盖" not in existing_text
+        and "LC1,LC2可被CC1、CC2覆盖" not in existing_text
+    ):
+        notes.append("LC1，LC2可被CC1、CC2覆盖")
+
+    rule_query_text = str(metadata.get("rule_query_text", "") or "")
+    rated_voltage_match = re.search(
+        r"额定电压\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*kV\b",
+        rule_query_text,
+        flags=re.IGNORECASE,
+    )
+    rated_voltage_kv = float(rated_voltage_match.group(1)) if rated_voltage_match else None
+    op1_optional_required_item = "失步关合和开断试验(OP1)"
+    if (
+        op1_optional_required_item in allowed_set
+        and rated_voltage_kv is not None
+        and rated_voltage_kv >= 72.5
+        and "失步关合和开断试验(OP1)试验可免做" not in existing_text
+    ):
+        notes.append("失步关合和开断试验(OP1)试验可免做")
+
+    return notes
+
+
 async def _stream_electrical_response_with_final_event(
     response_stream: AsyncIterator[str],
     raw_data: dict[str, Any] | None,
@@ -6439,7 +6578,9 @@ async def _stream_electrical_response_with_final_event(
         raw_data,
         processed_text,
     )
-    yield {"event": "final", "response": processed_text}
+    a_section_notes = _build_electrical_a_section_note_patch(raw_data, response_text)
+    if a_section_notes:
+        yield {"event": "a_section_notes", "response": "\n".join(a_section_notes)}
 
 
 def _log_electrical_answer_debug(

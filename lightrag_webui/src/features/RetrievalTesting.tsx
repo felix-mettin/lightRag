@@ -258,14 +258,43 @@ export default function RetrievalTesting() {
       }
 
       // Create a function to update the assistant's message
+      const applyASectionNotesPatch = (content: string, patch: string) => {
+        const notes = patch
+          .split('\n')
+          .map((line) => line.trim())
+          .filter((line) => line && !content.includes(line))
+
+        if (notes.length === 0) {
+          return content
+        }
+
+        const noteBlock = notes.join('\n')
+        const sectionMatch = content.match(/(^|\n)### A\. [^\n]*(?:\n|$)/)
+        if (!sectionMatch || sectionMatch.index === undefined) {
+          return `${content.trimEnd()}\n\n${noteBlock}`
+        }
+
+        const sectionStart = sectionMatch.index + sectionMatch[0].length
+        const rest = content.slice(sectionStart)
+        const nextSectionMatch = rest.match(/\n### [B-Z]\. /)
+        const insertAt = nextSectionMatch
+          ? sectionStart + nextSectionMatch.index
+          : content.length
+        const before = content.slice(0, insertAt).trimEnd()
+        const after = content.slice(insertAt)
+        return `${before}\n\n${noteBlock}${after}`
+      }
+
       const updateAssistantMessage = (
         chunk: string,
         isError?: boolean,
-        mode: 'append' | 'replace' = 'append'
+        mode: 'append' | 'replace' | 'patch_a_notes' = 'append'
       ) => {
         assistantMessage.content = mode === 'replace'
           ? chunk
-          : assistantMessage.content + chunk
+          : mode === 'patch_a_notes'
+            ? applyASectionNotesPatch(assistantMessage.content, chunk)
+            : assistantMessage.content + chunk
 
         // Start thinking timer on first sight of think tag
         if (assistantMessage.content.includes('<think>') && !thinkingStartTime.current) {
