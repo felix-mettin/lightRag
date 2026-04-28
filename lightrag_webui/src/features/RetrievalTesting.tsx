@@ -268,10 +268,12 @@ export default function RetrievalTesting() {
           return content
         }
 
-        const noteBlock = notes.join('\n')
+        const noteBlock = notes.length > 1
+          ? `${notes.slice(0, -1).join('  \n')}  \n${notes[notes.length - 1]}`
+          : notes[0]
         const sectionMatch = content.match(/(^|\n)### A\. [^\n]*(?:\n|$)/)
         if (!sectionMatch || sectionMatch.index === undefined) {
-          return `${content.trimEnd()}\n\n${noteBlock}`
+          return `${content.trimEnd()}\n\n${noteBlock}\n`
         }
 
         const sectionStart = sectionMatch.index + sectionMatch[0].length
@@ -282,7 +284,8 @@ export default function RetrievalTesting() {
           : content.length
         const before = content.slice(0, insertAt).trimEnd()
         const after = content.slice(insertAt)
-        return `${before}\n\n${noteBlock}${after}`
+        const noteSuffix = after ? '' : '\n'
+        return `${before}\n\n${noteBlock}${noteSuffix}${after}`
       }
 
       const updateAssistantMessage = (

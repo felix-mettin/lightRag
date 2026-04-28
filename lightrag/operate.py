@@ -6237,7 +6237,11 @@ def _postprocess_electrical_markdown_response(
         if required_notes:
             if filtered and filtered[-1].strip():
                 filtered.append("")
-            filtered.extend(required_notes)
+            for index, note in enumerate(required_notes):
+                if index < len(required_notes) - 1:
+                    filtered.append(f"{note}  ")
+                else:
+                    filtered.append(note)
         return filtered
 
     def _extract_test_name(heading_line: str) -> str | None:
@@ -6556,10 +6560,55 @@ async def _stream_electrical_response_with_final_event(
     debug_stage_prefix: str,
 ) -> AsyncIterator[str | dict[str, str]]:
     chunks: list[str] = []
+    a_section_notes = _build_electrical_a_section_note_patch(raw_data, "")
+    line_buffer = ""
+    inside_a_section = False
+    notes_emitted = False
+
+    async def _emit_notes_if_needed() -> AsyncIterator[dict[str, str]]:
+        nonlocal notes_emitted
+        if a_section_notes and not notes_emitted:
+            notes_emitted = True
+            yield {"event": "a_section_notes", "response": "\n".join(a_section_notes)}
+
+    async def _flush_complete_lines(text: str) -> AsyncIterator[str | dict[str, str]]:
+        nonlocal line_buffer, inside_a_section
+        line_buffer += text
+        while True:
+            newline_index = line_buffer.find("\n")
+            if newline_index < 0:
+                break
+            line = line_buffer[: newline_index + 1]
+            line_buffer = line_buffer[newline_index + 1 :]
+            stripped = line.strip()
+            if stripped.startswith("### "):
+                is_a_heading = stripped.startswith("### A.")
+                if inside_a_section and not is_a_heading:
+                    async for note_event in _emit_notes_if_needed():
+                        yield note_event
+                inside_a_section = is_a_heading
+            yield line
+
     async for chunk in response_stream:
         if chunk:
             chunks.append(chunk)
-            yield chunk
+            async for output in _flush_complete_lines(chunk):
+                yield output
+
+    if line_buffer:
+        stripped = line_buffer.strip()
+        if stripped.startswith("### "):
+            is_a_heading = stripped.startswith("### A.")
+            if inside_a_section and not is_a_heading:
+                async for note_event in _emit_notes_if_needed():
+                    yield note_event
+            inside_a_section = is_a_heading
+        yield line_buffer
+        line_buffer = ""
+
+    if inside_a_section:
+        async for note_event in _emit_notes_if_needed():
+            yield note_event
 
     response_text = _cleanup_model_response_text("".join(chunks), sys_prompt, query)
     _log_electrical_answer_debug(
@@ -6578,9 +6627,10 @@ async def _stream_electrical_response_with_final_event(
         raw_data,
         processed_text,
     )
-    a_section_notes = _build_electrical_a_section_note_patch(raw_data, response_text)
-    if a_section_notes:
-        yield {"event": "a_section_notes", "response": "\n".join(a_section_notes)}
+    if not notes_emitted:
+        a_section_notes = _build_electrical_a_section_note_patch(raw_data, response_text)
+        if a_section_notes:
+            yield {"event": "a_section_notes", "response": "\n".join(a_section_notes)}
 
 
 def _log_electrical_answer_debug(
