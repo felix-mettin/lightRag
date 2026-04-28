@@ -5423,8 +5423,8 @@ def _apply_domain_rule_decisions_to_project_context(
             {
                 "base_name": "电寿命试验(60%)",
                 "suffixes": [
-                    ("#O", "O", "2次"),
-                    ("#O-CO-CO", "O-0.3s-CO-180s-CO", "2次"),
+                    ("#单分", "O", "2次"),
+                    ("#循环", "O-0.3s-CO-180s-CO", "2次"),
                 ],
                 "short_circuit_checks": ["短路开断试验(T60)", "T60(60Hz)"],
                 "current_ratio": 0.6,
@@ -5433,9 +5433,9 @@ def _apply_domain_rule_decisions_to_project_context(
             {
                 "base_name": "电寿命试验(30%)",
                 "suffixes": [
-                    ("#O", "O", "84次"),
-                    ("#O-CO", "O-0.3s-CO", "14次"),
-                    ("#O-CO-CO", "O-0.3s-CO-180s-CO", "6次"),
+                    ("#单分", "O", "84次"),
+                    ("#合分", "O-0.3s-CO", "14次"),
+                    ("#循环", "O-0.3s-CO-180s-CO", "6次"),
                 ],
                 "short_circuit_checks": ["短路开断试验(T30)", "T30(60Hz)"],
                 "current_ratio": 0.3,
@@ -5444,9 +5444,9 @@ def _apply_domain_rule_decisions_to_project_context(
             {
                 "base_name": "电寿命试验(10%)",
                 "suffixes": [
-                    ("#O", "O", "84次"),
-                    ("#O-CO", "O-0.3s-CO", "14次"),
-                    ("#O-CO-CO", "O-0.3s-CO-180s-CO", "6次"),
+                    ("#单分", "O", "84次"),
+                    ("#合分", "O-0.3s-CO", "14次"),
+                    ("#循环", "O-0.3s-CO-180s-CO", "6次"),
                 ],
                 "short_circuit_checks": ["短路开断试验(T10)", "T10(60Hz)"],
                 "current_ratio": 0.1,
@@ -6017,20 +6017,21 @@ def _get_report_scope_test_whitelist(stand_type: str | None = None) -> dict[str,
     # so do NOT reassign the variable.
     if normalized == "IEC":
         insulation_tests.discard("局部放电试验")
+        insulation_tests.discard("电寿命试验")
         short_tests.update({
             "电寿命试验(100%)",
-            "电寿命试验(100%)#O-CO-CO",
+            "电寿命试验(100%)#循环",
             "电寿命试验(60%)",
-            "电寿命试验(60%)#O",
-            "电寿命试验(60%)#O-CO-CO",
+            "电寿命试验(60%)#单分",
+            "电寿命试验(60%)#循环",
             "电寿命试验(30%)",
             "电寿命试验(30%)#O",
-            "电寿命试验(30%)#O-CO",
-            "电寿命试验(30%)#O-CO-CO",
+            "电寿命试验(30%)#合分",
+            "电寿命试验(30%)#循环",
             "电寿命试验(10%)",
-            "电寿命试验(10%)#O",
-            "电寿命试验(10%)#O-CO",
-            "电寿命试验(10%)#O-CO-CO",
+            "电寿命试验(10%)#单分",
+            "电寿命试验(10%)#合分",
+            "电寿命试验(10%)#循环",
         })
     elif normalized == "DLT":
         insulation_tests.discard("局部放电试验")
@@ -6761,7 +6762,7 @@ def _build_electrical_a_section_note_patch(
         "LC1，LC2可被CC1、CC2覆盖" not in existing_text
         and "LC1,LC2可被CC1、CC2覆盖" not in existing_text
     ):
-        notes.append("LC1，LC2可被CC1、CC2覆盖")
+        notes.append("LC1，LC2可被CC1、CC2覆盖\n")
 
     rule_query_text = str(metadata.get("rule_query_text", "") or "")
     rated_voltage_match = re.search(
@@ -6777,7 +6778,7 @@ def _build_electrical_a_section_note_patch(
         and rated_voltage_kv >= 72.5
         and "失步关合和开断试验(OP1)试验可免做" not in existing_text
     ):
-        notes.append("失步关合和开断试验(OP1)试验可免做")
+        notes.append("失步关合和开断试验(OP1)试验可免做\n")
 
     return notes
 
@@ -14507,7 +14508,7 @@ async def _build_query_context(
 
     # Stage 4: Build final LLM context with dynamic token processing
     # _build_context_str now always returns tuple[str, dict]
-        context, raw_data = await _build_context_str(
+    context, raw_data = await _build_context_str(
             entities_context=truncation_result["entities_context"],
             relations_context=truncation_result["relations_context"],
             merged_chunks=merged_chunks,
@@ -14520,7 +14521,7 @@ async def _build_query_context(
             relation_id_to_original=truncation_result["relation_id_to_original"],
             knowledge_graph_inst=knowledge_graph_inst,
             stand_type=stand_type,
-        )
+    )
 
     # Convert keywords strings to lists and add complete metadata to raw_data
     hl_keywords_list = hl_keywords.split(", ") if hl_keywords else []
