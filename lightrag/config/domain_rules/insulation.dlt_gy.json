@@ -1733,7 +1733,7 @@
       "standard": "gb",
       "test_item": "操作冲击耐受电压试验",
       "status": "active",
-      "remove_original": false,
+      "remove_original": true,
       "inputs": {
         "trigger_when_any": [
           {
@@ -3115,7 +3115,7 @@
           {
             "source": "query",
             "type": "regex_match",
-            "pattern": "^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+            "pattern": "(?s)^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
           }
         ]
       },
@@ -3187,7 +3187,7 @@
           {
             "source": "query",
             "type": "regex_match",
-            "pattern": "^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+            "pattern": "(?s)^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
           }
         ]
       },
@@ -3349,7 +3349,7 @@
           {
             "source": "query",
             "type": "regex_match",
-            "pattern": "^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+            "pattern": "(?s)^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
           }
         ]
       },
@@ -3363,7 +3363,7 @@
           "inherits_from": "T100s(b)",
           "parameter_overrides": {
             "试验相数": "三相",
-            "操作顺序": "0-0.3-CO-180s-CO",
+            "操作顺序": "O-0.3s-CO-180s-CO",
             "试验次数": "1次"
           }
         }
@@ -3823,7 +3823,7 @@
               {
                 "source": "query",
                 "type": "contains",
-                "label": "50Hz"
+                "label": "三相"
               },
               {
                 "source": "query",
@@ -3842,7 +3842,7 @@
           {
             "source": "query",
             "type": "regex_match",
-            "pattern": "^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+            "pattern": "(?s)^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
           }
         ]
       },

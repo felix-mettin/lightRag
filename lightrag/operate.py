@@ -2113,7 +2113,7 @@ def _evaluate_domain_rule_decisions(
                         reason_text = "高压户外工频试验将相间及对地拆分为干态显式项和湿态原项，联合电压由高压联合电压规则承载。"
                 joint_voltage_rule_id = rule_id
                 if normalized_stand_type == "DLT":
-                    joint_voltage_rule_id = "insulation.dlt.power_frequency_joint_voltage_split"
+                    joint_voltage_rule_id = "insulation.gb.power_frequency_joint_voltage_split"
                 elif normalized_stand_type == "IEC":
                     joint_voltage_rule_id = "insulation.gb.power_frequency_joint_voltage_split"
                 else:
@@ -2139,7 +2139,7 @@ def _evaluate_domain_rule_decisions(
                     reason_text = "额定电压高于252kV且命中户外条件时，高压工频联合电压仅保留干态联合电压项，不再复用原项。"
                 switching_joint_voltage_rule_id = rule_id
                 if normalized_stand_type == "DLT":
-                    switching_joint_voltage_rule_id = "insulation.dlt.switching_impulse_joint_voltage_split"
+                    switching_joint_voltage_rule_id = "insulation.gb.switching_impulse_joint_voltage_split"
                 elif normalized_stand_type == "IEC":
                     switching_joint_voltage_rule_id = "insulation.iec.switching_impulse_joint_voltage_split"
                 else:
@@ -2910,7 +2910,7 @@ def _apply_domain_rule_decisions_to_project_context(
         break_count, break_count_rule = _resolve_break_count_local(query_text)
         kc_value = _extract_named_scalar_local(
             query_text,
-            ["容性电压系数kc", "容性电压系数", "kc"],
+            ["容性电压系数kc", "容性电压系数", "kc","容性系数"],
         )
         if rated_voltage is None:
             return None, phase_value, nonuniform_text, "未识别到额定电压，无法计算容性电流开断试验试验电压。"
@@ -3543,6 +3543,14 @@ def _apply_domain_rule_decisions_to_project_context(
         ):
             resolved[test_name] = {
                 "操作顺序": ("O", "T100A 试验操作顺序为O，无需 CO 循环。"),
+            }
+
+        for test_name in (
+            "T100s(a)",
+            "T100s(a)(60Hz)",
+        ):
+            resolved[test_name] = {
+                "操作顺序": ("C", "T100A 试验操作顺序为C，无需 其他 循环。"),
             }
 
         if rated_voltage_kv is not None:
@@ -4623,6 +4631,42 @@ def _apply_domain_rule_decisions_to_project_context(
             capacitive_split_trial_count_text,
             calc_rule=capacitive_split_trial_count_rule,
         )
+
+    if test_name in "控制和辅助回路的绝缘试验":
+        _ensure_param("控制和辅助回路的绝缘试验", "交流电压")
+        _set_param(
+            "控制和辅助回路的绝缘试验",
+            "交流电压",
+            "2 kV",
+            value_source="rule",
+            value_type="text",
+            constraints="2 kV",
+            calc_rule="控制和辅助回路的绝缘试验交流电压默认取 2 kV。",
+            resolution_mode="graph_final",
+        )
+        _ensure_param("控制和辅助回路的绝缘试验", "试验次数")
+        _set_param(
+            "控制和辅助回路的绝缘试验",
+            "试验次数",
+            "1次",
+            value_source="rule",
+            value_type="text",
+            constraints="1次",
+            calc_rule="控制和辅助回路的绝缘试验次数默认取 1次。",
+            resolution_mode="graph_final",
+        )
+        _ensure_param("控制和辅助回路的绝缘试验", "试验时间(min)")
+        _set_param(
+            "控制和辅助回路的绝缘试验",
+            "试验时间(min)",
+            "1min",
+            value_source="rule",
+            value_type="text",
+            constraints="1min",
+            calc_rule="控制和辅助回路的绝缘试验时间默认取 1min。",
+            resolution_mode="graph_final",
+        )
+
     if rated_voltage_kv is not None and "T60(预备试验)" in updated_param_map:
         t60_voltage_kv = round(rated_voltage_kv / 2, 2)
         _set_param(
@@ -4930,6 +4974,7 @@ def _apply_domain_rule_decisions_to_project_context(
 
     if rated_voltage_kv is not None and normalized_stand_type != "IEC":
         for test_name in ("电寿命(单分)", "电寿命(合分)", "电寿命(循环)"):
+            # 单分、合分、循环规则相同，都是三相试验为额定电压；单相实验时，试验电压= 额定电压/√3*首开极系数/断口数量*不均匀系数
             _set_if_present(
                 test_name,
                 "试验电压",
@@ -5805,7 +5850,7 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "雷电冲击耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","额定直流电压(±)","放电次数","最大适用海拔"},
         "雷电冲击耐受电压试验(断口)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
         "雷电冲击耐受电压试验(相间及对地)": {"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
-        "雷电冲击耐受电压试验(联合电压)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
+        "雷电冲击耐受电压试验(联合电压)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔","试验状态"},
         "操作冲击耐受电压试验(联合电压)":{"试验电压","SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
         "操作冲击耐受电压试验":{"试验电压","SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
         "操作冲击耐受电压试验(干)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
@@ -5822,7 +5867,7 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "近区故障试验(L75)":{"线路侧波阻抗","SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
         "近区故障试验(L90)":{"线路侧波阻抗","SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
         "辅助和控制回路温升试验": {"机构是否带合分闸线圈","辅助设备和控制设备的额定电源电压","辅助设备和控制设备的额定电流","材料绝热等级"},
-        "全套绝缘型式试验":{"最大适用海拔","试验项目(全雷操工)"},
+        "全套绝缘型式试验":{"最大适用海拔","试验项目(全雷操工)","试验次数",""},
         "容性电流开断试验(BC1)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电","关合涌流","关合涌流的频率",},
         "容性电流开断试验(BC2)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
         "容性电流开断试验(LC1)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
@@ -14462,20 +14507,20 @@ async def _build_query_context(
 
     # Stage 4: Build final LLM context with dynamic token processing
     # _build_context_str now always returns tuple[str, dict]
-    context, raw_data = await _build_context_str(
-        entities_context=truncation_result["entities_context"],
-        relations_context=truncation_result["relations_context"],
-        merged_chunks=merged_chunks,
-        query=query,
-        rule_query=rule_query,
-        query_param=query_param,
-        global_config=text_chunks_db.global_config,
-        chunk_tracking=search_result["chunk_tracking"],
-        entity_id_to_original=truncation_result["entity_id_to_original"],
-        relation_id_to_original=truncation_result["relation_id_to_original"],
-        knowledge_graph_inst=knowledge_graph_inst,
-        stand_type=stand_type,
-    )
+        context, raw_data = await _build_context_str(
+            entities_context=truncation_result["entities_context"],
+            relations_context=truncation_result["relations_context"],
+            merged_chunks=merged_chunks,
+            query=query,
+            rule_query=rule_query,
+            query_param=query_param,
+            global_config=text_chunks_db.global_config,
+            chunk_tracking=search_result["chunk_tracking"],
+            entity_id_to_original=truncation_result["entity_id_to_original"],
+            relation_id_to_original=truncation_result["relation_id_to_original"],
+            knowledge_graph_inst=knowledge_graph_inst,
+            stand_type=stand_type,
+        )
 
     # Convert keywords strings to lists and add complete metadata to raw_data
     hl_keywords_list = hl_keywords.split(", ") if hl_keywords else []
