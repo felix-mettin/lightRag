@@ -439,7 +439,7 @@
       "domain": "short_circuit",
       "kind": "split",
       "standard": "gb",
-      "test_item": "电寿命试验",
+      "test_item": "电寿命试验(100%)",
       "status": "active",
       "inputs": {
         "trigger_when_any": [
@@ -4318,6 +4318,242 @@
         }
       ],
       "deny_when_no_match": true
+    },
+    {
+      "rule_id": "short_circuit.iec.electrical_life_split_100",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "iec",
+      "test_item": "电寿命试验(100%)",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "短路性能型式试验"
+              },
+              {
+                "source": "query",
+                "type": "less_or_equal_numeric",
+                "label": "额定电压",
+                "value": 40.5,
+                "unit": "kV"
+              },
+              {
+                "source": "query",
+                "type": "regex_match",
+                "pattern": "^(?!.*断路器等级\\s*(?:(?:[:：=]|为|是)\\s*)?E1(?:级)?).*"
+              }
+            ]
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "电寿命试验(100%)",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "电寿命试验(100%)#O-CO-CO",
+          "inherits_from": "电寿命试验(100%)",
+          "parameter_overrides": {
+            "操作顺序": "O-0.3s-CO-180s-CO",
+            "试验次数": "2次"
+          }
+        }
+      ]
+    },
+    {
+      "rule_id": "short_circuit.iec.electrical_life_split_60",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "iec",
+      "test_item": "电寿命试验(60%)",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "短路性能型式试验"
+              },
+              {
+                "source": "query",
+                "type": "less_or_equal_numeric",
+                "label": "额定电压",
+                "value": 40.5,
+                "unit": "kV"
+              },
+              {
+                "source": "query",
+                "type": "regex_match",
+                "pattern": "^(?!.*断路器等级\\s*(?:(?:[:：=]|为|是)\\s*)?E1(?:级)?).*"
+              }
+            ]
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "电寿命试验(60%)",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "电寿命试验(60%)#O",
+          "inherits_from": "电寿命试验(60%)",
+          "parameter_overrides": {
+            "操作顺序": "O",
+            "试验次数": "2次"
+          }
+        },
+        {
+          "test_item": "电寿命试验(60%)#O-CO-CO",
+          "inherits_from": "电寿命试验(60%)",
+          "parameter_overrides": {
+            "操作顺序": "O-0.3s-CO-180s-CO",
+            "试验次数": "2次"
+          }
+        }
+      ]
+    },
+    {
+      "rule_id": "short_circuit.iec.electrical_life_split_30",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "iec",
+      "test_item": "电寿命试验(30%)",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "短路性能型式试验"
+              },
+              {
+                "source": "query",
+                "type": "less_or_equal_numeric",
+                "label": "额定电压",
+                "value": 40.5,
+                "unit": "kV"
+              },
+              {
+                "source": "query",
+                "type": "regex_match",
+                "pattern": "^(?!.*断路器等级\\s*(?:(?:[:：=]|为|是)\\s*)?E1(?:级)?).*"
+              }
+            ]
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "电寿命试验(30%)",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "电寿命试验(30%)#O",
+          "inherits_from": "电寿命试验(30%)",
+          "parameter_overrides": {
+            "操作顺序": "O",
+            "试验次数": "84次"
+          }
+        },
+        {
+          "test_item": "电寿命试验(30%)#O-CO",
+          "inherits_from": "电寿命试验(30%)",
+          "parameter_overrides": {
+            "操作顺序": "O-0.3s-CO",
+            "试验次数": "14次"
+          }
+        },
+        {
+          "test_item": "电寿命试验(30%)#O-CO-CO",
+          "inherits_from": "电寿命试验(30%)",
+          "parameter_overrides": {
+            "操作顺序": "O-0.3s-CO-180s-CO",
+            "试验次数": "6次"
+          }
+        }
+      ]
+    },
+    {
+      "rule_id": "short_circuit.iec.electrical_life_split_10",
+      "domain": "short_circuit",
+      "kind": "split",
+      "standard": "iec",
+      "test_item": "电寿命试验(10%)",
+      "status": "active",
+      "remove_original": true,
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "短路性能型式试验"
+              },
+              {
+                "source": "query",
+                "type": "less_or_equal_numeric",
+                "label": "额定电压",
+                "value": 40.5,
+                "unit": "kV"
+              },
+              {
+                "source": "query",
+                "type": "regex_match",
+                "pattern": "^(?!.*断路器等级\\s*(?:(?:[:：=]|为|是)\\s*)?E1(?:级)?).*"
+              }
+            ]
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "电寿命试验(10%)",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "电寿命试验(10%)#O",
+          "inherits_from": "电寿命试验(10%)",
+          "parameter_overrides": {
+            "操作顺序": "O",
+            "试验次数": "84次"
+          }
+        },
+        {
+          "test_item": "电寿命试验(10%)#O-CO",
+          "inherits_from": "电寿命试验(10%)",
+          "parameter_overrides": {
+            "操作顺序": "O-0.3s-CO",
+            "试验次数": "14次"
+          }
+        },
+        {
+          "test_item": "电寿命试验(10%)#O-CO-CO",
+          "inherits_from": "电寿命试验(10%)",
+          "parameter_overrides": {
+            "操作顺序": "O-0.3s-CO-180s-CO",
+            "试验次数": "6次"
+          }
+        }
+      ]
     }
   ]
 }

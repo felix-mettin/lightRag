@@ -28,7 +28,7 @@ from lightrag.base import (
     TextChunkSchema,
     QueryParam,
     QueryResult,
-    QueryContextResult,
+    QueryContextResult
 )
 from lightrag.prompt import PROMPTS
 from lightrag.utils import (
@@ -1982,6 +1982,14 @@ def _evaluate_domain_rule_decisions(
     for raw_rule in rules:
         if not isinstance(raw_rule, dict):
             continue
+        # If the rule explicitly targets a standard (gb/iec/dlt/etc.), skip it
+        # when the current evaluation stand_type is provided and does not match.
+        raw_rule_standard = str(raw_rule.get("standard", "") or "").strip()
+        if raw_rule_standard:
+            normalized_raw_standard = _normalize_operate_standard_type(raw_rule_standard)
+            if normalized_raw_standard and normalized_raw_standard != stand_type:
+                continue
+
         if not _rule_matches_current_scope(raw_rule):
             continue
 
@@ -2581,6 +2589,8 @@ def _apply_domain_rule_decisions_to_project_context(
     updated_value_map = deepcopy(project_param_value_map)
     schema_cfg = schema_cfg or {}
     configured_requirements = schema_cfg.get("test_item_param_requirements", {}) or {}
+    # Normalized standard type for conditional logic (GB vs IEC vs DLT etc.)
+    normalized_stand_type = _normalize_operate_standard_type(stand_type)
 
     def _normalize_test_item_lookup_key_local(value: str) -> str:
         text = _normalize_text_key(str(value))
@@ -2668,14 +2678,26 @@ def _apply_domain_rule_decisions_to_project_context(
         resolution_mode: str = "graph_final",
     ) -> None:
         _ensure_param(test_name, param_name)
+        # Normalize special count syntax like "2(-1)*次" -> "2次"
+        norm_value_text = str(value_text or "")
+        calc_rule_text = str(calc_rule or "").strip()
+        if str(param_name) in {"试验次数", "正常次数"}:
+            m = re.match(r"^\s*([0-9]+)\s*\(\s*\-1\s*\)\*\s*(次)?\s*$", norm_value_text)
+            if m:
+                original = norm_value_text
+                num = m.group(1)
+                norm_value_text = f"{num}次"
+                note = f"原始值为{original}，表示在满足特定条件时可减一次。"
+                calc_rule_text = f"{calc_rule_text} {note}".strip() if calc_rule_text else note
+
         updated_value_map[test_name][param_name].update(
             {
-                "value_text": value_text,
+                "value_text": norm_value_text,
                 "value_source": value_source,
-                "value_expr": value_text if value_source == "user_input" else "",
+                "value_expr": norm_value_text if value_source == "user_input" else "",
                 "unit": "",
-                "constraints": constraints if constraints is not None else value_text,
-                "calc_rule": calc_rule,
+                "constraints": constraints if constraints is not None else norm_value_text,
+                "calc_rule": calc_rule_text,
                 "derive_from_rated": derive_from_rated,
                 "resolution_mode": resolution_mode,
             }
@@ -4390,9 +4412,6 @@ def _apply_domain_rule_decisions_to_project_context(
             "温升试验",
             "温升试验(60Hz)",
             "状态检查试验(T10)",
-            "电寿命(单分)",
-            "电寿命(合分)",
-            "电寿命(循环)",
             "短路开断试验(T10)",
             "短路开断试验(T30)",
             "短路开断试验(T60)",
@@ -4909,7 +4928,7 @@ def _apply_domain_rule_decisions_to_project_context(
                 calc_rule=calc_rule,
             )
 
-    if rated_voltage_kv is not None:
+    if rated_voltage_kv is not None and normalized_stand_type != "IEC":
         for test_name in ("电寿命(单分)", "电寿命(合分)", "电寿命(循环)"):
             _set_if_present(
                 test_name,
@@ -4917,7 +4936,7 @@ def _apply_domain_rule_decisions_to_project_context(
                 _format_voltage_value(rated_voltage_kv),
                 calc_rule=f"40.5kV及以下时，{test_name}试验电压取额定电压 {rated_voltage_kv} kV。",
             )
-    if short_break_ka is not None:
+    if short_break_ka is not None and normalized_stand_type != "IEC":
         for test_name in ("电寿命(单分)", "电寿命(合分)", "电寿命(循环)"):
             _set_if_present(
                 test_name,
@@ -4925,7 +4944,7 @@ def _apply_domain_rule_decisions_to_project_context(
                 f"{str(short_break_ka).rstrip('0').rstrip('.')} kA",
                 calc_rule="用户已明确提供额定短路开断电流，问答阶段直接采用该值。",
             )
-    if rated_closing_ka is not None:
+    if rated_closing_ka is not None and normalized_stand_type != "IEC":
         for test_name in ("电寿命(单分)", "电寿命(合分)", "电寿命(循环)"):
             _set_if_present(
                 test_name,
@@ -5343,6 +5362,148 @@ def _apply_domain_rule_decisions_to_project_context(
             for instance_name in ("空载特性测量#1", "空载特性测量#2"):
                 updated_param_map[instance_name] = list(source_params)
                 updated_value_map[instance_name] = deepcopy(source_values)
+
+    # IEC electrical life: fallback split, test current assignment and reduction-note logic
+    # Only run IEC fallback when normalized standard is IEC and the query/report scope
+    # indicates a short-circuit type test (短路性能型式试验).
+    if normalized_stand_type == "IEC":
+        iec_el_configs = [
+            {
+                "base_name": "电寿命试验(100%)",
+                "suffixes": [("#O-CO-CO", "O-0.3s-CO-180s-CO", "2次")],
+                "short_circuit_checks": ["短路开断试验(T100s)", "短路开断试验(T100S)", "T100S(60Hz)", "T100s(60Hz)"],
+                "current_ratio": 1.0,
+                "reduction_note": "已做过短路开断试验(T100s)或T100s(60Hz)，可减一次。",
+            },
+            {
+                "base_name": "电寿命试验(60%)",
+                "suffixes": [
+                    ("#O", "O", "2次"),
+                    ("#O-CO-CO", "O-0.3s-CO-180s-CO", "2次"),
+                ],
+                "short_circuit_checks": ["短路开断试验(T60)", "T60(60Hz)"],
+                "current_ratio": 0.6,
+                "reduction_note": "已做过短路开断试验(T60)或T60(60Hz)，可减一次。",
+            },
+            {
+                "base_name": "电寿命试验(30%)",
+                "suffixes": [
+                    ("#O", "O", "84次"),
+                    ("#O-CO", "O-0.3s-CO", "14次"),
+                    ("#O-CO-CO", "O-0.3s-CO-180s-CO", "6次"),
+                ],
+                "short_circuit_checks": ["短路开断试验(T30)", "T30(60Hz)"],
+                "current_ratio": 0.3,
+                "reduction_note": "已做过短路开断试验(T30)或T30(60Hz)，可减一次。",
+            },
+            {
+                "base_name": "电寿命试验(10%)",
+                "suffixes": [
+                    ("#O", "O", "84次"),
+                    ("#O-CO", "O-0.3s-CO", "14次"),
+                    ("#O-CO-CO", "O-0.3s-CO-180s-CO", "6次"),
+                ],
+                "short_circuit_checks": ["短路开断试验(T10)", "T10(60Hz)"],
+                "current_ratio": 0.1,
+                "reduction_note": "已做过短路开断试验(T10)或T10(60Hz)，可减一次。",
+            },
+        ]
+
+        # Shared activation gate: Ur <= 40.5 kV and breaker class != E1
+        iec_el_enabled = bool(
+            rated_voltage_kv is not None
+            and rated_voltage_kv <= 40.5
+            and not re.search(
+                r"断路器等级\s*(?:(?:[:：=]|为|是)\s*)?E1(?:级)?",
+                query_text,
+                flags=re.IGNORECASE,
+            )
+        )
+        # Require explicit short-circuit report scope or token in query before acting.
+        current_report_scopes = set(_extract_current_report_scopes(query_text, schema_cfg))
+        short_circuit_scope_present = (
+            "短路性能型式试验" in current_report_scopes or "短路性能型式试验" in query_text
+        )
+
+        # Fallback split: if percentage-based items exist but were not split by domain rules,
+        # split them programmatically when the shared gate is satisfied and the query
+        # indicates a short-circuit type test.
+        if iec_el_enabled and short_circuit_scope_present:
+            for cfg in iec_el_configs:
+                base_name = cfg["base_name"]
+                if base_name not in updated_param_map:
+                    continue
+                already_split = any(
+                    str(k).startswith(base_name + "#")
+                    for k in updated_param_map.keys()
+                )
+                if already_split:
+                    continue
+                source_params = list(updated_param_map.get(base_name, []) or [])
+                source_values = deepcopy(updated_value_map.get(base_name, {}) or {})
+                if not source_params:
+                    continue
+                updated_param_map.pop(base_name, None)
+                updated_value_map.pop(base_name, None)
+                for suffix, op_seq, count_text in cfg["suffixes"]:
+                    child_name = base_name + suffix
+                    updated_param_map[child_name] = list(source_params)
+                    updated_value_map[child_name] = deepcopy(source_values)
+                    _set_param(
+                        child_name,
+                        "操作顺序",
+                        op_seq,
+                        value_source="rule",
+                        value_type="text",
+                        constraints=op_seq,
+                        calc_rule=f"IEC电寿命试验操作顺序为 {op_seq}。",
+                        resolution_mode="graph_final",
+                    )
+                    _set_param(
+                        child_name,
+                        "试验次数",
+                        count_text,
+                        value_source="rule",
+                        value_type="text",
+                        constraints=count_text,
+                        calc_rule=f"IEC电寿命试验次数为 {count_text}。",
+                        resolution_mode="graph_final",
+                    )
+
+        # Apply test currents and reduction notes to all IEC electrical-life children
+        # Only apply when short-circuit scope is present (same gating as the split above)
+        if short_circuit_scope_present:
+            for cfg in iec_el_configs:
+                for suffix, op_seq, count_text in cfg["suffixes"]:
+                    test_name = cfg["base_name"] + suffix
+                    if test_name not in updated_param_map:
+                        continue
+                    # Set test current based on rated short-circuit breaking current
+                    if short_break_ka is not None:
+                        current_ka = round(short_break_ka * cfg["current_ratio"], 3)
+                        current_text = f"{str(current_ka).rstrip('0').rstrip('.')} kA"
+                        _set_param(
+                            test_name,
+                            "试验电流kA",
+                            current_text,
+                            value_source="rule",
+                            value_type="text",
+                            constraints=current_text,
+                            calc_rule=f"额定短路开断电流 {short_break_ka} kA 的{int(cfg['current_ratio'] * 100)}%为 {current_text}。",
+                            resolution_mode="graph_final",
+                        )
+                    # Reduction-once detection: check if corresponding short-circuit test exists
+                    has_reduction = any(
+                        sc_test in updated_param_map or sc_test in query_text
+                        for sc_test in cfg["short_circuit_checks"]
+                    )
+                    if has_reduction:
+                        tc_entry = updated_value_map.get(test_name, {}).get("试验次数")
+                        if isinstance(tc_entry, dict):
+                            existing_calc = str(tc_entry.get("calc_rule", "") or "").strip()
+                            note = cfg["reduction_note"]
+                            new_calc = f"{existing_calc} {note}" if existing_calc else note
+                            tc_entry["calc_rule"] = new_calc
 
     return updated_param_map, updated_value_map
 
@@ -5809,9 +5970,24 @@ def _get_report_scope_test_whitelist(stand_type: str | None = None) -> dict[str,
     # IEC DLT 标准不包含局部放电试验
     # NOTE: set.discard() and set.add() are in-place operations returning None,
     # so do NOT reassign the variable.
-    if normalized in "IEC":
+    if normalized == "IEC":
         insulation_tests.discard("局部放电试验")
-    elif normalized in "DLT":
+        short_tests.update({
+            "电寿命试验(100%)",
+            "电寿命试验(100%)#O-CO-CO",
+            "电寿命试验(60%)",
+            "电寿命试验(60%)#O",
+            "电寿命试验(60%)#O-CO-CO",
+            "电寿命试验(30%)",
+            "电寿命试验(30%)#O",
+            "电寿命试验(30%)#O-CO",
+            "电寿命试验(30%)#O-CO-CO",
+            "电寿命试验(10%)",
+            "电寿命试验(10%)#O",
+            "电寿命试验(10%)#O-CO",
+            "电寿命试验(10%)#O-CO-CO",
+        })
+    elif normalized == "DLT":
         insulation_tests.discard("局部放电试验")
         short_tests.add("作为状态检查的雷电冲击耐受电压试验")
         switching_tests.add("作为状态检查的雷电冲击耐受电压试验")
