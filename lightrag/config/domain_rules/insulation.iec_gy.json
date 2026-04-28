@@ -364,7 +364,7 @@
           "test_item": "电寿命(循环)",
           "inherits_from": "电寿命试验",
           "parameter_overrides": {
-            "操作顺序": "O-180s-CO-180s-CO",
+            "操作顺序": "O-0.3s-CO-180s-CO",
             "试验次数": "1次"
           }
         }
@@ -605,6 +605,13 @@
       "standard": "gb",
       "test_item": "短路开断试验(T60)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -621,6 +628,13 @@
       "standard": "gb",
       "test_item": "短路开断试验(T100S)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -637,13 +651,6 @@
               "label": "额定电压",
               "value": 40.5,
               "unit": "kV"
-            },
-            {
-              "source": "query",
-              "type": "not_equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         }
@@ -767,6 +774,17 @@
               "label": "首开极系数kpp",
               "value": 1.3,
               "unit": ""
+            }
+          ]
+        },
+         {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "短路性能型式试验"
             },
             {
               "source": "query",
@@ -803,6 +821,35 @@
               "label": "首开极系数",
               "value": 1.5,
               "unit": ""
+            }
+          ]
+        },
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "短路性能型式试验"
+            },
+            {
+              "source": "query",
+              "type": "equals_numeric",
+              "label": "首开极系数kpp",
+              "value": 1.5,
+              "unit": ""
+            }
+          ]
+        },
+        {
+          "source": "query",
+          "type": "all",
+          "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "短路性能型式试验"
             },
             {
               "source": "query",
@@ -823,6 +870,13 @@
       "standard": "gb",
       "test_item": "近区故障试验(L90)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -1130,15 +1184,6 @@
                 "线路充电电流",
                 "线路充电"
               ]
-            },
-            {
-              "source": "query",
-              "type": "contains_any",
-              "labels": [
-                "额定线路充电电流",
-                "线路充电电流",
-                "线路充电"
-              ]
             }
           ]
         },
@@ -1343,8 +1388,10 @@
               "source": "query",
               "type": "contains_any",
               "labels": [
-                "额定电缆充电电流",
-                "电缆充电电流",
+                "额定电缆充电开断电流",
+                "电缆充电开断电流",
+                "额定电缆充电开合电流",
+                "电缆充电开合电流",
                 "电缆充电"
               ]
             }
@@ -1530,6 +1577,13 @@
         "standard": "gb",
         "test_item": "容性电流开断试验(CC2)",
         "status": "active",
+        "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+        }
+       ],
         "inputs": {
           "trigger_when_any": [
             {
@@ -1954,72 +2008,6 @@
               ]
             }
           ]
-        },
-        {
-          "source": "query",
-          "type": "all",
-          "conditions": [
-            {
-              "source": "query",
-              "type": "contains",
-              "label": "开合性能型式试验"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定电缆充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电缆充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电缆充电"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定线路充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "线路充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "线路充电"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定电容器组电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电容器组电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定背对背电容器组开断电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "背对背电容器组开断电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电容器组开断电流"
-            }
-          ]
         }
       ],
       "deny_when_no_match": true
@@ -2095,6 +2083,13 @@
       "standard": "gb",
       "test_item": "BC1(60HZ)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -2115,82 +2110,6 @@
                 "额定背对背电容器组开断电流",
                 "背对背电容器组开断电流"
               ]
-            },
-            {
-              "source": "query",
-              "type": "regex_match",
-              "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
-            }
-          ]
-        },
-        {
-          "source": "query",
-          "type": "all",
-          "conditions": [
-            {
-              "source": "query",
-              "type": "contains",
-              "label": "开合性能型式试验"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定电缆充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电缆充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电缆充电"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定线路充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "线路充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "线路充电"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定电容器组电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电容器组电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定背对背电容器组开断电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "背对背电容器组开断电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电容器组开断电流"
-            },
-            {
-              "source": "query",
-              "type": "regex_match",
-              "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
             }
           ]
         }
@@ -2204,6 +2123,13 @@
       "standard": "gb",
       "test_item": "BC2(60HZ)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -2224,86 +2150,6 @@
                 "额定背对背电容器组开断电流",
                 "背对背电容器组开断电流"
               ]
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
-            }
-          ]
-        },
-        {
-          "source": "query",
-          "type": "all",
-          "conditions": [
-            {
-              "source": "query",
-              "type": "contains",
-              "label": "开合性能型式试验"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定电缆充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电缆充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电缆充电"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定线路充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "线路充电电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "线路充电"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定电容器组电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电容器组电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "额定背对背电容器组开断电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "背对背电容器组开断电流"
-            },
-            {
-              "source": "query",
-              "type": "not_contains",
-              "label": "电容器组开断电流"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         }
@@ -2317,6 +2163,13 @@
       "standard": "gb",
       "test_item": "CC1(60HZ)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -2335,11 +2188,6 @@
                 "电缆充电电流",
                 "电缆充电"
               ]
-            },
-            {
-              "source": "query",
-              "type": "regex_match",
-              "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
             }
           ]
         },
@@ -2406,11 +2254,6 @@
               "source": "query",
               "type": "not_contains",
               "label": "电容器组开断电流"
-            },
-            {
-              "source": "query",
-              "type": "regex_match",
-              "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
             }
           ]
         }
@@ -2424,6 +2267,13 @@
       "standard": "gb",
       "test_item": "CC2(60HZ)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -2438,11 +2288,6 @@
               "source": "query",
               "type": "contains",
               "label": "额定电缆充电电流"
-            },
-            {
-              "source": "query",
-              "type": "regex_match",
-              "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
             }
           ]
         },
@@ -2469,13 +2314,6 @@
               "source": "query",
               "type": "not_contains",
               "label": "额定电容器组电流"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         }
@@ -2489,6 +2327,13 @@
       "standard": "gb",
       "test_item": "L75(60HZ)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -2517,13 +2362,6 @@
               "label": "额定短路开断电流",
               "value": 12.5,
               "unit": "kA"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "HZ"
             }
           ]
         },
@@ -2554,13 +2392,6 @@
               "label": "短路开断电流",
               "value": 12.5,
               "unit": "kA"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "HZ"
             }
           ]
         },
@@ -2596,13 +2427,6 @@
               "label": "额定短路开断电流",
               "value": 12.5,
               "unit": "kA"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "HZ"
             }
           ]
         },
@@ -2638,13 +2462,6 @@
               "label": "短路开断电流",
               "value": 12.5,
               "unit": "kA"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "HZ"
             }
           ]
         }
@@ -2658,6 +2475,13 @@
       "standard": "gb",
       "test_item": "L90(60HZ)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -2686,13 +2510,6 @@
               "label": "额定短路开断电流",
               "value": 12.5,
               "unit": "kA"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "HZ"
             }
           ]
         },
@@ -2723,13 +2540,6 @@
               "label": "短路开断电流",
               "value": 12.5,
               "unit": "kA"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "HZ"
             }
           ]
         },
@@ -2765,13 +2575,6 @@
               "label": "额定短路开断电流",
               "value": 12.5,
               "unit": "kA"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "HZ"
             }
           ]
         },
@@ -2807,13 +2610,6 @@
               "label": "短路开断电流",
               "value": 12.5,
               "unit": "kA"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "HZ"
             }
           ]
         }
@@ -2827,6 +2623,13 @@
       "standard": "gb",
       "test_item": "LC1(60HZ)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -2845,13 +2648,6 @@
                 "电缆充电电流",
                 "电缆充电"
               ]
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         },
@@ -2938,6 +2734,13 @@
       "standard": "gb",
       "test_item": "LC2(60HZ)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -2956,13 +2759,6 @@
                 "线路充电电流",
                 "线路充电"
               ]
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         },
@@ -3029,13 +2825,6 @@
               "source": "query",
               "type": "not_contains",
               "label": "电容器组开断电流"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         }
@@ -3112,6 +2901,13 @@
       "standard": "gb",
       "test_item": "T100A(60HZ)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -3121,13 +2917,6 @@
               "source": "query",
               "type": "contains",
               "label": "短路性能型式试验"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         }
@@ -3141,6 +2930,13 @@
       "standard": "gb",
       "test_item": "T100S(60HZ)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -3157,13 +2953,6 @@
               "label": "额定电压",
               "value": 40.5,
               "unit": "kv"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         }
@@ -3249,7 +3038,7 @@
           {
             "source": "query",
             "type": "regex_match",
-            "pattern": "^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+            "pattern": "(?s)^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
           }
         ]
       },
@@ -3321,7 +3110,7 @@
           {
             "source": "query",
             "type": "regex_match",
-            "pattern": "^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+            "pattern": "(?s)^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
           }
         ]
       },
@@ -3420,7 +3209,7 @@
           {
             "source": "query",
             "type": "regex_match",
-            "pattern": "^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+            "pattern": "(?s)^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
           }
         ]
       },
@@ -3483,7 +3272,7 @@
           {
             "source": "query",
             "type": "regex_match",
-            "pattern": "^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+            "pattern": "(?s)^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
           }
         ]
       },
@@ -3497,7 +3286,7 @@
           "inherits_from": "T100s(b)",
           "parameter_overrides": {
             "试验相数": "三相",
-            "操作顺序": "0-0.3-CO-180s-CO",
+            "操作顺序": "O-0.3s-CO-180s-CO",
             "试验次数": "1次"
           }
         }
@@ -3685,6 +3474,13 @@
       "standard": "gb",
       "test_item": "T100s(b)(60Hz)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -3701,13 +3497,6 @@
               "label": "额定电压",
               "value": 72.5,
               "unit": "kV"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         }
@@ -3851,6 +3640,13 @@
       "standard": "gb",
       "test_item": "T60(60HZ)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -3860,13 +3656,6 @@
               "source": "query",
               "type": "contains",
               "label": "短路性能型式试验"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         }
@@ -3976,7 +3765,7 @@
           {
             "source": "query",
             "type": "regex_match",
-            "pattern": "^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+            "pattern": "(?s)^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
           }
         ]
       },
@@ -4013,7 +3802,7 @@
               {
                 "source": "query",
                 "type": "contains",
-                "label": "50Hz"
+                "label": "三相"
               },
               {
                 "source": "query",
@@ -4167,6 +3956,13 @@
       "standard": "gb",
       "test_item": "短路开断试验(T100A)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -4180,13 +3976,6 @@
           ]
         }
       ],
-      "deny_when_any": [
-        {
-          "source": "query",
-          "type": "regex_match",
-          "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
-        }
-      ],
       "deny_when_no_match": true
     },
     {
@@ -4196,6 +3985,13 @@
       "standard": "gb",
       "test_item": "短路开断试验(T100S)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+        }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -4253,9 +4049,9 @@
             },
             {
               "source": "query",
-              "type": "not_equals_numeric",
+              "type": "equals_numeric",
               "label": "额定频率",
-              "value": 60.0,
+              "value": 50.0,
               "unit": "Hz"
             }
           ]
@@ -4270,6 +4066,13 @@
       "standard": "gb",
       "test_item": "温升试验(60HZ)",
       "status": "active",
+      "deny_when_any": [
+            {
+             "source": "query",
+             "type": "regex_match",
+             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+            }
+      ],
       "allow_when_any": [
         {
           "source": "query",
@@ -4279,13 +4082,6 @@
               "source": "query",
               "type": "contains",
               "label": "温升性能型式试验"
-            },
-            {
-              "source": "query",
-              "type": "equals_numeric",
-              "label": "额定频率",
-              "value": 60.0,
-              "unit": "Hz"
             }
           ]
         }
@@ -4304,6 +4100,11 @@
           "source": "query",
           "type": "all",
           "conditions": [
+            {
+              "source": "query",
+              "type": "contains",
+              "label": "短路性能型式试验"
+            },
             {
               "source": "query",
               "type": "contains",
