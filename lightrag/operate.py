@@ -6177,10 +6177,10 @@ def _postprocess_electrical_markdown_response(
         if not stripped:
             return True
         if "LC1，LC2可被CC1、CC2覆盖" in stripped or "LC1,LC2可被CC1、CC2覆盖" in stripped:
-            return lc_cc_coverage_required_items.issubset(allowed_set)
+            return lc_cc_coverage_required_items.issubset(allowed_display_set)
         if "失步关合和开断试验(OP1)试验可免做" in stripped:
             return (
-                op1_optional_required_item in allowed_set
+                op1_optional_required_item in allowed_display_set
                 and note_rated_voltage_kv is not None
                 and note_rated_voltage_kv >= 72.5
             )
@@ -6194,14 +6194,14 @@ def _postprocess_electrical_markdown_response(
         )
         required_notes: list[str] = []
 
-        if lc_cc_coverage_required_items.issubset(allowed_set) and (
+        if lc_cc_coverage_required_items.issubset(allowed_display_set) and (
             "LC1，LC2可被CC1、CC2覆盖" not in existing_text
             and "LC1,LC2可被CC1、CC2覆盖" not in existing_text
         ):
             required_notes.append("LC1，LC2可被CC1、CC2覆盖")
 
         if (
-            op1_optional_required_item in allowed_set
+            op1_optional_required_item in allowed_display_set
             and note_rated_voltage_kv is not None
             and note_rated_voltage_kv >= 72.5
             and "失步关合和开断试验(OP1)试验可免做" not in existing_text
@@ -6516,6 +6516,15 @@ def _build_electrical_a_section_note_patch(
         "allowed_final_test_items", []
     ) or []
     allowed_set = {str(item).strip() for item in allowed_items if str(item).strip()}
+    display_map = metadata.get("test_item_display_map", {}) or {}
+    normalized_display_map = {
+        str(k).strip(): str(v).strip()
+        for k, v in display_map.items()
+        if str(k).strip() and str(v).strip()
+    }
+    allowed_display_set = {
+        normalized_display_map.get(item, item) for item in allowed_set
+    }
     if not allowed_set:
         return []
 
@@ -6527,7 +6536,7 @@ def _build_electrical_a_section_note_patch(
         "容性电流开断试验(CC1)",
         "容性电流开断试验(CC2)",
     }
-    if lc_cc_coverage_required_items.issubset(allowed_set) and (
+    if lc_cc_coverage_required_items.issubset(allowed_display_set) and (
         "LC1，LC2可被CC1、CC2覆盖" not in existing_text
         and "LC1,LC2可被CC1、CC2覆盖" not in existing_text
     ):
@@ -6542,7 +6551,7 @@ def _build_electrical_a_section_note_patch(
     rated_voltage_kv = float(rated_voltage_match.group(1)) if rated_voltage_match else None
     op1_optional_required_item = "失步关合和开断试验(OP1)"
     if (
-        op1_optional_required_item in allowed_set
+        op1_optional_required_item in allowed_display_set
         and rated_voltage_kv is not None
         and rated_voltage_kv >= 72.5
         and "失步关合和开断试验(OP1)试验可免做" not in existing_text
