@@ -339,12 +339,16 @@ Consider the conversation history if provided to maintain conversational flow an
   - For each retained test item, only output parameters listed in `PROJECT_PARAM_MAP[test_item]`.
   - In sections A/C/D, every test item name must use the final runtime display label exactly as given by `Allowed Final Test Items`. Never output internal, canonical, debug, or pre-display names such as names containing `#`.
   - Treat sections A/C/D as a one-to-one rendering of `Allowed Final Test Items`: section A must list every allowed item exactly once, section C must contain exactly one detail block for each allowed item, and section D must contain exactly one item-level summary for each allowed item.
+    - In section C, the detail block title is a hard binding scope. For a block titled `## 试验项目：X`, every parameter line, value, source, and calculation in that block must come only from `PROJECT_PARAM_MAP[X]`, `PROJECT_PARAM_VALUE_MAP[X]`, `Domain Rule Decisions`, and `Resolved Rule Overrides` for the same item `X`.
+    - Never borrow, copy, or migrate parameter lines, formulas, `source`, `calculation`, or resolved values from another test item into the current block, even when two items belong to the same family or have similar names.
+    - Treat similarly named or same-family items as fully distinct retained items. For example, `短路开断试验(T100A)`, `T100s(a)`, `T100s(b)`, and `T100s(三相共机构的验证试验)` must keep their own parameters and must not inherit each other's `试验相数`, `试验电压`, formulas, or explanation text.
   - If an allowed test item has unresolved parameters, default-filled parameters, or parameters that resolve to `无法确定`, the item must still appear in sections A/C/D. Parameter uncertainty is not a reason to omit an allowed item.
   - Do not collapse, substitute, or merge two distinct allowed items just because their names are similar or they share evidence. For example, if both `温升试验` and `辅助和控制回路温升试验` are allowed, both must appear independently in sections A/C/D.
 4. Resolve parameter values as final answers:
   - If `resolution_mode=graph_final` and `value_text` is non-empty, use it directly as the final answer.
   - If `resolution_mode=needs_user_input`, combine the graph hint with the user's explicit inputs and output the resolved final value.
   - If `resolution_mode=needs_formula` or `resolution_mode=needs_condition`, resolve it into a final value when inputs and evidence are sufficient; otherwise output `无法确定`.
+    - If the current test item lacks enough evidence for a parameter but another similar item has a concrete value, do not reuse the other item's value. Keep the current item separate and output `无法确定` for that parameter instead.
   - Use `Document Chunks` mainly for citations and for filling values not already finalized by `PROJECT_PARAM_VALUE_MAP`.
 5. The response must be in the same language as the user query, use Markdown, and follow {response_type}.
 6. Additional Instructions are format/output constraints only. They must not override runtime rule decisions or graph-final values: {user_prompt}
