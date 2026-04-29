@@ -833,6 +833,13 @@ def _sanitize_value_text(value_text: str) -> str:
     return text
 
 
+def _normalize_fixed_param_value(param_name: str, value_text: str) -> str:
+    normalized_value = _sanitize_value_text(value_text)
+    if str(param_name or "").strip() == "电压极性":
+        return "正极性及负极性"
+    return normalized_value
+
+
 def _find_override_rule_by_test_name(
         tree_tests_by_path: dict[str, Any],
         report_type: str,
@@ -1659,6 +1666,64 @@ def _evaluate_domain_rule_decisions(
                     return sum(float(part) for part in parts)
         return None
 
+    def _extract_named_primary_numeric(
+        query_text: str,
+        labels: list[str],
+        unit: str = "",
+    ) -> float | None:
+        text = str(query_text or "").strip()
+        if not text:
+            return None
+        normalized = text.replace("（", "(").replace("）", ")")
+        normalized_unit = str(unit or "").strip().lower()
+        if normalized_unit == "kv":
+            explicit_unit_pattern = r"\s*(?:kV|KV|kv)\b"
+        elif normalized_unit == "ka":
+            explicit_unit_pattern = r"\s*(?:kA|KA|ka)\b"
+        elif normalized_unit == "a":
+            explicit_unit_pattern = r"\s*A\b"
+        elif normalized_unit == "hz":
+            explicit_unit_pattern = r"\s*(?:Hz|HZ|hz)\b"
+        elif normalized_unit in {"p.u.", "pu", "p.u", "p u"}:
+            explicit_unit_pattern = r"\s*(?:p\.?\s*u\.?)\b"
+        else:
+            explicit_unit_pattern = r"\s*(?:kV|KV|kv|kA|KA|ka|A|Hz|HZ|hz|p\.?\s*u\.?)\b"
+        for label in labels:
+            normalized_label = str(label or "").strip()
+            if not normalized_label:
+                continue
+            pattern = (
+                rf"{re.escape(normalized_label)}\s*(?:[:：=]\s*)?"
+                rf"([0-9\.\+\(\)\s]+?)"
+                rf"(?:{explicit_unit_pattern}|(?=\s*(?:[,，、;；。]|$|[A-Za-z\u4e00-\u9fff])))"
+            )
+            match = re.search(pattern, normalized, flags=re.IGNORECASE)
+            if not match:
+                continue
+            value_text = re.sub(r"\s+", "", str(match.group(1) or ""))
+            if not value_text:
+                continue
+            pair_match = re.fullmatch(
+                r"([0-9]+(?:\.[0-9]+)?)\(\+([0-9]+(?:\.[0-9]+)?)\)",
+                value_text,
+            )
+            if not pair_match:
+                pair_match = re.fullmatch(
+                    r"\(([0-9]+(?:\.[0-9]+)?)\+([0-9]+(?:\.[0-9]+)?)\)",
+                    value_text,
+                )
+            if not pair_match:
+                pair_match = re.fullmatch(
+                    r"([0-9]+(?:\.[0-9]+)?)\+([0-9]+(?:\.[0-9]+)?)",
+                    value_text,
+                )
+            if pair_match:
+                return float(pair_match.group(1))
+            single_match = re.fullmatch(r"([0-9]+(?:\.[0-9]+)?)", value_text)
+            if single_match:
+                return float(single_match.group(1))
+        return None
+
     def _extract_named_voltage_kv(query_text: str, labels: list[str]) -> float | None:
         return _extract_named_numeric(query_text, labels, unit="kV")
 
@@ -1761,6 +1826,18 @@ def _evaluate_domain_rule_decisions(
                 return actual
         return None
 
+    def _extract_condition_primary_numeric_from_candidates(
+        query_text: str, labels: list[str], unit: str
+    ) -> float | None:
+        normalized_labels = [
+            str(candidate or "").strip()
+            for candidate in labels
+            if str(candidate or "").strip()
+        ]
+        if not normalized_labels:
+            return None
+        return _extract_named_primary_numeric(query_text, normalized_labels, unit=unit)
+
     def _matches_condition(condition: dict[str, Any], query_text: str) -> bool:
         cond_type = str(condition.get("type", "") or "").strip()
         label = str(condition.get("label", "") or "").strip()
@@ -1858,6 +1935,54 @@ def _evaluate_domain_rule_decisions(
                 str(condition.get("unit", "") or "").strip(),
             )
             return actual is not None and float(actual) < float(value)
+        if cond_type == "has_any_numeric_label":
+            labels = [
+                str(item or "").strip()
+                for item in (condition.get("labels", []) or [])
+                if str(item or "").strip()
+            ]
+            if label:
+                labels.append(label)
+            if not labels:
+                return False
+            unit = str(condition.get("unit", "") or "").strip()
+            actual = _extract_condition_numeric_from_candidates(query_text, labels, unit)
+            return actual is not None
+        if cond_type == "left_greater_than_right_numeric":
+            left_labels = [
+                str(item or "").strip()
+                for item in (condition.get("left_labels", []) or [])
+                if str(item or "").strip()
+            ]
+            right_labels = [
+                str(item or "").strip()
+                for item in (condition.get("right_labels", []) or [])
+                if str(item or "").strip()
+            ]
+            left_label = str(condition.get("left_label", "") or "").strip()
+            right_label = str(condition.get("right_label", "") or "").strip()
+            if left_label:
+                left_labels.append(left_label)
+            if right_label:
+                right_labels.append(right_label)
+            if not left_labels or not right_labels:
+                return False
+            unit = str(condition.get("unit", "") or "").strip()
+            left_actual = _extract_condition_primary_numeric_from_candidates(
+                query_text,
+                left_labels,
+                unit,
+            )
+            right_actual = _extract_condition_primary_numeric_from_candidates(
+                query_text,
+                right_labels,
+                unit,
+            )
+            return (
+                left_actual is not None
+                and right_actual is not None
+                and float(left_actual) > float(right_actual)
+            )
         if cond_type == "ratio_greater_or_equal":
             numerator_labels = [
                 str(item or "").strip()
@@ -2399,6 +2524,28 @@ def _evaluate_domain_rule_decisions(
                         matched_reason_texts.append(
                             f"{condition.get('label', '')}<{condition.get('value', '')}{condition.get('unit', '')}"
                         )
+                    elif condition.get("type") == "left_greater_than_right_numeric":
+                        left_desc = str(condition.get("left_label", "") or "").strip()
+                        if not left_desc:
+                            left_desc = next(
+                                (
+                                    str(item or "").strip()
+                                    for item in (condition.get("left_labels", []) or [])
+                                    if str(item or "").strip()
+                                ),
+                                "左值",
+                            )
+                        right_desc = str(condition.get("right_label", "") or "").strip()
+                        if not right_desc:
+                            right_desc = next(
+                                (
+                                    str(item or "").strip()
+                                    for item in (condition.get("right_labels", []) or [])
+                                    if str(item or "").strip()
+                                ),
+                                "右值",
+                            )
+                        matched_reason_texts.append(f"{left_desc}>{right_desc}")
                     elif condition.get("type") in ("ratio_greater_or_equal", "ratio_less"):
                         numerator_desc = str(condition.get("numerator_label", "") or "").strip()
                         denominator_desc = str(condition.get("denominator_label", "") or "").strip()
@@ -2679,7 +2826,7 @@ def _apply_domain_rule_decisions_to_project_context(
     ) -> None:
         _ensure_param(test_name, param_name)
         # Normalize special count syntax like "2(-1)*次" -> "2次"
-        norm_value_text = str(value_text or "")
+        norm_value_text = _normalize_fixed_param_value(param_name, str(value_text or ""))
         calc_rule_text = str(calc_rule or "").strip()
         if str(param_name) in {"试验次数", "正常次数"}:
             m = re.match(r"^\s*([0-9]+)\s*\(\s*\-1\s*\)\*\s*(次)?\s*$", norm_value_text)
@@ -2689,6 +2836,10 @@ def _apply_domain_rule_decisions_to_project_context(
                 norm_value_text = f"{num}次"
                 note = f"原始值为{original}，表示在满足特定条件时可减一次。"
                 calc_rule_text = f"{calc_rule_text} {note}".strip() if calc_rule_text else note
+        norm_constraints = _normalize_fixed_param_value(
+            param_name,
+            constraints if constraints is not None else norm_value_text,
+        )
 
         updated_value_map[test_name][param_name].update(
             {
@@ -2696,7 +2847,7 @@ def _apply_domain_rule_decisions_to_project_context(
                 "value_source": value_source,
                 "value_expr": norm_value_text if value_source == "user_input" else "",
                 "unit": "",
-                "constraints": constraints if constraints is not None else norm_value_text,
+                "constraints": norm_constraints,
                 "calc_rule": calc_rule_text,
                 "derive_from_rated": derive_from_rated,
                 "resolution_mode": resolution_mode,
@@ -2765,7 +2916,8 @@ def _apply_domain_rule_decisions_to_project_context(
         for label in labels:
             pattern = (
                 rf"{re.escape(label)}\s*(?:[:：=]\s*)?"
-                rf"([0-9\.\+\(\)\s]+?)\s*(?:kV\b|$)"
+                rf"([0-9\.\+\(\)\s]+?)"
+                rf"(?:\s*(?:kV|KV|kv)\b|(?=\s*(?:[,，、;；。]|$|[A-Za-z\u4e00-\u9fff])))"
             )
             match = re.search(pattern, normalized, flags=re.IGNORECASE)
             if not match:
@@ -2829,10 +2981,14 @@ def _apply_domain_rule_decisions_to_project_context(
             phase = explicit_match.group(1)
             return phase, f"用户已明确给出试验相数为{phase}，直接采用。"
 
-        if re.search(r"三相\s*断路器|三相\s*试验", normalized):
-            return "三相", "问题中明确提到三相断路器/三相试验，按三相计算。"
-        if re.search(r"单相\s*断路器|单相\s*试验", normalized):
-            return "单相", "问题中明确提到单相断路器/单相试验，按单相计算。"
+        if any(token in normalized for token in ("三相共箱共机构", "共箱共机构")):
+            return "三相", "问题中明确提到共箱共机构，按三相断路器计算。"
+        if any(token in normalized for token in ("三相分箱共机构", "分箱共机构")):
+            return "单相", "问题中明确提到分箱共机构，按单相断路器计算。"
+        if re.search(r"三相\s*试品|三相\s*断路器|三相\s*试验", normalized):
+            return "三相", "问题中明确提到三相试品/三相断路器/三相试验，按三相计算。"
+        if re.search(r"单相\s*试品|单相\s*断路器|单相\s*试验", normalized):
+            return "单相", "问题中明确提到单相试品/单相断路器/单相试验，按单相计算。"
 
         single_count = len(re.findall(r"单相", normalized))
         three_count = len(re.findall(r"三相", normalized))
@@ -2846,6 +3002,28 @@ def _apply_domain_rule_decisions_to_project_context(
         if rated_voltage is not None:
             return "单相", f"未明确给出试验相数，额定电压 {rated_voltage} kV 高于40.5 kV，默认按单相计算。"
         return "单相", "未明确给出试验相数且无法识别额定电压，默认按单相计算。"
+
+    def _query_has_explicit_phase_indicator_local(query_text: str) -> bool:
+        normalized = str(query_text or "").replace("（", "(").replace("）", ")")
+        if re.search(
+            r"(?:试验相数|试验方式)\s*(?:[:：=]\s*)?(单相|三相)",
+            normalized,
+            flags=re.IGNORECASE,
+        ):
+            return True
+        explicit_tokens = (
+            "三相分箱共机构",
+            "分箱共机构",
+            "三相共箱共机构",
+            "共箱共机构",
+            "单相试品",
+            "三相试品",
+            "单相断路器",
+            "三相断路器",
+            "单相试验",
+            "三相试验",
+        )
+        return any(token in normalized for token in explicit_tokens)
 
     def _resolve_capacitive_nonuniform_coefficient_local(
         query_text: str,
@@ -3128,6 +3306,14 @@ def _apply_domain_rule_decisions_to_project_context(
     capacitive_split_trial_count_text = "24次" if capacitive_grade_value == "C2" else "12次"
     capacitive_split_trial_count_rule = (
         f"开合容性电流能力级别判定为{capacitive_grade_value}，拆分后的容性电流开断试验次数取{capacitive_split_trial_count_text}。"
+    )
+    bc1_trial_count_text = "48次" if capacitive_grade_value == "C2" else "24次"
+    bc1_trial_count_rule = (
+        f"开合容性电流能力级别判定为{capacitive_grade_value}，BC1 及 BC1(60Hz) 试验次数取{bc1_trial_count_text}。"
+    )
+    bc2_trial_count_text = "120次" if capacitive_grade_value == "C2" else "24次"
+    bc2_trial_count_rule = (
+        f"开合容性电流能力级别判定为{capacitive_grade_value}，BC2 及 BC2(60Hz) 试验次数取{bc2_trial_count_text}。"
     )
 
     def _set_capacitive_current_local(
@@ -3807,16 +3993,7 @@ def _apply_domain_rule_decisions_to_project_context(
         if param_name not in updated_param_map.get(test_name, []):
             return
         current_entry = updated_value_map.get(test_name, {}).get(param_name, {}) or {}
-        if isinstance(current_entry, dict) and any(
-            str(current_entry.get(field_name, "") or "").strip()
-            for field_name in (
-                "value_text",
-                "value_expr",
-                "constraints",
-                "calc_rule",
-                "derive_from_rated",
-            )
-        ):
+        if _entry_has_effective_value(current_entry):
             return
         _set_param(
             test_name,
@@ -3844,6 +4021,45 @@ def _apply_domain_rule_decisions_to_project_context(
             )
         )
 
+    def _entry_is_runtime_placeholder(entry: Any) -> bool:
+        if not isinstance(entry, dict):
+            return False
+
+        resolution_mode = str(entry.get("resolution_mode", "") or "").strip().lower()
+        if resolution_mode in {"needs_user_input", "needs_condition"}:
+            return True
+
+        merged = " ".join(
+            str(entry.get(field_name, "") or "").strip().lower()
+            for field_name in (
+                "value_text",
+                "value_expr",
+                "constraints",
+                "derive_from_rated",
+            )
+        ).strip()
+        if not merged:
+            return False
+
+        placeholder_markers = (
+            "用户录入",
+            "用户输入",
+            "未输入默认",
+            "默认取值为\"--\"",
+            "默认取值为'--'",
+            "默认取值为--",
+            "根据gbt",
+            "根据gb/t",
+            "根据iec",
+            "根据dlt",
+            "根据dl/t",
+            "向上取数",
+        )
+        return any(marker in merged for marker in placeholder_markers)
+
+    def _entry_has_effective_value(entry: Any) -> bool:
+        return _entry_has_any_value(entry) and not _entry_is_runtime_placeholder(entry)
+
     def _set_entry_if_value_missing(
         test_name: str,
         param_name: str,
@@ -3853,7 +4069,7 @@ def _apply_domain_rule_decisions_to_project_context(
             return
         _ensure_param(test_name, param_name)
         current_entry = updated_value_map.get(test_name, {}).get(param_name, {}) or {}
-        if _entry_has_any_value(current_entry):
+        if _entry_has_effective_value(current_entry):
             return
         updated_value_map[test_name][param_name] = deepcopy(entry)
 
@@ -3868,11 +4084,11 @@ def _apply_domain_rule_decisions_to_project_context(
                 continue
             for source_param_name in source_param_names:
                 source_entry = source_values.get(source_param_name, {}) or {}
-                if not _entry_has_any_value(source_entry):
+                if not _entry_has_effective_value(source_entry):
                     continue
                 _set_entry_if_value_missing(test_name, param_name, deepcopy(source_entry))
                 current_entry = updated_value_map.get(test_name, {}).get(param_name, {}) or {}
-                if _entry_has_any_value(current_entry):
+                if _entry_has_effective_value(current_entry):
                     return True
         return False
 
@@ -4334,11 +4550,11 @@ def _apply_domain_rule_decisions_to_project_context(
             _set_param(
                 test_name,
                 "开合容性电流能力的级别",
-                c_grade or "C2",
+                capacitive_grade_value,
                 value_source="rule" if c_grade else "default",
                 value_type="text",
-                constraints=c_grade or "C2",
-                calc_rule="用户已提供开合容性电流能力级别信息，直接采用。" if c_grade else "未提供开合容性电流能力级别时默认按C2处理。",
+                constraints=capacitive_grade_value,
+                calc_rule=capacitive_grade_rule,
                 resolution_mode="graph_final",
             )
 
@@ -4494,11 +4710,7 @@ def _apply_domain_rule_decisions_to_project_context(
         query_text,
         rated_voltage_kv,
     )
-    global_test_phase_from_user = re.search(
-        r"(?:试验相数|试验方式)\s*(?:[:：=]\s*)?(单相|三相)",
-        normalized_query_text,
-        flags=re.IGNORECASE,
-    ) is not None
+    global_test_phase_from_user = _query_has_explicit_phase_indicator_local(query_text)
     global_break_count, global_break_count_rule = _resolve_break_count_local(query_text)
     if rated_voltage_kv is not None:
         (
@@ -4535,6 +4747,12 @@ def _apply_domain_rule_decisions_to_project_context(
     ):
         if bc_current_a is not None:
             _set_capacitive_current_local(test_name, bc_current_a, 0.4, "额定电容器组电流")
+        _set_if_present(
+            test_name,
+            "试验次数",
+            bc1_trial_count_text,
+            calc_rule=bc1_trial_count_rule,
+        )
         if bc_test_category:
             _set_if_present(
                 test_name,
@@ -4549,6 +4767,12 @@ def _apply_domain_rule_decisions_to_project_context(
     ):
         if bc_current_a is not None:
             _set_capacitive_current_local(test_name, bc_current_a, 1.0, "额定电容器组电流")
+        _set_if_present(
+            test_name,
+            "试验次数",
+            bc2_trial_count_text,
+            calc_rule=bc2_trial_count_rule,
+        )
         if bc_test_category:
             _set_if_present(
                 test_name,
@@ -5033,8 +5257,8 @@ def _apply_domain_rule_decisions_to_project_context(
     _set_if_present(
         "作为状态检查的工频耐受电压试验",
         "正常次数",
-        "1次",
-        calc_rule="作为状态检查的工频耐受电压试验正常次数固定为1次。",
+        "6次",
+        calc_rule="作为状态检查的工频耐受电压试验正常次数固定为6次。",
     )
 
     _set_if_value_missing(
@@ -5222,6 +5446,14 @@ def _apply_domain_rule_decisions_to_project_context(
 
     _normalize_insulation_test_position_for_phase()
 
+    if is_low_voltage and insulation_phase_text == "三相":
+        _set_if_present(
+            "工频耐受电压试验(干)",
+            "试验部位",
+            "相间、对地及断口",
+            calc_rule="低压状态下若试验相数为三相，工频耐受电压试验(干)的试验部位固定为相间、对地及断口。",
+        )
+
     _set_insulation_normal_count(
         (
             "工频耐受电压试验",
@@ -5319,9 +5551,9 @@ def _apply_domain_rule_decisions_to_project_context(
         _set_if_value_missing(
             test_name,
             "开关相数",
-            insulation_phase_text,
+            "3" if insulation_phase_text == "三相" else "1",
             value_source="rule",
-            calc_rule=f"全套绝缘型式试验的开关相数沿用绝缘试验相数判定；{insulation_phase_rule}",
+            calc_rule=f"全套绝缘型式试验的开关相数由试验相数映射得到；当前试验相数为{insulation_phase_text}，因此开关相数为{'3' if insulation_phase_text == '三相' else '1'}；{insulation_phase_rule}",
         )
 
         _set_entry_if_value_missing(
@@ -5407,6 +5639,23 @@ def _apply_domain_rule_decisions_to_project_context(
             for instance_name in ("空载特性测量#1", "空载特性测量#2"):
                 updated_param_map[instance_name] = list(source_params)
                 updated_value_map[instance_name] = deepcopy(source_values)
+
+    for test_name, param_names in tuple(updated_param_map.items()):
+        if "开关相数" not in (param_names or []):
+            continue
+        phase_text = str(
+            updated_value_map.get(test_name, {}).get("试验相数", {}).get("value_text", "") or ""
+        ).strip()
+        if phase_text not in {"单相", "三相"}:
+            continue
+        switch_phase_value = "3" if phase_text == "三相" else "1"
+        _set_if_value_missing(
+            test_name,
+            "开关相数",
+            switch_phase_value,
+            value_source="rule",
+            calc_rule=f"开关相数由试验相数映射得到；当前试验相数为{phase_text}，因此开关相数为{switch_phase_value}。",
+        )
 
     # IEC electrical life: fallback split, test current assignment and reduction-note logic
     # Only run IEC fallback when normalized standard is IEC and the query/report scope
@@ -5847,9 +6096,9 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "工频耐受电压试验(断口)":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
         "工频耐受电压试验(相间及对地)":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
         "工频耐受电压试验(联合电压)":{"SF6气体的最低功能压力(20℃表压)","放电次数","最大适用海拔"} ,
-        "雷电冲击耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","额定直流电压(±)","放电次数","最大适用海拔"},
-        "雷电冲击耐受电压试验(断口)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
-        "雷电冲击耐受电压试验(相间及对地)": {"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
+        "雷电冲击耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","额定直流电压(±)","放电次数","最大适用海拔","试验状态"},
+        "雷电冲击耐受电压试验(断口)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔","试验状态"},
+        "雷电冲击耐受电压试验(相间及对地)": {"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔","试验状态"},
         "雷电冲击耐受电压试验(联合电压)":{"SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔","试验状态"},
         "操作冲击耐受电压试验(联合电压)":{"试验电压","SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
         "操作冲击耐受电压试验":{"试验电压","SF6气体的最低功能压力(20℃表压)","放电次数","额定直流电压(±)","最大适用海拔"},
@@ -5867,7 +6116,7 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "近区故障试验(L75)":{"线路侧波阻抗","SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
         "近区故障试验(L90)":{"线路侧波阻抗","SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
         "辅助和控制回路温升试验": {"机构是否带合分闸线圈","辅助设备和控制设备的额定电源电压","辅助设备和控制设备的额定电流","材料绝热等级"},
-        "全套绝缘型式试验":{"最大适用海拔","试验项目(全雷操工)","试验次数",""},
+        "全套绝缘型式试验":{"失败次数","正常次数","试验项目(全雷操工)"},
         "容性电流开断试验(BC1)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电","关合涌流","关合涌流的频率",},
         "容性电流开断试验(BC2)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
         "容性电流开断试验(LC1)": {"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电",},
@@ -5888,7 +6137,7 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "OP2关合":{"试验项数","SF6气体的最低功能压力(20℃表压)","外壳是否带电","直流分量(试验)","额定频率","发电机额定容量","故障类型"},
         "短时耐受电流试验": {"回路电阻","回路电阻(μΩ)","峰值电流kA"},
         "峰值耐受电流试验": {"回路电阻","回路电阻(μΩ)"},
-        "状态检查试验(T10)":{"外壳是否带电"},
+        "状态检查试验(T10)":{"外壳是否带电","SF6气体的最低功能压力(20℃表压)",'试验电流kA',"操作顺序"},
         "作为状态检查的雷电冲击耐受电压试验":{"SF6气体的最低功能压力(20℃表压)","放电次数"},
         "L60":{"线路侧波阻抗","外壳是否带电"},
         "T100s(60Hz)":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电","故障类型"},
@@ -5908,9 +6157,9 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "短路开断试验(T10)": {"外壳是否带电", "失败次数","SF6气体的最低功能压力(20℃表压)"},
         "短路开断试验(T30)": {"外壳是否带电", "失败次数","SF6气体的最低功能压力(20℃表压)","额定频率"},
         "短路开断试验(T60)": {"外壳是否带电", "失败次数","SF6气体的最低功能压力(20℃表压)","额定频率"},
-        "短路开断试验(T100S)": {"外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","失败次数"},
-        "短路开断试验(T100A)": {"外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","失败次数"},
-        "异相接地故障试验": {"SF6气体的最低功能压力(20℃表压)","额定频率"},
+        "短路开断试验(T100S)": {"外壳是否带电","首开极系数","SF6气体的最低功能压力(20℃表压)","故障类型","失败次数","结构特征"},
+        "短路开断试验(T100A)": {"外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","失败次数",'结构特征','首开极系数'},
+        "异相接地故障试验": {"SF6气体的最低功能压力(20℃表压)","额定频率",'外壳是否带电'},
         "单相接地故障试验": {"SF6气体的最低功能压力(20℃表压)","额定频率"},
         "近区故障试验(L60)": {"外壳是否带电"},
         "失步关合和开断试验(OP1)": {"外壳是否带电","SF6气体的最低功能压力(20℃表压)","故障类型","发电机额定容量"},
@@ -6305,7 +6554,7 @@ def _postprocess_electrical_markdown_response(
 
     def _format_param_line(test_name: str, param_name: str, entry: dict[str, Any]) -> str:
         entry = dict(entry or {})
-        value_text = _sanitize_value_text(str(entry.get("value_text", "") or ""))
+        value_text = _normalize_fixed_param_value(param_name, str(entry.get("value_text", "") or ""))
         if param_name == "介质性质" and not explicit_gas_or_oil:
             value_text = "正常"
             entry.update(
@@ -9551,7 +9800,7 @@ def _build_controlled_nodes_edges(
                 override_rule,
                 tree_tests_by_path,
             )
-            resolved_value_text = _sanitize_value_text(resolved_value_text)
+            resolved_value_text = _normalize_fixed_param_value(param_name or param_key, resolved_value_text)
             if _is_noisy_param_value_text(resolved_value_text):
                 logger.debug(
                     "Drop noisy parameter value text: test=%s param=%s value=%s",
@@ -9560,7 +9809,11 @@ def _build_controlled_nodes_edges(
                     resolved_value_text[:80],
                 )
                 continue
-            resolved_value_expr = _sanitize_value_text(str(param.get("value_expr", "") or ""))
+            resolved_value_expr = "" if (param_name or param_key) == "电压极性" else _sanitize_value_text(str(param.get("value_expr", "") or ""))
+            resolved_constraints = _normalize_fixed_param_value(
+                param_name or param_key,
+                str(param.get("constraints", "") or ""),
+            )
             param_id = _stable_param_id(test_name, param_key, id_scope_key)
             nodes.append(
                 (
@@ -9576,7 +9829,7 @@ def _build_controlled_nodes_edges(
                         "unit": param.get("unit", ""),
                         "value_type": param.get("value_type", ""),
                         "value_source": value_source,
-                        "constraints": param.get("constraints", ""),
+                        "constraints": resolved_constraints,
                         "calc_rule": param.get("calc_rule", ""),
                         "table_ref": param.get("table_ref", ""),
                         "derive_from_rated": param.get("derive_from_rated", ""),
@@ -9643,7 +9896,10 @@ def _build_controlled_nodes_edges(
                     override_rule,
                     tree_tests_by_path,
                 )
-                fallback_value_text = _sanitize_value_text(fallback_value_text)
+                fallback_value_text = _normalize_fixed_param_value(
+                    fallback_name or fallback_key,
+                    fallback_value_text,
+                )
                 if not fallback_value_text or _is_noisy_param_value_text(fallback_value_text):
                     continue
                 fallback_value_source = str(fallback_param.get("value_source", "") or "")
@@ -9652,7 +9908,11 @@ def _build_controlled_nodes_edges(
                         fallback_value_text,
                         str(fallback_param.get("constraints", "") or ""),
                     )
-                fallback_value_expr = _sanitize_value_text(str(fallback_param.get("value_expr", "") or ""))
+                fallback_value_expr = "" if (fallback_name or fallback_key) == "电压极性" else _sanitize_value_text(str(fallback_param.get("value_expr", "") or ""))
+                fallback_constraints = _normalize_fixed_param_value(
+                    fallback_name or fallback_key,
+                    str(fallback_param.get("constraints", "") or ""),
+                )
                 fallback_param_id = _stable_param_id(test_name, fallback_key, id_scope_key)
                 nodes.append(
                     (
@@ -9668,7 +9928,7 @@ def _build_controlled_nodes_edges(
                             "unit": fallback_param.get("unit", ""),
                             "value_type": fallback_param.get("value_type", ""),
                             "value_source": fallback_value_source,
-                            "constraints": fallback_param.get("constraints", ""),
+                            "constraints": fallback_constraints,
                             "calc_rule": fallback_param.get("calc_rule", ""),
                             "table_ref": fallback_param.get("table_ref", ""),
                             "derive_from_rated": fallback_param.get("derive_from_rated", ""),
@@ -14052,11 +14312,17 @@ async def _build_context_str(
                     continue
                 seen_param_names.add(normalized)
                 params.append(param_name)
-                value_text = str(node.get("value_text", "") or "").strip()
+                value_text = _normalize_fixed_param_value(
+                    param_name,
+                    str(node.get("value_text", "") or ""),
+                )
                 value_source = str(node.get("value_source", "") or "").strip()
-                value_expr = str(node.get("value_expr", "") or "").strip()
+                value_expr = "" if param_name == "电压极性" else str(node.get("value_expr", "") or "").strip()
                 unit = str(node.get("unit", "") or "").strip()
-                constraints = str(node.get("constraints", "") or "").strip()
+                constraints = _normalize_fixed_param_value(
+                    param_name,
+                    str(node.get("constraints", "") or ""),
+                )
                 calc_rule = str(node.get("calc_rule", "") or "").strip()
                 derive_from_rated = str(node.get("derive_from_rated", "") or "").strip()
                 resolution_mode = _classify_query_value_resolution_mode(
@@ -14507,20 +14773,20 @@ async def _build_query_context(
 
     # Stage 4: Build final LLM context with dynamic token processing
     # _build_context_str now always returns tuple[str, dict]
-        context, raw_data = await _build_context_str(
-            entities_context=truncation_result["entities_context"],
-            relations_context=truncation_result["relations_context"],
-            merged_chunks=merged_chunks,
-            query=query,
-            rule_query=rule_query,
-            query_param=query_param,
-            global_config=text_chunks_db.global_config,
-            chunk_tracking=search_result["chunk_tracking"],
-            entity_id_to_original=truncation_result["entity_id_to_original"],
-            relation_id_to_original=truncation_result["relation_id_to_original"],
-            knowledge_graph_inst=knowledge_graph_inst,
-            stand_type=stand_type,
-        )
+    context, raw_data = await _build_context_str(
+        entities_context=truncation_result["entities_context"],
+        relations_context=truncation_result["relations_context"],
+        merged_chunks=merged_chunks,
+        query=query,
+        rule_query=rule_query,
+        query_param=query_param,
+        global_config=text_chunks_db.global_config,
+        chunk_tracking=search_result["chunk_tracking"],
+        entity_id_to_original=truncation_result["entity_id_to_original"],
+        relation_id_to_original=truncation_result["relation_id_to_original"],
+        knowledge_graph_inst=knowledge_graph_inst,
+        stand_type=stand_type,
+    )
 
     # Convert keywords strings to lists and add complete metadata to raw_data
     hl_keywords_list = hl_keywords.split(", ") if hl_keywords else []

@@ -328,7 +328,7 @@ Consider the conversation history if provided to maintain conversational flow an
 1. Ground the answer strictly in the provided **Context**. Do not invent, assume, or infer facts that are not explicitly supported.
 2. Use both `Knowledge Graph Data` and `Document Chunks`, but obey this runtime priority order:
   - `Resolved Rule Overrides` is the highest-priority final answer sheet.
-  - `Allowed Final Test Items` is the final whitelist for sections A/C/D.
+  - `Allowed Final Test Items` is the final whitelist for sections A/C/D and also the exhaustive output contract for those sections: every allowed item must appear, and no allowed item may be omitted because of sparse parameters, missing values, shared evidence, or semantic similarity to another item.
   - `Removed Test Items` must never appear in sections A/C/D.
   - `Domain Rule Decisions` is the highest-priority business decision source for applicability, split/merge, count, and override logic.
   - `PROJECT_PARAM_MAP` is the final parameter whitelist for each retained test item.
@@ -338,6 +338,9 @@ Consider the conversation history if provided to maintain conversational flow an
   - For split/merge/count behavior, use the runtime result exactly and do not restore removed originals or invent extra derived items.
   - For each retained test item, only output parameters listed in `PROJECT_PARAM_MAP[test_item]`.
   - In sections A/C/D, every test item name must use the final runtime display label exactly as given by `Allowed Final Test Items`. Never output internal, canonical, debug, or pre-display names such as names containing `#`.
+  - Treat sections A/C/D as a one-to-one rendering of `Allowed Final Test Items`: section A must list every allowed item exactly once, section C must contain exactly one detail block for each allowed item, and section D must contain exactly one item-level summary for each allowed item.
+  - If an allowed test item has unresolved parameters, default-filled parameters, or parameters that resolve to `无法确定`, the item must still appear in sections A/C/D. Parameter uncertainty is not a reason to omit an allowed item.
+  - Do not collapse, substitute, or merge two distinct allowed items just because their names are similar or they share evidence. For example, if both `温升试验` and `辅助和控制回路温升试验` are allowed, both must appear independently in sections A/C/D.
 4. Resolve parameter values as final answers:
   - If `resolution_mode=graph_final` and `value_text` is non-empty, use it directly as the final answer.
   - If `resolution_mode=needs_user_input`, combine the graph hint with the user's explicit inputs and output the resolved final value.
