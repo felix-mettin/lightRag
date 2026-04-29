@@ -47,11 +47,11 @@
           "param_name": "操作顺序",
           "value_text": "O",
           "value_expr": "O",
-          "value_source": "user_input",
-          "value_type": "user_input",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
-          "derive_from_rated": "O"
+          "derive_from_rated": ""
         },
         {
           "param_name": "额定电压",
@@ -65,23 +65,23 @@
         },
         {
           "param_name": "关合涌流",
-          "value_text": "用于背对背电容器组关合性能覆盖",
-          "value_expr": "用于背对背电容器组关合性能覆盖",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用于背对背电容器组关合性能覆盖",
+          "value_text": "20kA",
+          "value_expr": "20kA",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "20kA",
           "calc_rule": "",
-          "derive_from_rated": "用于背对背电容器组关合性能覆盖"
+          "derive_from_rated": ""
         },
         {
           "param_name": "关合涌流的频率",
-          "value_text": "Ibi=20kA对应4250Hz（背对背工况）",
-          "value_expr": "Ibi=20kA对应4250Hz（背对背工况）",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "Ibi=20kA对应4250Hz（背对背工况）",
+          "value_text": "4250Hz",
+          "value_expr": "4250Hz",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "4250Hz",
           "calc_rule": "",
-          "derive_from_rated": "Ibi=20kA对应4250Hz（背对背工况）"
+          "derive_from_rated": ""
         },
         {
           "param_name": "开合容性电流能力的级别",
@@ -204,11 +204,11 @@
           "param_name": "操作顺序",
           "value_text": "O",
           "value_expr": "O",
-          "value_source": "user_input",
-          "value_type": "user_input",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
-          "derive_from_rated": "O"
+          "derive_from_rated": ""
         },
         {
           "param_name": "额定电压",
@@ -222,23 +222,23 @@
         },
         {
           "param_name": "关合涌流",
-          "value_text": "用于背对背电容器组关合性能覆盖",
-          "value_expr": "用于背对背电容器组关合性能覆盖",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用于背对背电容器组关合性能覆盖",
+          "value_text": "20kA",
+          "value_expr": "20kA",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "20kA",
           "calc_rule": "",
-          "derive_from_rated": "用于背对背电容器组关合性能覆盖"
+          "derive_from_rated": ""
         },
         {
           "param_name": "关合涌流的频率",
-          "value_text": "Ibi=20kA对应4250Hz（背对背工况）",
-          "value_expr": "Ibi=20kA对应4250Hz（背对背工况）",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "Ibi=20kA对应4250Hz（背对背工况）",
+          "value_text": "4250Hz",
+          "value_expr": "4250Hz",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "4250Hz",
           "calc_rule": "",
-          "derive_from_rated": "Ibi=20kA对应4250Hz（背对背工况）"
+          "derive_from_rated": ""
         },
         {
           "param_name": "开合容性电流能力的级别",
@@ -361,11 +361,11 @@
           "param_name": "操作顺序",
           "value_text": "CO",
           "value_expr": "CO",
-          "value_source": "user_input",
-          "value_type": "user_input",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "CO",
           "calc_rule": "",
-          "derive_from_rated": "CO"
+          "derive_from_rated": ""
         },
         {
           "param_name": "额定电压",
@@ -379,23 +379,23 @@
         },
         {
           "param_name": "关合涌流",
-          "value_text": "用于背对背电容器组关合性能覆盖",
-          "value_expr": "用于背对背电容器组关合性能覆盖",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用于背对背电容器组关合性能覆盖",
+          "value_text": "20kA",
+          "value_expr": "20kA",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "20kA",
           "calc_rule": "",
-          "derive_from_rated": "用于背对背电容器组关合性能覆盖"
+          "derive_from_rated": ""
         },
         {
           "param_name": "关合涌流的频率",
-          "value_text": "Ibi=20kA对应4250Hz（背对背工况）",
-          "value_expr": "Ibi=20kA对应4250Hz（背对背工况）",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "Ibi=20kA对应4250Hz（背对背工况）",
+          "value_text": "4250Hz",
+          "value_expr": "4250Hz",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "4250Hz",
           "calc_rule": "",
-          "derive_from_rated": "Ibi=20kA对应4250Hz（背对背工况）"
+          "derive_from_rated": ""
         },
         {
           "param_name": "开合容性电流能力的级别",
@@ -518,11 +518,11 @@
           "param_name": "操作顺序",
           "value_text": "CO",
           "value_expr": "CO",
-          "value_source": "user_input",
-          "value_type": "user_input",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "CO",
           "calc_rule": "",
-          "derive_from_rated": "CO"
+          "derive_from_rated": ""
         },
         {
           "param_name": "额定电压",
@@ -536,23 +536,23 @@
         },
         {
           "param_name": "关合涌流",
-          "value_text": "用于背对背电容器组关合性能覆盖",
-          "value_expr": "用于背对背电容器组关合性能覆盖",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用于背对背电容器组关合性能覆盖",
+          "value_text": "20kA",
+          "value_expr": "20kA",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "20kA",
           "calc_rule": "",
-          "derive_from_rated": "用于背对背电容器组关合性能覆盖"
+          "derive_from_rated": ""
         },
         {
           "param_name": "关合涌流的频率",
-          "value_text": "Ibi=20kA对应4250Hz（背对背工况）",
-          "value_expr": "Ibi=20kA对应4250Hz（背对背工况）",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "Ibi=20kA对应4250Hz（背对背工况）",
+          "value_text": "4250Hz",
+          "value_expr": "4250Hz",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "4250Hz",
           "calc_rule": "",
-          "derive_from_rated": "Ibi=20kA对应4250Hz（背对背工况）"
+          "derive_from_rated": ""
         },
         {
           "param_name": "开合容性电流能力的级别",
@@ -675,11 +675,11 @@
           "param_name": "操作顺序",
           "value_text": "O",
           "value_expr": "O",
-          "value_source": "user_input",
-          "value_type": "user_input",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
-          "derive_from_rated": "O"
+          "derive_from_rated": ""
         },
         {
           "param_name": "额定电压",
@@ -802,11 +802,11 @@
           "param_name": "操作顺序",
           "value_text": "O",
           "value_expr": "O",
-          "value_source": "user_input",
-          "value_type": "user_input",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
-          "derive_from_rated": "O"
+          "derive_from_rated": ""
         },
         {
           "param_name": "额定电压",
@@ -1611,11 +1611,11 @@
           "param_name": "操作顺序",
           "value_text": "O",
           "value_expr": "O",
-          "value_source": "user_input",
-          "value_type": "user_input",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
-          "derive_from_rated": "O"
+          "derive_from_rated": ""
         },
         {
           "param_name": "额定电压",
@@ -1738,11 +1738,11 @@
           "param_name": "操作顺序",
           "value_text": "O",
           "value_expr": "O",
-          "value_source": "user_input",
-          "value_type": "user_input",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
-          "derive_from_rated": "O"
+          "derive_from_rated": ""
         },
         {
           "param_name": "额定电压",
@@ -2108,9 +2108,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "C",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "C",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "C",
           "calc_rule": "",
           "derive_from_rated": ""
@@ -2225,9 +2225,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "C",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "C",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "C",
           "calc_rule": "",
           "derive_from_rated": ""
@@ -2989,13 +2989,13 @@
         },
         {
           "param_name": "操作顺序",
-          "value_text": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-          "value_expr": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
+          "value_text": "C",
+          "value_expr": "C",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "C",
           "calc_rule": "",
-          "derive_from_rated": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO"
+          "derive_from_rated": ""
         },
         {
           "param_name": "断路器等级",
@@ -3116,13 +3116,13 @@
         },
         {
           "param_name": "操作顺序",
-          "value_text": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-          "value_expr": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
+          "value_text": "C",
+          "value_expr": "C",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "C",
           "calc_rule": "",
-          "derive_from_rated": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO"
+          "derive_from_rated": ""
         },
         {
           "param_name": "断路器等级",
@@ -3243,13 +3243,13 @@
         },
         {
           "param_name": "操作顺序",
-          "value_text": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-          "value_expr": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
+          "value_text": "C",
+          "value_expr": "C",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "C",
           "calc_rule": "",
-          "derive_from_rated": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO"
+          "derive_from_rated": ""
         },
         {
           "param_name": "断路器等级",
@@ -3370,13 +3370,13 @@
         },
         {
           "param_name": "操作顺序",
-          "value_text": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-          "value_expr": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
+          "value_text": "C",
+          "value_expr": "C",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "C",
           "calc_rule": "",
-          "derive_from_rated": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO"
+          "derive_from_rated": ""
         },
         {
           "param_name": "断路器等级",
@@ -4469,7 +4469,7 @@
       ],
       "path_key": "型式试验 > 开合性能型式试验 > T60(预备试验)",
       "skip": false,
-      "note": "开合容性电流能力的级别==C2，未输入默认C2",
+      "note": "开合容性电流能力的级别==C2，未输入默认C2，但是同时存在 T60则不做该实验",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -4566,7 +4566,7 @@
       ],
       "path_key": "开合性能型式试验 > 开合性能型式试验 > T60(预备试验)",
       "skip": false,
-      "note": "开合容性电流能力的级别==C2，未输入默认C2",
+      "note": "开合容性电流能力的级别==C2，未输入默认C2，但是同时存在 T60则不做该实验",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -4687,11 +4687,11 @@
         },
         {
           "param_name": "电压极性",
-          "value_text": "正极性或负极性",
+          "value_text": "正极性及负极性",
           "value_expr": "",
           "value_source": "standard",
           "value_type": "standard",
-          "constraints": "正极性或负极性",
+          "constraints": "正极性及负极性",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -4824,11 +4824,11 @@
         },
         {
           "param_name": "电压极性",
-          "value_text": "正极性或负极性",
+          "value_text": "正极性及负极性",
           "value_expr": "",
           "value_source": "standard",
           "value_type": "standard",
-          "constraints": "正极性或负极性",
+          "constraints": "正极性及负极性",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -5185,13 +5185,13 @@
         },
         {
           "param_name": "操作顺序",
-          "value_text": "用户提供特定的按照用户提供额定操作顺序展示",
-          "value_expr": "用户提供特定的按照用户提供额定操作顺序展示",
+          "value_text": "用户提供特定的按照用户提供额定操作顺序展示()",
+          "value_expr": "用户提供特定的按照用户提供额定操作顺序展示()",
           "value_source": "user_input",
           "value_type": "user_input",
-          "constraints": "用户提供特定的按照用户提供额定操作顺序展示",
+          "constraints": "用户提供特定的按照用户提供额定操作顺序展示()",
           "calc_rule": "",
-          "derive_from_rated": "用户提供特定的按照用户提供额定操作顺序展示"
+          "derive_from_rated": "用户提供特定的按照用户提供额定操作顺序展示()"
         },
         {
           "param_name": "断路器等级",
@@ -5342,13 +5342,13 @@
         },
         {
           "param_name": "操作顺序",
-          "value_text": "用户提供特定的按照用户提供额定操作顺序展示",
-          "value_expr": "用户提供特定的按照用户提供额定操作顺序展示",
+          "value_text": "用户提供特定的按照用户提供额定操作顺序展示()",
+          "value_expr": "用户提供特定的按照用户提供额定操作顺序展示()",
           "value_source": "user_input",
           "value_type": "user_input",
-          "constraints": "用户提供特定的按照用户提供额定操作顺序展示",
+          "constraints": "用户提供特定的按照用户提供额定操作顺序展示()",
           "calc_rule": "",
-          "derive_from_rated": "用户提供特定的按照用户提供额定操作顺序展示"
+          "derive_from_rated": "用户提供特定的按照用户提供额定操作顺序展示()"
         },
         {
           "param_name": "断路器等级",
@@ -5719,7 +5719,7 @@
       ],
       "path_key": "型式试验 > 短路性能型式试验 > 短路开断试验(T100A)",
       "skip": false,
-      "note": "额定频率==50Hz or 额定频率==50/60Hz",
+      "note": "额定频率==50Hz or 额定频率==50/60Hz\n（三相共箱共机构 也需要执行）",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -5886,7 +5886,7 @@
       ],
       "path_key": "短路性能型式试验 > 短路性能型式试验 > 短路开断试验(T100A)",
       "skip": false,
-      "note": "额定频率==50Hz or 额定频率==50/60Hz",
+      "note": "额定频率==50Hz or 额定频率==50/60Hz\n（三相共箱共机构 也需要执行）",
       "parameters": [
         {
           "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -6725,11 +6725,11 @@
         },
         {
           "param_name": "首开极系数",
-          "value_text": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
-          "value_expr": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
+          "value_text": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若客户提出首开极系数则按照用户录入进行试验",
+          "value_expr": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若客户提出首开极系数则按照用户录入进行试验",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
+          "constraints": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若客户提出首开极系数则按照用户录入进行试验",
           "calc_rule": "",
           "derive_from_rated": ""
         }
@@ -6872,11 +6872,11 @@
         },
         {
           "param_name": "首开极系数",
-          "value_text": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
-          "value_expr": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
+          "value_text": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若客户提出首开极系数则按照用户录入进行试验",
+          "value_expr": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若客户提出首开极系数则按照用户录入进行试验",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
+          "constraints": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若客户提出首开极系数则按照用户录入进行试验",
           "calc_rule": "",
           "derive_from_rated": ""
         }
@@ -6969,13 +6969,13 @@
         },
         {
           "param_name": "试验工位",
-          "value_text": "默认取值\"老站\"",
-          "value_expr": "默认取值\"老站\"",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "默认取值\"老站\"",
+          "value_text": "老站",
+          "value_expr": "老站",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "老站",
           "calc_rule": "",
-          "derive_from_rated": "默认取值\"老站\""
+          "derive_from_rated": ""
         }
       ],
       "remove_parameters": [],
@@ -7066,13 +7066,13 @@
         },
         {
           "param_name": "试验工位",
-          "value_text": "默认取值\"老站\"",
-          "value_expr": "默认取值\"老站\"",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "默认取值\"老站\"",
+          "value_text": "老站",
+          "value_expr": "老站",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "老站",
           "calc_rule": "",
-          "derive_from_rated": "默认取值\"老站\""
+          "derive_from_rated": ""
         }
       ],
       "remove_parameters": [],
@@ -7133,11 +7133,11 @@
         },
         {
           "param_name": "试验部位",
-          "value_text": "默认取值\"主回路\"",
-          "value_expr": "默认取值\"主回路\"",
+          "value_text": "主回路",
+          "value_expr": "主回路",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "默认取值\"主回路\"",
+          "constraints": "主回路",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -7153,11 +7153,11 @@
         },
         {
           "param_name": "试验工位",
-          "value_text": "默认取值\"默认老站\"",
-          "value_expr": "默认取值\"默认老站\"",
+          "value_text": "老站",
+          "value_expr": "老站",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "默认取值\"默认老站\"",
+          "constraints": "老站",
           "calc_rule": "",
           "derive_from_rated": ""
         }
@@ -7220,11 +7220,11 @@
         },
         {
           "param_name": "试验部位",
-          "value_text": "默认取值\"主回路\"",
-          "value_expr": "默认取值\"主回路\"",
+          "value_text": "主回路",
+          "value_expr": "主回路",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "默认取值\"主回路\"",
+          "constraints": "主回路",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -7240,11 +7240,11 @@
         },
         {
           "param_name": "试验工位",
-          "value_text": "默认取值\"默认老站\"",
-          "value_expr": "默认取值\"默认老站\"",
+          "value_text": "老站",
+          "value_expr": "老站",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "默认取值\"默认老站\"",
+          "constraints": "老站",
           "calc_rule": "",
           "derive_from_rated": ""
         }
@@ -7307,11 +7307,11 @@
         },
         {
           "param_name": "试验部位",
-          "value_text": "默认取值\"主回路\"",
-          "value_expr": "默认取值\"主回路\"",
+          "value_text": "主回路",
+          "value_expr": "主回路",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "默认取值\"主回路\"",
+          "constraints": "主回路",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -7384,11 +7384,11 @@
         },
         {
           "param_name": "试验部位",
-          "value_text": "默认取值\"主回路\"",
-          "value_expr": "默认取值\"主回路\"",
+          "value_text": "主回路",
+          "value_expr": "主回路",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "默认取值\"主回路\"",
+          "constraints": "主回路",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -7421,11 +7421,11 @@
       "parameters": [
         {
           "param_name": "试验次数",
-          "value_text": "默认为1次",
+          "value_text": "1次",
           "value_expr": "",
           "value_source": "standard",
           "value_type": "standard",
-          "constraints": "默认为1次",
+          "constraints": "1次",
           "calc_rule": "",
           "derive_from_rated": ""
         }
@@ -7448,11 +7448,11 @@
       "parameters": [
         {
           "param_name": "试验次数",
-          "value_text": "默认为1次",
+          "value_text": "1次",
           "value_expr": "",
           "value_source": "standard",
           "value_type": "standard",
-          "constraints": "默认为1次",
+          "constraints": "1次",
           "calc_rule": "",
           "derive_from_rated": ""
         }
@@ -9121,11 +9121,11 @@
         },
         {
           "param_name": "试验部位",
-          "value_text": "默认取值\"主回路\"",
-          "value_expr": "默认取值\"主回路\"",
+          "value_text": "主回路",
+          "value_expr": "主回路",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "默认取值\"主回路\"",
+          "constraints": "主回路",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -9198,11 +9198,11 @@
         },
         {
           "param_name": "试验部位",
-          "value_text": "默认取值\"主回路\"",
-          "value_expr": "默认取值\"主回路\"",
+          "value_text": "主回路",
+          "value_expr": "主回路",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "默认取值\"主回路\"",
+          "constraints": "主回路",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -9275,11 +9275,11 @@
         },
         {
           "param_name": "开关相数",
-          "value_text": "当额定电压是72.5kv或以上时，试品结构为三相共箱时取值三相，试品结构为三相分箱时取值单相",
+          "value_text": "当额定电压是72.5kv或以上时，试品结构为三相共箱时取值为数字\"3\"，试品结构为三相分箱时取值为数字\"1\"",
           "value_expr": "",
           "value_source": "standard",
           "value_type": "standard",
-          "constraints": "当额定电压是72.5kv或以上时，试品结构为三相共箱时取值三相，试品结构为三相分箱时取值单相",
+          "constraints": "当额定电压是72.5kv或以上时，试品结构为三相共箱时取值为数字\"3\"，试品结构为三相分箱时取值为数字\"1\"",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -9372,11 +9372,11 @@
         },
         {
           "param_name": "开关相数",
-          "value_text": "当额定电压是72.5kv或以上时，试品结构为三相共箱时取值三相，试品结构为三相分箱时取值单相",
+          "value_text": "当额定电压是72.5kv或以上时，试品结构为三相共箱时取值为数字\"3\"，试品结构为三相分箱时取值为数字\"1\"",
           "value_expr": "",
           "value_source": "standard",
           "value_type": "standard",
-          "constraints": "当额定电压是72.5kv或以上时，试品结构为三相共箱时取值三相，试品结构为三相分箱时取值单相",
+          "constraints": "当额定电压是72.5kv或以上时，试品结构为三相共箱时取值为数字\"3\"，试品结构为三相分箱时取值为数字\"1\"",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -9480,9 +9480,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "O",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "O",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
           "derive_from_rated": ""
@@ -9499,21 +9499,21 @@
         },
         {
           "param_name": "关合涌流",
-          "value_text": "用于背对背电容器组关合性能覆盖",
-          "value_expr": "用于背对背电容器组关合性能覆盖",
+          "value_text": "20kA",
+          "value_expr": "20kA",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "用于背对背电容器组关合性能覆盖",
+          "constraints": "20kA",
           "calc_rule": "",
           "derive_from_rated": ""
         },
         {
           "param_name": "关合涌流的频率",
-          "value_text": "Ibi=20kA对应4250Hz（背对背工况）",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "Ibi=20kA对应4250Hz（背对背工况）",
+          "value_text": "4250Hz",
+          "value_expr": "4250Hz",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "4250Hz",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -9637,9 +9637,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "O",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "O",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
           "derive_from_rated": ""
@@ -9656,21 +9656,21 @@
         },
         {
           "param_name": "关合涌流",
-          "value_text": "用于背对背电容器组关合性能覆盖",
-          "value_expr": "用于背对背电容器组关合性能覆盖",
+          "value_text": "20kA",
+          "value_expr": "20kA",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "用于背对背电容器组关合性能覆盖",
+          "constraints": "20kA",
           "calc_rule": "",
           "derive_from_rated": ""
         },
         {
           "param_name": "关合涌流的频率",
-          "value_text": "Ibi=20kA对应4250Hz（背对背工况）",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "Ibi=20kA对应4250Hz（背对背工况）",
+          "value_text": "4250Hz",
+          "value_expr": "4250Hz",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "4250Hz",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -9794,9 +9794,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "CO",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "CO",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "CO",
           "calc_rule": "",
           "derive_from_rated": ""
@@ -9813,21 +9813,21 @@
         },
         {
           "param_name": "关合涌流",
-          "value_text": "用于背对背电容器组关合性能覆盖",
-          "value_expr": "用于背对背电容器组关合性能覆盖",
+          "value_text": "20kA",
+          "value_expr": "20kA",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "用于背对背电容器组关合性能覆盖",
+          "constraints": "20kA",
           "calc_rule": "",
           "derive_from_rated": ""
         },
         {
           "param_name": "关合涌流的频率",
-          "value_text": "Ibi=20kA对应4250Hz（背对背工况）",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "Ibi=20kA对应4250Hz（背对背工况）",
+          "value_text": "4250Hz",
+          "value_expr": "4250Hz",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "4250Hz",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -9951,9 +9951,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "CO",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "CO",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "CO",
           "calc_rule": "",
           "derive_from_rated": ""
@@ -9970,21 +9970,21 @@
         },
         {
           "param_name": "关合涌流",
-          "value_text": "用于背对背电容器组关合性能覆盖",
-          "value_expr": "用于背对背电容器组关合性能覆盖",
+          "value_text": "20kA",
+          "value_expr": "20kA",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "用于背对背电容器组关合性能覆盖",
+          "constraints": "20kA",
           "calc_rule": "",
           "derive_from_rated": ""
         },
         {
           "param_name": "关合涌流的频率",
-          "value_text": "Ibi=20kA对应4250Hz（背对背工况）",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "Ibi=20kA对应4250Hz（背对背工况）",
+          "value_text": "4250Hz",
+          "value_expr": "4250Hz",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "4250Hz",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -10108,9 +10108,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "O",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "O",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
           "derive_from_rated": ""
@@ -10235,9 +10235,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "O",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "O",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
           "derive_from_rated": ""
@@ -10616,9 +10616,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "O",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "O",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
           "derive_from_rated": ""
@@ -10743,9 +10743,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "O",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "O",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
           "derive_from_rated": ""
@@ -11114,9 +11114,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "O",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "O",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
           "derive_from_rated": ""
@@ -11193,11 +11193,11 @@
         },
         {
           "param_name": "试验相数",
-          "value_text": "默认取值\"单相\"",
-          "value_expr": "默认取值\"单相\"",
+          "value_text": "单相",
+          "value_expr": "单相",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "默认取值\"单相\"",
+          "constraints": "单相",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -11251,9 +11251,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "O",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "O",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
           "derive_from_rated": ""
@@ -11330,11 +11330,11 @@
         },
         {
           "param_name": "试验相数",
-          "value_text": "默认取值\"单相\"",
-          "value_expr": "默认取值\"单相\"",
+          "value_text": "单相",
+          "value_expr": "单相",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "默认取值\"单相\"",
+          "constraints": "单相",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -11388,9 +11388,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "CO-O-O",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "CO-O-O",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "CO-O-O",
           "calc_rule": "",
           "derive_from_rated": ""
@@ -11525,9 +11525,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "CO-O-O",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "CO-O-O",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "CO-O-O",
           "calc_rule": "",
           "derive_from_rated": ""
@@ -12766,9 +12766,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "O",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "O",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
           "derive_from_rated": ""
@@ -12853,9 +12853,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "O",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "O",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
           "derive_from_rated": ""
@@ -12934,11 +12934,11 @@
             "param_name": "操作顺序",
             "value_text": "O",
             "value_expr": "O",
-            "value_source": "user_input",
-            "value_type": "user_input",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "O",
             "calc_rule": "",
-            "derive_from_rated": "O"
+            "derive_from_rated": ""
           },
           {
             "param_name": "额定电压",
@@ -12952,23 +12952,23 @@
           },
           {
             "param_name": "关合涌流",
-            "value_text": "用于背对背电容器组关合性能覆盖",
-            "value_expr": "用于背对背电容器组关合性能覆盖",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用于背对背电容器组关合性能覆盖",
+            "value_text": "20kA",
+            "value_expr": "20kA",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "20kA",
             "calc_rule": "",
-            "derive_from_rated": "用于背对背电容器组关合性能覆盖"
+            "derive_from_rated": ""
           },
           {
             "param_name": "关合涌流的频率",
-            "value_text": "Ibi=20kA对应4250Hz（背对背工况）",
-            "value_expr": "Ibi=20kA对应4250Hz（背对背工况）",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "Ibi=20kA对应4250Hz（背对背工况）",
+            "value_text": "4250Hz",
+            "value_expr": "4250Hz",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "4250Hz",
             "calc_rule": "",
-            "derive_from_rated": "Ibi=20kA对应4250Hz（背对背工况）"
+            "derive_from_rated": ""
           },
           {
             "param_name": "开合容性电流能力的级别",
@@ -13091,11 +13091,11 @@
             "param_name": "操作顺序",
             "value_text": "O",
             "value_expr": "O",
-            "value_source": "user_input",
-            "value_type": "user_input",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "O",
             "calc_rule": "",
-            "derive_from_rated": "O"
+            "derive_from_rated": ""
           },
           {
             "param_name": "额定电压",
@@ -13109,23 +13109,23 @@
           },
           {
             "param_name": "关合涌流",
-            "value_text": "用于背对背电容器组关合性能覆盖",
-            "value_expr": "用于背对背电容器组关合性能覆盖",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用于背对背电容器组关合性能覆盖",
+            "value_text": "20kA",
+            "value_expr": "20kA",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "20kA",
             "calc_rule": "",
-            "derive_from_rated": "用于背对背电容器组关合性能覆盖"
+            "derive_from_rated": ""
           },
           {
             "param_name": "关合涌流的频率",
-            "value_text": "Ibi=20kA对应4250Hz（背对背工况）",
-            "value_expr": "Ibi=20kA对应4250Hz（背对背工况）",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "Ibi=20kA对应4250Hz（背对背工况）",
+            "value_text": "4250Hz",
+            "value_expr": "4250Hz",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "4250Hz",
             "calc_rule": "",
-            "derive_from_rated": "Ibi=20kA对应4250Hz（背对背工况）"
+            "derive_from_rated": ""
           },
           {
             "param_name": "开合容性电流能力的级别",
@@ -13250,11 +13250,11 @@
             "param_name": "操作顺序",
             "value_text": "CO",
             "value_expr": "CO",
-            "value_source": "user_input",
-            "value_type": "user_input",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "CO",
             "calc_rule": "",
-            "derive_from_rated": "CO"
+            "derive_from_rated": ""
           },
           {
             "param_name": "额定电压",
@@ -13268,23 +13268,23 @@
           },
           {
             "param_name": "关合涌流",
-            "value_text": "用于背对背电容器组关合性能覆盖",
-            "value_expr": "用于背对背电容器组关合性能覆盖",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用于背对背电容器组关合性能覆盖",
+            "value_text": "20kA",
+            "value_expr": "20kA",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "20kA",
             "calc_rule": "",
-            "derive_from_rated": "用于背对背电容器组关合性能覆盖"
+            "derive_from_rated": ""
           },
           {
             "param_name": "关合涌流的频率",
-            "value_text": "Ibi=20kA对应4250Hz（背对背工况）",
-            "value_expr": "Ibi=20kA对应4250Hz（背对背工况）",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "Ibi=20kA对应4250Hz（背对背工况）",
+            "value_text": "4250Hz",
+            "value_expr": "4250Hz",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "4250Hz",
             "calc_rule": "",
-            "derive_from_rated": "Ibi=20kA对应4250Hz（背对背工况）"
+            "derive_from_rated": ""
           },
           {
             "param_name": "开合容性电流能力的级别",
@@ -13407,11 +13407,11 @@
             "param_name": "操作顺序",
             "value_text": "CO",
             "value_expr": "CO",
-            "value_source": "user_input",
-            "value_type": "user_input",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "CO",
             "calc_rule": "",
-            "derive_from_rated": "CO"
+            "derive_from_rated": ""
           },
           {
             "param_name": "额定电压",
@@ -13425,23 +13425,23 @@
           },
           {
             "param_name": "关合涌流",
-            "value_text": "用于背对背电容器组关合性能覆盖",
-            "value_expr": "用于背对背电容器组关合性能覆盖",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用于背对背电容器组关合性能覆盖",
+            "value_text": "20kA",
+            "value_expr": "20kA",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "20kA",
             "calc_rule": "",
-            "derive_from_rated": "用于背对背电容器组关合性能覆盖"
+            "derive_from_rated": ""
           },
           {
             "param_name": "关合涌流的频率",
-            "value_text": "Ibi=20kA对应4250Hz（背对背工况）",
-            "value_expr": "Ibi=20kA对应4250Hz（背对背工况）",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "Ibi=20kA对应4250Hz（背对背工况）",
+            "value_text": "4250Hz",
+            "value_expr": "4250Hz",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "4250Hz",
             "calc_rule": "",
-            "derive_from_rated": "Ibi=20kA对应4250Hz（背对背工况）"
+            "derive_from_rated": ""
           },
           {
             "param_name": "开合容性电流能力的级别",
@@ -13566,11 +13566,11 @@
             "param_name": "操作顺序",
             "value_text": "O",
             "value_expr": "O",
-            "value_source": "user_input",
-            "value_type": "user_input",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "O",
             "calc_rule": "",
-            "derive_from_rated": "O"
+            "derive_from_rated": ""
           },
           {
             "param_name": "额定电压",
@@ -13693,11 +13693,11 @@
             "param_name": "操作顺序",
             "value_text": "O",
             "value_expr": "O",
-            "value_source": "user_input",
-            "value_type": "user_input",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "O",
             "calc_rule": "",
-            "derive_from_rated": "O"
+            "derive_from_rated": ""
           },
           {
             "param_name": "额定电压",
@@ -14510,11 +14510,11 @@
             "param_name": "操作顺序",
             "value_text": "O",
             "value_expr": "O",
-            "value_source": "user_input",
-            "value_type": "user_input",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "O",
             "calc_rule": "",
-            "derive_from_rated": "O"
+            "derive_from_rated": ""
           },
           {
             "param_name": "额定电压",
@@ -14637,11 +14637,11 @@
             "param_name": "操作顺序",
             "value_text": "O",
             "value_expr": "O",
-            "value_source": "user_input",
-            "value_type": "user_input",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "O",
             "calc_rule": "",
-            "derive_from_rated": "O"
+            "derive_from_rated": ""
           },
           {
             "param_name": "额定电压",
@@ -15011,9 +15011,9 @@
           {
             "param_name": "操作顺序",
             "value_text": "C",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
+            "value_expr": "C",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "C",
             "calc_rule": "",
             "derive_from_rated": ""
@@ -15128,9 +15128,9 @@
           {
             "param_name": "操作顺序",
             "value_text": "C",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
+            "value_expr": "C",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "C",
             "calc_rule": "",
             "derive_from_rated": ""
@@ -15898,13 +15898,13 @@
           },
           {
             "param_name": "操作顺序",
-            "value_text": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-            "value_expr": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
+            "value_text": "C",
+            "value_expr": "C",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "C",
             "calc_rule": "",
-            "derive_from_rated": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO"
+            "derive_from_rated": ""
           },
           {
             "param_name": "断路器等级",
@@ -16025,13 +16025,13 @@
           },
           {
             "param_name": "操作顺序",
-            "value_text": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-            "value_expr": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
+            "value_text": "C",
+            "value_expr": "C",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "C",
             "calc_rule": "",
-            "derive_from_rated": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO"
+            "derive_from_rated": ""
           },
           {
             "param_name": "断路器等级",
@@ -16154,13 +16154,13 @@
           },
           {
             "param_name": "操作顺序",
-            "value_text": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-            "value_expr": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
+            "value_text": "C",
+            "value_expr": "C",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "C",
             "calc_rule": "",
-            "derive_from_rated": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO"
+            "derive_from_rated": ""
           },
           {
             "param_name": "断路器等级",
@@ -16281,13 +16281,13 @@
           },
           {
             "param_name": "操作顺序",
-            "value_text": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-            "value_expr": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
+            "value_text": "C",
+            "value_expr": "C",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "C",
             "calc_rule": "",
-            "derive_from_rated": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO"
+            "derive_from_rated": ""
           },
           {
             "param_name": "断路器等级",
@@ -17390,7 +17390,7 @@
         ],
         "path_key": "型式试验 > 开合性能型式试验 > T60(预备试验)",
         "skip": false,
-        "note": "开合容性电流能力的级别==C2，未输入默认C2",
+        "note": "开合容性电流能力的级别==C2，未输入默认C2，但是同时存在 T60则不做该实验",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -17487,7 +17487,7 @@
         ],
         "path_key": "开合性能型式试验 > 开合性能型式试验 > T60(预备试验)",
         "skip": false,
-        "note": "开合容性电流能力的级别==C2，未输入默认C2",
+        "note": "开合容性电流能力的级别==C2，未输入默认C2，但是同时存在 T60则不做该实验",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -17610,11 +17610,11 @@
           },
           {
             "param_name": "电压极性",
-            "value_text": "正极性或负极性",
+            "value_text": "正极性及负极性",
             "value_expr": "",
             "value_source": "standard",
             "value_type": "standard",
-            "constraints": "正极性或负极性",
+            "constraints": "正极性及负极性",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -17747,11 +17747,11 @@
           },
           {
             "param_name": "电压极性",
-            "value_text": "正极性或负极性",
+            "value_text": "正极性及负极性",
             "value_expr": "",
             "value_source": "standard",
             "value_type": "standard",
-            "constraints": "正极性或负极性",
+            "constraints": "正极性及负极性",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -18112,13 +18112,13 @@
           },
           {
             "param_name": "操作顺序",
-            "value_text": "用户提供特定的按照用户提供额定操作顺序展示",
-            "value_expr": "用户提供特定的按照用户提供额定操作顺序展示",
+            "value_text": "用户提供特定的按照用户提供额定操作顺序展示()",
+            "value_expr": "用户提供特定的按照用户提供额定操作顺序展示()",
             "value_source": "user_input",
             "value_type": "user_input",
-            "constraints": "用户提供特定的按照用户提供额定操作顺序展示",
+            "constraints": "用户提供特定的按照用户提供额定操作顺序展示()",
             "calc_rule": "",
-            "derive_from_rated": "用户提供特定的按照用户提供额定操作顺序展示"
+            "derive_from_rated": "用户提供特定的按照用户提供额定操作顺序展示()"
           },
           {
             "param_name": "断路器等级",
@@ -18269,13 +18269,13 @@
           },
           {
             "param_name": "操作顺序",
-            "value_text": "用户提供特定的按照用户提供额定操作顺序展示",
-            "value_expr": "用户提供特定的按照用户提供额定操作顺序展示",
+            "value_text": "用户提供特定的按照用户提供额定操作顺序展示()",
+            "value_expr": "用户提供特定的按照用户提供额定操作顺序展示()",
             "value_source": "user_input",
             "value_type": "user_input",
-            "constraints": "用户提供特定的按照用户提供额定操作顺序展示",
+            "constraints": "用户提供特定的按照用户提供额定操作顺序展示()",
             "calc_rule": "",
-            "derive_from_rated": "用户提供特定的按照用户提供额定操作顺序展示"
+            "derive_from_rated": "用户提供特定的按照用户提供额定操作顺序展示()"
           },
           {
             "param_name": "断路器等级",
@@ -18650,7 +18650,7 @@
         ],
         "path_key": "型式试验 > 短路性能型式试验 > 短路开断试验(T100A)",
         "skip": false,
-        "note": "额定频率==50Hz or 额定频率==50/60Hz",
+        "note": "额定频率==50Hz or 额定频率==50/60Hz\n（三相共箱共机构 也需要执行）",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -18817,7 +18817,7 @@
         ],
         "path_key": "短路性能型式试验 > 短路性能型式试验 > 短路开断试验(T100A)",
         "skip": false,
-        "note": "额定频率==50Hz or 额定频率==50/60Hz",
+        "note": "额定频率==50Hz or 额定频率==50/60Hz\n（三相共箱共机构 也需要执行）",
         "parameters": [
           {
             "param_name": "SF6气体的最低功能压力(20℃表压)",
@@ -19662,11 +19662,11 @@
           },
           {
             "param_name": "首开极系数",
-            "value_text": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
-            "value_expr": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
+            "value_text": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若客户提出首开极系数则按照用户录入进行试验",
+            "value_expr": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若客户提出首开极系数则按照用户录入进行试验",
             "value_source": "default",
             "value_type": "default",
-            "constraints": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
+            "constraints": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若客户提出首开极系数则按照用户录入进行试验",
             "calc_rule": "",
             "derive_from_rated": ""
           }
@@ -19809,11 +19809,11 @@
           },
           {
             "param_name": "首开极系数",
-            "value_text": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
-            "value_expr": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
+            "value_text": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若客户提出首开极系数则按照用户录入进行试验",
+            "value_expr": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若客户提出首开极系数则按照用户录入进行试验",
             "value_source": "default",
             "value_type": "default",
-            "constraints": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
+            "constraints": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若客户提出首开极系数则按照用户录入进行试验",
             "calc_rule": "",
             "derive_from_rated": ""
           }
@@ -19908,13 +19908,13 @@
           },
           {
             "param_name": "试验工位",
-            "value_text": "默认取值\"老站\"",
-            "value_expr": "默认取值\"老站\"",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "默认取值\"老站\"",
+            "value_text": "老站",
+            "value_expr": "老站",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "老站",
             "calc_rule": "",
-            "derive_from_rated": "默认取值\"老站\""
+            "derive_from_rated": ""
           }
         ],
         "remove_parameters": [],
@@ -20005,13 +20005,13 @@
           },
           {
             "param_name": "试验工位",
-            "value_text": "默认取值\"老站\"",
-            "value_expr": "默认取值\"老站\"",
-            "value_source": "user_input",
-            "value_type": "user_input",
-            "constraints": "默认取值\"老站\"",
+            "value_text": "老站",
+            "value_expr": "老站",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "老站",
             "calc_rule": "",
-            "derive_from_rated": "默认取值\"老站\""
+            "derive_from_rated": ""
           }
         ],
         "remove_parameters": [],
@@ -20074,11 +20074,11 @@
           },
           {
             "param_name": "试验部位",
-            "value_text": "默认取值\"主回路\"",
-            "value_expr": "默认取值\"主回路\"",
+            "value_text": "主回路",
+            "value_expr": "主回路",
             "value_source": "default",
             "value_type": "default",
-            "constraints": "默认取值\"主回路\"",
+            "constraints": "主回路",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -20094,11 +20094,11 @@
           },
           {
             "param_name": "试验工位",
-            "value_text": "默认取值\"默认老站\"",
-            "value_expr": "默认取值\"默认老站\"",
+            "value_text": "老站",
+            "value_expr": "老站",
             "value_source": "default",
             "value_type": "default",
-            "constraints": "默认取值\"默认老站\"",
+            "constraints": "老站",
             "calc_rule": "",
             "derive_from_rated": ""
           }
@@ -20161,11 +20161,11 @@
           },
           {
             "param_name": "试验部位",
-            "value_text": "默认取值\"主回路\"",
-            "value_expr": "默认取值\"主回路\"",
+            "value_text": "主回路",
+            "value_expr": "主回路",
             "value_source": "default",
             "value_type": "default",
-            "constraints": "默认取值\"主回路\"",
+            "constraints": "主回路",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -20181,11 +20181,11 @@
           },
           {
             "param_name": "试验工位",
-            "value_text": "默认取值\"默认老站\"",
-            "value_expr": "默认取值\"默认老站\"",
+            "value_text": "老站",
+            "value_expr": "老站",
             "value_source": "default",
             "value_type": "default",
-            "constraints": "默认取值\"默认老站\"",
+            "constraints": "老站",
             "calc_rule": "",
             "derive_from_rated": ""
           }
@@ -20250,11 +20250,11 @@
           },
           {
             "param_name": "试验部位",
-            "value_text": "默认取值\"主回路\"",
-            "value_expr": "默认取值\"主回路\"",
+            "value_text": "主回路",
+            "value_expr": "主回路",
             "value_source": "default",
             "value_type": "default",
-            "constraints": "默认取值\"主回路\"",
+            "constraints": "主回路",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -20327,11 +20327,11 @@
           },
           {
             "param_name": "试验部位",
-            "value_text": "默认取值\"主回路\"",
-            "value_expr": "默认取值\"主回路\"",
+            "value_text": "主回路",
+            "value_expr": "主回路",
             "value_source": "default",
             "value_type": "default",
-            "constraints": "默认取值\"主回路\"",
+            "constraints": "主回路",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -20366,11 +20366,11 @@
         "parameters": [
           {
             "param_name": "试验次数",
-            "value_text": "默认为1次",
+            "value_text": "1次",
             "value_expr": "",
             "value_source": "standard",
             "value_type": "standard",
-            "constraints": "默认为1次",
+            "constraints": "1次",
             "calc_rule": "",
             "derive_from_rated": ""
           }
@@ -20393,11 +20393,11 @@
         "parameters": [
           {
             "param_name": "试验次数",
-            "value_text": "默认为1次",
+            "value_text": "1次",
             "value_expr": "",
             "value_source": "standard",
             "value_type": "standard",
-            "constraints": "默认为1次",
+            "constraints": "1次",
             "calc_rule": "",
             "derive_from_rated": ""
           }
@@ -22084,11 +22084,11 @@
           },
           {
             "param_name": "试验部位",
-            "value_text": "默认取值\"主回路\"",
-            "value_expr": "默认取值\"主回路\"",
+            "value_text": "主回路",
+            "value_expr": "主回路",
             "value_source": "default",
             "value_type": "default",
-            "constraints": "默认取值\"主回路\"",
+            "constraints": "主回路",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -22161,11 +22161,11 @@
           },
           {
             "param_name": "试验部位",
-            "value_text": "默认取值\"主回路\"",
-            "value_expr": "默认取值\"主回路\"",
+            "value_text": "主回路",
+            "value_expr": "主回路",
             "value_source": "default",
             "value_type": "default",
-            "constraints": "默认取值\"主回路\"",
+            "constraints": "主回路",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -22240,11 +22240,11 @@
           },
           {
             "param_name": "开关相数",
-            "value_text": "当额定电压是72.5kv或以上时，试品结构为三相共箱时取值三相，试品结构为三相分箱时取值单相",
+            "value_text": "当额定电压是72.5kv或以上时，试品结构为三相共箱时取值为数字\"3\"，试品结构为三相分箱时取值为数字\"1\"",
             "value_expr": "",
             "value_source": "standard",
             "value_type": "standard",
-            "constraints": "当额定电压是72.5kv或以上时，试品结构为三相共箱时取值三相，试品结构为三相分箱时取值单相",
+            "constraints": "当额定电压是72.5kv或以上时，试品结构为三相共箱时取值为数字\"3\"，试品结构为三相分箱时取值为数字\"1\"",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -22337,11 +22337,11 @@
           },
           {
             "param_name": "开关相数",
-            "value_text": "当额定电压是72.5kv或以上时，试品结构为三相共箱时取值三相，试品结构为三相分箱时取值单相",
+            "value_text": "当额定电压是72.5kv或以上时，试品结构为三相共箱时取值为数字\"3\"，试品结构为三相分箱时取值为数字\"1\"",
             "value_expr": "",
             "value_source": "standard",
             "value_type": "standard",
-            "constraints": "当额定电压是72.5kv或以上时，试品结构为三相共箱时取值三相，试品结构为三相分箱时取值单相",
+            "constraints": "当额定电压是72.5kv或以上时，试品结构为三相共箱时取值为数字\"3\"，试品结构为三相分箱时取值为数字\"1\"",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -22447,9 +22447,9 @@
           {
             "param_name": "操作顺序",
             "value_text": "O",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
+            "value_expr": "O",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "O",
             "calc_rule": "",
             "derive_from_rated": ""
@@ -22466,21 +22466,21 @@
           },
           {
             "param_name": "关合涌流",
-            "value_text": "用于背对背电容器组关合性能覆盖",
-            "value_expr": "用于背对背电容器组关合性能覆盖",
+            "value_text": "20kA",
+            "value_expr": "20kA",
             "value_source": "default",
             "value_type": "default",
-            "constraints": "用于背对背电容器组关合性能覆盖",
+            "constraints": "20kA",
             "calc_rule": "",
             "derive_from_rated": ""
           },
           {
             "param_name": "关合涌流的频率",
-            "value_text": "Ibi=20kA对应4250Hz（背对背工况）",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "Ibi=20kA对应4250Hz（背对背工况）",
+            "value_text": "4250Hz",
+            "value_expr": "4250Hz",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "4250Hz",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -22604,9 +22604,9 @@
           {
             "param_name": "操作顺序",
             "value_text": "O",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
+            "value_expr": "O",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "O",
             "calc_rule": "",
             "derive_from_rated": ""
@@ -22623,21 +22623,21 @@
           },
           {
             "param_name": "关合涌流",
-            "value_text": "用于背对背电容器组关合性能覆盖",
-            "value_expr": "用于背对背电容器组关合性能覆盖",
+            "value_text": "20kA",
+            "value_expr": "20kA",
             "value_source": "default",
             "value_type": "default",
-            "constraints": "用于背对背电容器组关合性能覆盖",
+            "constraints": "20kA",
             "calc_rule": "",
             "derive_from_rated": ""
           },
           {
             "param_name": "关合涌流的频率",
-            "value_text": "Ibi=20kA对应4250Hz（背对背工况）",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "Ibi=20kA对应4250Hz（背对背工况）",
+            "value_text": "4250Hz",
+            "value_expr": "4250Hz",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "4250Hz",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -22763,9 +22763,9 @@
           {
             "param_name": "操作顺序",
             "value_text": "CO",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
+            "value_expr": "CO",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "CO",
             "calc_rule": "",
             "derive_from_rated": ""
@@ -22782,21 +22782,21 @@
           },
           {
             "param_name": "关合涌流",
-            "value_text": "用于背对背电容器组关合性能覆盖",
-            "value_expr": "用于背对背电容器组关合性能覆盖",
+            "value_text": "20kA",
+            "value_expr": "20kA",
             "value_source": "default",
             "value_type": "default",
-            "constraints": "用于背对背电容器组关合性能覆盖",
+            "constraints": "20kA",
             "calc_rule": "",
             "derive_from_rated": ""
           },
           {
             "param_name": "关合涌流的频率",
-            "value_text": "Ibi=20kA对应4250Hz（背对背工况）",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "Ibi=20kA对应4250Hz（背对背工况）",
+            "value_text": "4250Hz",
+            "value_expr": "4250Hz",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "4250Hz",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -22920,9 +22920,9 @@
           {
             "param_name": "操作顺序",
             "value_text": "CO",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
+            "value_expr": "CO",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "CO",
             "calc_rule": "",
             "derive_from_rated": ""
@@ -22939,21 +22939,21 @@
           },
           {
             "param_name": "关合涌流",
-            "value_text": "用于背对背电容器组关合性能覆盖",
-            "value_expr": "用于背对背电容器组关合性能覆盖",
+            "value_text": "20kA",
+            "value_expr": "20kA",
             "value_source": "default",
             "value_type": "default",
-            "constraints": "用于背对背电容器组关合性能覆盖",
+            "constraints": "20kA",
             "calc_rule": "",
             "derive_from_rated": ""
           },
           {
             "param_name": "关合涌流的频率",
-            "value_text": "Ibi=20kA对应4250Hz（背对背工况）",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
-            "constraints": "Ibi=20kA对应4250Hz（背对背工况）",
+            "value_text": "4250Hz",
+            "value_expr": "4250Hz",
+            "value_source": "default",
+            "value_type": "default",
+            "constraints": "4250Hz",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -23079,9 +23079,9 @@
           {
             "param_name": "操作顺序",
             "value_text": "O",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
+            "value_expr": "O",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "O",
             "calc_rule": "",
             "derive_from_rated": ""
@@ -23206,9 +23206,9 @@
           {
             "param_name": "操作顺序",
             "value_text": "O",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
+            "value_expr": "O",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "O",
             "calc_rule": "",
             "derive_from_rated": ""
@@ -23591,9 +23591,9 @@
           {
             "param_name": "操作顺序",
             "value_text": "O",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
+            "value_expr": "O",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "O",
             "calc_rule": "",
             "derive_from_rated": ""
@@ -23718,9 +23718,9 @@
           {
             "param_name": "操作顺序",
             "value_text": "O",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
+            "value_expr": "O",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "O",
             "calc_rule": "",
             "derive_from_rated": ""
@@ -24093,9 +24093,9 @@
           {
             "param_name": "操作顺序",
             "value_text": "O",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
+            "value_expr": "O",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "O",
             "calc_rule": "",
             "derive_from_rated": ""
@@ -24172,11 +24172,11 @@
           },
           {
             "param_name": "试验相数",
-            "value_text": "默认取值\"单相\"",
-            "value_expr": "默认取值\"单相\"",
+            "value_text": "单相",
+            "value_expr": "单相",
             "value_source": "default",
             "value_type": "default",
-            "constraints": "默认取值\"单相\"",
+            "constraints": "单相",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -24230,9 +24230,9 @@
           {
             "param_name": "操作顺序",
             "value_text": "O",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
+            "value_expr": "O",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "O",
             "calc_rule": "",
             "derive_from_rated": ""
@@ -24309,11 +24309,11 @@
           },
           {
             "param_name": "试验相数",
-            "value_text": "默认取值\"单相\"",
-            "value_expr": "默认取值\"单相\"",
+            "value_text": "单相",
+            "value_expr": "单相",
             "value_source": "default",
             "value_type": "default",
-            "constraints": "默认取值\"单相\"",
+            "constraints": "单相",
             "calc_rule": "",
             "derive_from_rated": ""
           },
@@ -24369,9 +24369,9 @@
           {
             "param_name": "操作顺序",
             "value_text": "CO-O-O",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
+            "value_expr": "CO-O-O",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "CO-O-O",
             "calc_rule": "",
             "derive_from_rated": ""
@@ -24506,9 +24506,9 @@
           {
             "param_name": "操作顺序",
             "value_text": "CO-O-O",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
+            "value_expr": "CO-O-O",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "CO-O-O",
             "calc_rule": "",
             "derive_from_rated": ""
@@ -25757,9 +25757,9 @@
           {
             "param_name": "操作顺序",
             "value_text": "O",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
+            "value_expr": "O",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "O",
             "calc_rule": "",
             "derive_from_rated": ""
@@ -25844,9 +25844,9 @@
           {
             "param_name": "操作顺序",
             "value_text": "O",
-            "value_expr": "",
-            "value_source": "standard",
-            "value_type": "standard",
+            "value_expr": "O",
+            "value_source": "default",
+            "value_type": "default",
             "constraints": "O",
             "calc_rule": "",
             "derive_from_rated": ""
@@ -25928,11 +25928,11 @@
           "param_name": "操作顺序",
           "value_text": "O",
           "value_expr": "O",
-          "value_source": "user_input",
-          "value_type": "user_input",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
-          "derive_from_rated": "O"
+          "derive_from_rated": ""
         },
         {
           "param_name": "额定电压",
@@ -25946,23 +25946,23 @@
         },
         {
           "param_name": "关合涌流",
-          "value_text": "用于背对背电容器组关合性能覆盖",
-          "value_expr": "用于背对背电容器组关合性能覆盖",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用于背对背电容器组关合性能覆盖",
+          "value_text": "20kA",
+          "value_expr": "20kA",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "20kA",
           "calc_rule": "",
-          "derive_from_rated": "用于背对背电容器组关合性能覆盖"
+          "derive_from_rated": ""
         },
         {
           "param_name": "关合涌流的频率",
-          "value_text": "Ibi=20kA对应4250Hz（背对背工况）",
-          "value_expr": "Ibi=20kA对应4250Hz（背对背工况）",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "Ibi=20kA对应4250Hz（背对背工况）",
+          "value_text": "4250Hz",
+          "value_expr": "4250Hz",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "4250Hz",
           "calc_rule": "",
-          "derive_from_rated": "Ibi=20kA对应4250Hz（背对背工况）"
+          "derive_from_rated": ""
         },
         {
           "param_name": "开合容性电流能力的级别",
@@ -26087,11 +26087,11 @@
           "param_name": "操作顺序",
           "value_text": "CO",
           "value_expr": "CO",
-          "value_source": "user_input",
-          "value_type": "user_input",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "CO",
           "calc_rule": "",
-          "derive_from_rated": "CO"
+          "derive_from_rated": ""
         },
         {
           "param_name": "额定电压",
@@ -26105,23 +26105,23 @@
         },
         {
           "param_name": "关合涌流",
-          "value_text": "用于背对背电容器组关合性能覆盖",
-          "value_expr": "用于背对背电容器组关合性能覆盖",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用于背对背电容器组关合性能覆盖",
+          "value_text": "20kA",
+          "value_expr": "20kA",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "20kA",
           "calc_rule": "",
-          "derive_from_rated": "用于背对背电容器组关合性能覆盖"
+          "derive_from_rated": ""
         },
         {
           "param_name": "关合涌流的频率",
-          "value_text": "Ibi=20kA对应4250Hz（背对背工况）",
-          "value_expr": "Ibi=20kA对应4250Hz（背对背工况）",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "Ibi=20kA对应4250Hz（背对背工况）",
+          "value_text": "4250Hz",
+          "value_expr": "4250Hz",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "4250Hz",
           "calc_rule": "",
-          "derive_from_rated": "Ibi=20kA对应4250Hz（背对背工况）"
+          "derive_from_rated": ""
         },
         {
           "param_name": "开合容性电流能力的级别",
@@ -26246,11 +26246,11 @@
           "param_name": "操作顺序",
           "value_text": "O",
           "value_expr": "O",
-          "value_source": "user_input",
-          "value_type": "user_input",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
-          "derive_from_rated": "O"
+          "derive_from_rated": ""
         },
         {
           "param_name": "额定电压",
@@ -26722,11 +26722,11 @@
           "param_name": "操作顺序",
           "value_text": "O",
           "value_expr": "O",
-          "value_source": "user_input",
-          "value_type": "user_input",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
-          "derive_from_rated": "O"
+          "derive_from_rated": ""
         },
         {
           "param_name": "额定电压",
@@ -26969,9 +26969,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "C",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "C",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "C",
           "calc_rule": "",
           "derive_from_rated": ""
@@ -27415,13 +27415,13 @@
         },
         {
           "param_name": "操作顺序",
-          "value_text": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-          "value_expr": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
+          "value_text": "C",
+          "value_expr": "C",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "C",
           "calc_rule": "",
-          "derive_from_rated": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO"
+          "derive_from_rated": ""
         },
         {
           "param_name": "断路器等级",
@@ -27544,13 +27544,13 @@
         },
         {
           "param_name": "操作顺序",
-          "value_text": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-          "value_expr": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO",
+          "value_text": "C",
+          "value_expr": "C",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "C",
           "calc_rule": "",
-          "derive_from_rated": "用户录入额定操作顺序，如果未输入默认为O-0.3s-CO-180s-CO"
+          "derive_from_rated": ""
         },
         {
           "param_name": "断路器等级",
@@ -28147,7 +28147,7 @@
       "report_type": "开合性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "开合容性电流能力的级别==C2，未输入默认C2",
+      "note": "开合容性电流能力的级别==C2，未输入默认C2，但是同时存在 T60则不做该实验",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -28278,11 +28278,11 @@
         },
         {
           "param_name": "电压极性",
-          "value_text": "正极性或负极性",
+          "value_text": "正极性及负极性",
           "value_expr": "",
           "value_source": "standard",
           "value_type": "standard",
-          "constraints": "正极性或负极性",
+          "constraints": "正极性及负极性",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -28536,13 +28536,13 @@
         },
         {
           "param_name": "操作顺序",
-          "value_text": "用户提供特定的按照用户提供额定操作顺序展示",
-          "value_expr": "用户提供特定的按照用户提供额定操作顺序展示",
+          "value_text": "用户提供特定的按照用户提供额定操作顺序展示()",
+          "value_expr": "用户提供特定的按照用户提供额定操作顺序展示()",
           "value_source": "user_input",
           "value_type": "user_input",
-          "constraints": "用户提供特定的按照用户提供额定操作顺序展示",
+          "constraints": "用户提供特定的按照用户提供额定操作顺序展示()",
           "calc_rule": "",
-          "derive_from_rated": "用户提供特定的按照用户提供额定操作顺序展示"
+          "derive_from_rated": "用户提供特定的按照用户提供额定操作顺序展示()"
         },
         {
           "param_name": "断路器等级",
@@ -28782,7 +28782,7 @@
       "report_type": "短路性能型式试验",
       "aliases": [],
       "acceptance_criteria": "",
-      "note": "额定频率==50Hz or 额定频率==50/60Hz",
+      "note": "额定频率==50Hz or 额定频率==50/60Hz\n（三相共箱共机构 也需要执行）",
       "confidence": 1.0,
       "required_reports": [
         {
@@ -29361,11 +29361,11 @@
         },
         {
           "param_name": "首开极系数",
-          "value_text": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
-          "value_expr": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
+          "value_text": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若客户提出首开极系数则按照用户录入进行试验",
+          "value_expr": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若客户提出首开极系数则按照用户录入进行试验",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "40.5kV及以下默认为1.5 p.u，72.5kv及以上默认1.3 p.u，若客户提出首开极系数则按照用户录入进行试验",
+          "constraints": "40.5kV及以下默认为1.5，72.5kv及以上默认1.3，若客户提出首开极系数则按照用户录入进行试验",
           "calc_rule": "",
           "derive_from_rated": ""
         }
@@ -29460,13 +29460,13 @@
         },
         {
           "param_name": "试验工位",
-          "value_text": "默认取值\"老站\"",
-          "value_expr": "默认取值\"老站\"",
-          "value_source": "user_input",
-          "value_type": "user_input",
-          "constraints": "默认取值\"老站\"",
+          "value_text": "老站",
+          "value_expr": "老站",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "老站",
           "calc_rule": "",
-          "derive_from_rated": "默认取值\"老站\""
+          "derive_from_rated": ""
         }
       ],
       "rules": []
@@ -29529,11 +29529,11 @@
         },
         {
           "param_name": "试验部位",
-          "value_text": "默认取值\"主回路\"",
-          "value_expr": "默认取值\"主回路\"",
+          "value_text": "主回路",
+          "value_expr": "主回路",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "默认取值\"主回路\"",
+          "constraints": "主回路",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -29549,11 +29549,11 @@
         },
         {
           "param_name": "试验工位",
-          "value_text": "默认取值\"默认老站\"",
-          "value_expr": "默认取值\"默认老站\"",
+          "value_text": "老站",
+          "value_expr": "老站",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "默认取值\"默认老站\"",
+          "constraints": "老站",
           "calc_rule": "",
           "derive_from_rated": ""
         }
@@ -29618,11 +29618,11 @@
         },
         {
           "param_name": "试验部位",
-          "value_text": "默认取值\"主回路\"",
-          "value_expr": "默认取值\"主回路\"",
+          "value_text": "主回路",
+          "value_expr": "主回路",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "默认取值\"主回路\"",
+          "constraints": "主回路",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -29657,11 +29657,11 @@
       "parameters": [
         {
           "param_name": "试验次数",
-          "value_text": "默认为1次",
+          "value_text": "1次",
           "value_expr": "",
           "value_source": "standard",
           "value_type": "standard",
-          "constraints": "默认为1次",
+          "constraints": "1次",
           "calc_rule": "",
           "derive_from_rated": ""
         }
@@ -30537,11 +30537,11 @@
         },
         {
           "param_name": "试验部位",
-          "value_text": "默认取值\"主回路\"",
-          "value_expr": "默认取值\"主回路\"",
+          "value_text": "主回路",
+          "value_expr": "主回路",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "默认取值\"主回路\"",
+          "constraints": "主回路",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -30616,11 +30616,11 @@
         },
         {
           "param_name": "开关相数",
-          "value_text": "当额定电压是72.5kv或以上时，试品结构为三相共箱时取值三相，试品结构为三相分箱时取值单相",
+          "value_text": "当额定电压是72.5kv或以上时，试品结构为三相共箱时取值为数字\"3\"，试品结构为三相分箱时取值为数字\"1\"",
           "value_expr": "",
           "value_source": "standard",
           "value_type": "standard",
-          "constraints": "当额定电压是72.5kv或以上时，试品结构为三相共箱时取值三相，试品结构为三相分箱时取值单相",
+          "constraints": "当额定电压是72.5kv或以上时，试品结构为三相共箱时取值为数字\"3\"，试品结构为三相分箱时取值为数字\"1\"",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -30726,9 +30726,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "O",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "O",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
           "derive_from_rated": ""
@@ -30745,21 +30745,21 @@
         },
         {
           "param_name": "关合涌流",
-          "value_text": "用于背对背电容器组关合性能覆盖",
-          "value_expr": "用于背对背电容器组关合性能覆盖",
+          "value_text": "20kA",
+          "value_expr": "20kA",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "用于背对背电容器组关合性能覆盖",
+          "constraints": "20kA",
           "calc_rule": "",
           "derive_from_rated": ""
         },
         {
           "param_name": "关合涌流的频率",
-          "value_text": "Ibi=20kA对应4250Hz（背对背工况）",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "Ibi=20kA对应4250Hz（背对背工况）",
+          "value_text": "4250Hz",
+          "value_expr": "4250Hz",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "4250Hz",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -30885,9 +30885,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "CO",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "CO",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "CO",
           "calc_rule": "",
           "derive_from_rated": ""
@@ -30904,21 +30904,21 @@
         },
         {
           "param_name": "关合涌流",
-          "value_text": "用于背对背电容器组关合性能覆盖",
-          "value_expr": "用于背对背电容器组关合性能覆盖",
+          "value_text": "20kA",
+          "value_expr": "20kA",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "用于背对背电容器组关合性能覆盖",
+          "constraints": "20kA",
           "calc_rule": "",
           "derive_from_rated": ""
         },
         {
           "param_name": "关合涌流的频率",
-          "value_text": "Ibi=20kA对应4250Hz（背对背工况）",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
-          "constraints": "Ibi=20kA对应4250Hz（背对背工况）",
+          "value_text": "4250Hz",
+          "value_expr": "4250Hz",
+          "value_source": "default",
+          "value_type": "default",
+          "constraints": "4250Hz",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -31044,9 +31044,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "O",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "O",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
           "derive_from_rated": ""
@@ -31302,9 +31302,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "O",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "O",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
           "derive_from_rated": ""
@@ -31550,9 +31550,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "O",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "O",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
           "derive_from_rated": ""
@@ -31629,11 +31629,11 @@
         },
         {
           "param_name": "试验相数",
-          "value_text": "默认取值\"单相\"",
-          "value_expr": "默认取值\"单相\"",
+          "value_text": "单相",
+          "value_expr": "单相",
           "value_source": "default",
           "value_type": "default",
-          "constraints": "默认取值\"单相\"",
+          "constraints": "单相",
           "calc_rule": "",
           "derive_from_rated": ""
         },
@@ -31689,9 +31689,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "CO-O-O",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "CO-O-O",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "CO-O-O",
           "calc_rule": "",
           "derive_from_rated": ""
@@ -32402,9 +32402,9 @@
         {
           "param_name": "操作顺序",
           "value_text": "O",
-          "value_expr": "",
-          "value_source": "standard",
-          "value_type": "standard",
+          "value_expr": "O",
+          "value_source": "default",
+          "value_type": "default",
           "constraints": "O",
           "calc_rule": "",
           "derive_from_rated": ""

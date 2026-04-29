@@ -7,7 +7,7 @@
       "standard": "gb",
       "test_item": "工频耐受电压试验",
       "status": "active",
-      "remove_original": true,
+      "remove_original": false,
       "inputs": {
         "base_voltage_labels": [
           "额定短时工频耐受电压",
@@ -67,7 +67,7 @@
                 "source": "query",
                 "type": "greater_or_equal_numeric",
                 "label": "额定电压",
-                "value": 72.5,
+                "value": 363,
                 "unit": "kV"
               }
             ]
@@ -252,7 +252,7 @@
                 "source": "query",
                 "type": "greater_or_equal_numeric",
                 "label": "额定电压",
-                "value": 72.5,
+                "value": 363,
                 "unit": "kV"
               }
             ]
@@ -294,20 +294,18 @@
               "type": "contains",
               "label": "短路性能型式试验"
             },
-            {
-              "source": "query",
-              "type": "less_or_equal_numeric",
-              "label": "额定电压",
-              "value": 40.5,
-              "unit": "kV"
-            }
+              {
+                "source": "query",
+                "type": "regex_match",
+                "pattern": "电寿命(?:等级)?[（(]?(?:自动重合闸|非自动重合闸)?[)）]?(?:等级)?\\s*[:：]?\\s*E2|E2\\s*(?:级)?电寿命(?:等级)?"
+              }
           ]
         }
       ],
       "deny_when_no_match": true
     },
     {
-      "rule_id": "short_circuit.gb.electrical_life_split_30",
+      "rule_id": "short_circuit.gb.electrical_life_split",
       "domain": "short_circuit",
       "kind": "split",
       "standard": "gb",
@@ -325,15 +323,8 @@
               },
               {
                 "source": "query",
-                "type": "less_or_equal_numeric",
-                "label": "额定电压",
-                "value": 40.5,
-                "unit": "kV"
-              },
-              {
-                "source": "query",
                 "type": "regex_match",
-                "pattern": "电寿命(?:试验|等级)?(?:[^\\n]{0,20})?30次|30次(?:[^\\n]{0,20})?电寿命(?:试验|等级)?"
+                "pattern": "电寿命(?:等级)?[（(]?(?:自动重合闸|非自动重合闸)?[)）]?(?:等级)?\\s*[:：]?\\s*E2|E2\\s*(?:级)?电寿命(?:等级)?"
               }
             ]
           }
@@ -365,145 +356,7 @@
           "inherits_from": "电寿命试验",
           "parameter_overrides": {
             "操作顺序": "O-0.3s-CO-180s-CO",
-            "试验次数": "1次"
-          }
-        }
-      ]
-    },
-    {
-      "rule_id": "short_circuit.gb.electrical_life_split_50",
-      "domain": "short_circuit",
-      "kind": "split",
-      "standard": "gb",
-      "test_item": "电寿命试验",
-      "status": "active",
-      "inputs": {
-        "trigger_when_any": [
-          {
-            "type": "all",
-            "conditions": [
-              {
-                "source": "query",
-                "type": "contains",
-                "label": "短路性能型式试验"
-              },
-              {
-                "source": "query",
-                "type": "less_or_equal_numeric",
-                "label": "额定电压",
-                "value": 40.5,
-                "unit": "kV"
-              },
-              {
-                "source": "query",
-                "type": "regex_match",
-                "pattern": "电寿命(?:试验|等级)?(?:[^\\n]{0,20})?50次|50次(?:[^\\n]{0,20})?电寿命(?:试验|等级)?"
-              }
-            ]
-          }
-        ]
-      },
-      "single_output": {
-        "test_item": "电寿命试验",
-        "parameter_overrides": {}
-      },
-      "split_output": [
-        {
-          "test_item": "电寿命(单分)",
-          "inherits_from": "电寿命试验",
-          "parameter_overrides": {
-            "操作顺序": "O",
-            "试验次数": "23次"
-          }
-        },
-        {
-          "test_item": "电寿命(合分)",
-          "inherits_from": "电寿命试验",
-          "parameter_overrides": {
-            "操作顺序": "CO",
-            "试验次数": "21次"
-          }
-        },
-        {
-          "test_item": "电寿命(循环)",
-          "inherits_from": "电寿命试验",
-          "parameter_overrides": {
-            "操作顺序": "O-180s-CO-180s-CO",
-            "试验次数": "1次"
-          }
-        }
-      ]
-    },
-    {
-      "rule_id": "short_circuit.gb.electrical_life_split",
-      "domain": "short_circuit",
-      "kind": "split",
-      "standard": "gb",
-      "test_item": "电寿命试验",
-      "status": "active",
-      "inputs": {
-        "trigger_when_any": [
-          {
-            "type": "all",
-            "conditions": [
-              {
-                "source": "query",
-                "type": "contains",
-                "label": "短路性能型式试验"
-              },
-              {
-                "source": "query",
-                "type": "less_or_equal_numeric",
-                "label": "额定电压",
-                "value": 40.5,
-                "unit": "kV"
-              },
-              {
-                "source": "query",
-                "type": "regex_match",
-                "pattern": "电寿命(?:等级)?[（(]?(?:自动重合闸|非自动重合闸)?[)）]?(?:等级)?\\s*[:：]?\\s*E2|E2\\s*(?:级)?电寿命(?:等级)?"
-              },
-              {
-                "source": "query",
-                "type": "not_contains",
-                "label": "30次"
-              },
-              {
-                "source": "query",
-                "type": "not_contains",
-                "label": "50次"
-              }
-            ]
-          }
-        ]
-      },
-      "single_output": {
-        "test_item": "电寿命试验",
-        "parameter_overrides": {}
-      },
-      "split_output": [
-        {
-          "test_item": "电寿命(单分)",
-          "inherits_from": "电寿命试验",
-          "parameter_overrides": {
-            "操作顺序": "O",
-            "试验次数": "8次"
-          }
-        },
-        {
-          "test_item": "电寿命(合分)",
-          "inherits_from": "电寿命试验",
-          "parameter_overrides": {
-            "操作顺序": "CO",
-            "试验次数": "6次"
-          }
-        },
-        {
-          "test_item": "电寿命(循环)",
-          "inherits_from": "电寿命试验",
-          "parameter_overrides": {
-            "操作顺序": "O-180s-CO-180s-CO",
-            "试验次数": "1次"
+            "试验次数": "2次"
           }
         }
       ]
@@ -1697,7 +1550,7 @@
                 "source": "query",
                 "type": "greater_numeric",
                 "label": "额定电压",
-                "value": 252,
+                "value": 363,
                 "unit": "kV"
               }
             ]
