@@ -1988,7 +1988,9 @@ def _evaluate_domain_rule_decisions(
         if raw_rule_standard:
             normalized_raw_standard = _normalize_operate_standard_type(raw_rule_standard)
             if normalized_raw_standard and normalized_raw_standard != stand_type:
-                continue
+                # DLT 标准下允许复用 GB 规则（domain_rules 中尚无独立的 dlt 规则时）
+                if not (stand_type == "DLT" and normalized_raw_standard == "GB"):
+                    continue
 
         if not _rule_matches_current_scope(raw_rule):
             continue
@@ -2765,7 +2767,7 @@ def _apply_domain_rule_decisions_to_project_context(
         for label in labels:
             pattern = (
                 rf"{re.escape(label)}\s*(?:[:：=]\s*)?"
-                rf"([0-9\.\+\(\)\s]+?)\s*(?:kV\b|$)"
+                rf"([0-9\.\+\(\)\s]+?)\s*(?:kV\b|[,，、\s]|$)"
             )
             match = re.search(pattern, normalized, flags=re.IGNORECASE)
             if not match:
@@ -2833,6 +2835,12 @@ def _apply_domain_rule_decisions_to_project_context(
             return "三相", "问题中明确提到三相断路器/三相试验，按三相计算。"
         if re.search(r"单相\s*断路器|单相\s*试验", normalized):
             return "单相", "问题中明确提到单相断路器/单相试验，按单相计算。"
+
+        # # 检查断路器结构关键词：共箱 → 三相，分箱 → 单相
+        # if re.search(r"(?:三相)?共箱", normalized):
+        #     return "三相", "用户声明共箱结构，按三相试验计算。"
+        # if re.search(r"(?:三相)?分箱", normalized):
+        #     return "单相", "用户声明分箱结构，按单相试验计算。"
 
         single_count = len(re.findall(r"单相", normalized))
         three_count = len(re.findall(r"三相", normalized))
@@ -5006,6 +5014,7 @@ def _apply_domain_rule_decisions_to_project_context(
         "工频耐受电压试验(湿)",
         "工频耐受电压试验(断口)",
         "工频耐受电压试验(相间及对地)",
+        "工频耐受电压试验(联合电压)",
         "作为状态检查的工频耐受电压试验",
         "雷电冲击耐受电压试验",
         "雷电冲击耐受电压试验(联合电压)",
@@ -5423,8 +5432,8 @@ def _apply_domain_rule_decisions_to_project_context(
             {
                 "base_name": "电寿命试验(60%)",
                 "suffixes": [
-                    ("#单分", "O", "2次"),
-                    ("#循环", "O-0.3s-CO-180s-CO", "2次"),
+                    ("#O", "O", "2次"),
+                    ("#O-CO-CO", "O-0.3s-CO-180s-CO", "2次"),
                 ],
                 "short_circuit_checks": ["短路开断试验(T60)", "T60(60Hz)"],
                 "current_ratio": 0.6,
@@ -5433,9 +5442,9 @@ def _apply_domain_rule_decisions_to_project_context(
             {
                 "base_name": "电寿命试验(30%)",
                 "suffixes": [
-                    ("#单分", "O", "84次"),
-                    ("#合分", "O-0.3s-CO", "14次"),
-                    ("#循环", "O-0.3s-CO-180s-CO", "6次"),
+                    ("#O", "O", "84次"),
+                    ("#O-CO", "O-0.3s-CO", "14次"),
+                    ("#O-CO-CO", "O-0.3s-CO-180s-CO", "6次"),
                 ],
                 "short_circuit_checks": ["短路开断试验(T30)", "T30(60Hz)"],
                 "current_ratio": 0.3,
@@ -5444,9 +5453,9 @@ def _apply_domain_rule_decisions_to_project_context(
             {
                 "base_name": "电寿命试验(10%)",
                 "suffixes": [
-                    ("#单分", "O", "84次"),
-                    ("#合分", "O-0.3s-CO", "14次"),
-                    ("#循环", "O-0.3s-CO-180s-CO", "6次"),
+                    ("#O", "O", "84次"),
+                    ("#O-CO", "O-0.3s-CO", "14次"),
+                    ("#O-CO-CO", "O-0.3s-CO-180s-CO", "6次"),
                 ],
                 "short_circuit_checks": ["短路开断试验(T10)", "T10(60Hz)"],
                 "current_ratio": 0.1,
@@ -6017,21 +6026,20 @@ def _get_report_scope_test_whitelist(stand_type: str | None = None) -> dict[str,
     # so do NOT reassign the variable.
     if normalized == "IEC":
         insulation_tests.discard("局部放电试验")
-        insulation_tests.discard("电寿命试验")
         short_tests.update({
             "电寿命试验(100%)",
-            "电寿命试验(100%)#循环",
+            "电寿命试验(100%)#O-CO-CO",
             "电寿命试验(60%)",
-            "电寿命试验(60%)#单分",
-            "电寿命试验(60%)#循环",
+            "电寿命试验(60%)#O",
+            "电寿命试验(60%)#O-CO-CO",
             "电寿命试验(30%)",
             "电寿命试验(30%)#O",
-            "电寿命试验(30%)#合分",
-            "电寿命试验(30%)#循环",
+            "电寿命试验(30%)#O-CO",
+            "电寿命试验(30%)#O-CO-CO",
             "电寿命试验(10%)",
-            "电寿命试验(10%)#单分",
-            "电寿命试验(10%)#合分",
-            "电寿命试验(10%)#循环",
+            "电寿命试验(10%)#O",
+            "电寿命试验(10%)#O-CO",
+            "电寿命试验(10%)#O-CO-CO",
         })
     elif normalized == "DLT":
         insulation_tests.discard("局部放电试验")
@@ -6762,7 +6770,7 @@ def _build_electrical_a_section_note_patch(
         "LC1，LC2可被CC1、CC2覆盖" not in existing_text
         and "LC1,LC2可被CC1、CC2覆盖" not in existing_text
     ):
-        notes.append("LC1，LC2可被CC1、CC2覆盖\n")
+        notes.append("LC1，LC2可被CC1、CC2覆盖")
 
     rule_query_text = str(metadata.get("rule_query_text", "") or "")
     rated_voltage_match = re.search(
@@ -6778,7 +6786,7 @@ def _build_electrical_a_section_note_patch(
         and rated_voltage_kv >= 72.5
         and "失步关合和开断试验(OP1)试验可免做" not in existing_text
     ):
-        notes.append("失步关合和开断试验(OP1)试验可免做\n")
+        notes.append("失步关合和开断试验(OP1)试验可免做")
 
     return notes
 
