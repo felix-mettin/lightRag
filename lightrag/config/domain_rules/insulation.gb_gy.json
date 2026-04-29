@@ -1184,7 +1184,7 @@
         {
           "source": "query",
           "type": "regex_match",
-          "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
+          "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -1288,7 +1288,7 @@
         {
           "source": "query",
           "type": "regex_match",
-          "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
+          "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -1392,7 +1392,7 @@
         {
           "source": "query",
           "type": "regex_match",
-          "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
+          "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -1498,7 +1498,7 @@
         {
           "source": "query",
           "type": "regex_match",
-          "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
+          "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -1908,7 +1908,7 @@
         {
           "source": "query",
           "type": "regex_match",
-          "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
+          "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2014,7 +2014,7 @@
         {
           "source": "query",
           "type": "regex_match",
-          "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
+          "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
