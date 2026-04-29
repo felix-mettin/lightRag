@@ -278,237 +278,6 @@
       ]
     },
     {
-      "rule_id": "short_circuit.gb.electrical_life_applicability",
-      "domain": "short_circuit",
-      "kind": "applicability",
-      "standard": "gb",
-      "test_item": "电寿命试验",
-      "status": "active",
-      "allow_when_any": [
-        {
-          "source": "query",
-          "type": "all",
-          "conditions": [
-            {
-              "source": "query",
-              "type": "contains",
-              "label": "短路性能型式试验"
-            },
-            {
-              "source": "query",
-              "type": "less_or_equal_numeric",
-              "label": "额定电压",
-              "value": 40.5,
-              "unit": "kV"
-            }
-          ]
-        }
-      ],
-      "deny_when_no_match": true
-    },
-    {
-      "rule_id": "short_circuit.gb.electrical_life_split_30",
-      "domain": "short_circuit",
-      "kind": "split",
-      "standard": "gb",
-      "test_item": "电寿命试验",
-      "status": "active",
-      "inputs": {
-        "trigger_when_any": [
-          {
-            "type": "all",
-            "conditions": [
-              {
-                "source": "query",
-                "type": "contains",
-                "label": "短路性能型式试验"
-              },
-              {
-                "source": "query",
-                "type": "less_or_equal_numeric",
-                "label": "额定电压",
-                "value": 40.5,
-                "unit": "kV"
-              },
-              {
-                "source": "query",
-                "type": "regex_match",
-                "pattern": "电寿命(?:试验|等级)?(?:[^\\n]{0,20})?30次|30次(?:[^\\n]{0,20})?电寿命(?:试验|等级)?"
-              }
-            ]
-          }
-        ]
-      },
-      "single_output": {
-        "test_item": "电寿命试验",
-        "parameter_overrides": {}
-      },
-      "split_output": [
-        {
-          "test_item": "电寿命(单分)",
-          "inherits_from": "电寿命试验",
-          "parameter_overrides": {
-            "操作顺序": "O",
-            "试验次数": "13次"
-          }
-        },
-        {
-          "test_item": "电寿命(合分)",
-          "inherits_from": "电寿命试验",
-          "parameter_overrides": {
-            "操作顺序": "CO",
-            "试验次数": "11次"
-          }
-        },
-        {
-          "test_item": "电寿命(循环)",
-          "inherits_from": "电寿命试验",
-          "parameter_overrides": {
-            "操作顺序": "O-0.3s-CO-180s-CO",
-            "试验次数": "1次"
-          }
-        }
-      ]
-    },
-    {
-      "rule_id": "short_circuit.gb.electrical_life_split_50",
-      "domain": "short_circuit",
-      "kind": "split",
-      "standard": "gb",
-      "test_item": "电寿命试验",
-      "status": "active",
-      "inputs": {
-        "trigger_when_any": [
-          {
-            "type": "all",
-            "conditions": [
-              {
-                "source": "query",
-                "type": "contains",
-                "label": "短路性能型式试验"
-              },
-              {
-                "source": "query",
-                "type": "less_or_equal_numeric",
-                "label": "额定电压",
-                "value": 40.5,
-                "unit": "kV"
-              },
-              {
-                "source": "query",
-                "type": "regex_match",
-                "pattern": "电寿命(?:试验|等级)?(?:[^\\n]{0,20})?50次|50次(?:[^\\n]{0,20})?电寿命(?:试验|等级)?"
-              }
-            ]
-          }
-        ]
-      },
-      "single_output": {
-        "test_item": "电寿命试验",
-        "parameter_overrides": {}
-      },
-      "split_output": [
-        {
-          "test_item": "电寿命(单分)",
-          "inherits_from": "电寿命试验",
-          "parameter_overrides": {
-            "操作顺序": "O",
-            "试验次数": "23次"
-          }
-        },
-        {
-          "test_item": "电寿命(合分)",
-          "inherits_from": "电寿命试验",
-          "parameter_overrides": {
-            "操作顺序": "CO",
-            "试验次数": "21次"
-          }
-        },
-        {
-          "test_item": "电寿命(循环)",
-          "inherits_from": "电寿命试验",
-          "parameter_overrides": {
-            "操作顺序": "O-180s-CO-180s-CO",
-            "试验次数": "1次"
-          }
-        }
-      ]
-    },
-    {
-      "rule_id": "short_circuit.gb.electrical_life_split",
-      "domain": "short_circuit",
-      "kind": "split",
-      "standard": "gb",
-      "test_item": "电寿命试验(100%)",
-      "status": "active",
-      "inputs": {
-        "trigger_when_any": [
-          {
-            "type": "all",
-            "conditions": [
-              {
-                "source": "query",
-                "type": "contains",
-                "label": "短路性能型式试验"
-              },
-              {
-                "source": "query",
-                "type": "less_or_equal_numeric",
-                "label": "额定电压",
-                "value": 40.5,
-                "unit": "kV"
-              },
-              {
-                "source": "query",
-                "type": "regex_match",
-                "pattern": "电寿命(?:等级)?[（(]?(?:自动重合闸|非自动重合闸)?[)）]?(?:等级)?\\s*[:：]?\\s*E2|E2\\s*(?:级)?电寿命(?:等级)?"
-              },
-              {
-                "source": "query",
-                "type": "not_contains",
-                "label": "30次"
-              },
-              {
-                "source": "query",
-                "type": "not_contains",
-                "label": "50次"
-              }
-            ]
-          }
-        ]
-      },
-      "single_output": {
-        "test_item": "电寿命试验",
-        "parameter_overrides": {}
-      },
-      "split_output": [
-        {
-          "test_item": "电寿命(单分)",
-          "inherits_from": "电寿命试验",
-          "parameter_overrides": {
-            "操作顺序": "O",
-            "试验次数": "8次"
-          }
-        },
-        {
-          "test_item": "电寿命(合分)",
-          "inherits_from": "电寿命试验",
-          "parameter_overrides": {
-            "操作顺序": "CO",
-            "试验次数": "6次"
-          }
-        },
-        {
-          "test_item": "电寿命(循环)",
-          "inherits_from": "电寿命试验",
-          "parameter_overrides": {
-            "操作顺序": "O-180s-CO-180s-CO",
-            "试验次数": "1次"
-          }
-        }
-      ]
-    },
-    {
       "rule_id": "short_circuit.gb.op1_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
@@ -4148,19 +3917,15 @@
               {
                 "source": "query",
                 "type": "regex_match",
-                "pattern": "^(?!.*断路器等级\\s*(?:(?:[:：=]|为|是)\\s*)?E1(?:级)?).*"
+                "pattern": "电寿命(?![^\\n]{0,20}E1)"
               }
             ]
           }
         ]
       },
-      "single_output": {
-        "test_item": "电寿命试验(100%)",
-        "parameter_overrides": {}
-      },
       "split_output": [
         {
-          "test_item": "电寿命试验(100%)#O-CO-CO",
+          "test_item": "电寿命试验(100%)#循环",
           "inherits_from": "电寿命试验(100%)",
           "parameter_overrides": {
             "操作顺序": "O-0.3s-CO-180s-CO",
@@ -4197,7 +3962,7 @@
               {
                 "source": "query",
                 "type": "regex_match",
-                "pattern": "^(?!.*断路器等级\\s*(?:(?:[:：=]|为|是)\\s*)?E1(?:级)?).*"
+                "pattern": "电寿命(?![^\\n]{0,20}E1)"
               }
             ]
           }
@@ -4209,7 +3974,7 @@
       },
       "split_output": [
         {
-          "test_item": "电寿命试验(60%)#O",
+          "test_item": "电寿命试验(60%)#单分",
           "inherits_from": "电寿命试验(60%)",
           "parameter_overrides": {
             "操作顺序": "O",
@@ -4217,7 +3982,7 @@
           }
         },
         {
-          "test_item": "电寿命试验(60%)#O-CO-CO",
+          "test_item": "电寿命试验(60%)#循环",
           "inherits_from": "电寿命试验(60%)",
           "parameter_overrides": {
             "操作顺序": "O-0.3s-CO-180s-CO",
@@ -4254,7 +4019,7 @@
               {
                 "source": "query",
                 "type": "regex_match",
-                "pattern": "^(?!.*断路器等级\\s*(?:(?:[:：=]|为|是)\\s*)?E1(?:级)?).*"
+                "pattern": "电寿命(?![^\\n]{0,20}E1)"
               }
             ]
           }
@@ -4266,7 +4031,7 @@
       },
       "split_output": [
         {
-          "test_item": "电寿命试验(30%)#O",
+          "test_item": "电寿命试验(30%)#单分",
           "inherits_from": "电寿命试验(30%)",
           "parameter_overrides": {
             "操作顺序": "O",
@@ -4274,7 +4039,7 @@
           }
         },
         {
-          "test_item": "电寿命试验(30%)#O-CO",
+          "test_item": "电寿命试验(30%)#合分",
           "inherits_from": "电寿命试验(30%)",
           "parameter_overrides": {
             "操作顺序": "O-0.3s-CO",
@@ -4282,7 +4047,7 @@
           }
         },
         {
-          "test_item": "电寿命试验(30%)#O-CO-CO",
+          "test_item": "电寿命试验(30%)#循环",
           "inherits_from": "电寿命试验(30%)",
           "parameter_overrides": {
             "操作顺序": "O-0.3s-CO-180s-CO",
@@ -4319,7 +4084,7 @@
               {
                 "source": "query",
                 "type": "regex_match",
-                "pattern": "^(?!.*断路器等级\\s*(?:(?:[:：=]|为|是)\\s*)?E1(?:级)?).*"
+                "pattern": "电寿命(?![^\\n]{0,20}E1)"
               }
             ]
           }
@@ -4331,7 +4096,7 @@
       },
       "split_output": [
         {
-          "test_item": "电寿命试验(10%)#O",
+          "test_item": "电寿命试验(10%)#单分",
           "inherits_from": "电寿命试验(10%)",
           "parameter_overrides": {
             "操作顺序": "O",
@@ -4339,7 +4104,7 @@
           }
         },
         {
-          "test_item": "电寿命试验(10%)#O-CO",
+          "test_item": "电寿命试验(10%)#合分",
           "inherits_from": "电寿命试验(10%)",
           "parameter_overrides": {
             "操作顺序": "O-0.3s-CO",
@@ -4347,7 +4112,7 @@
           }
         },
         {
-          "test_item": "电寿命试验(10%)#O-CO-CO",
+          "test_item": "电寿命试验(10%)#循环",
           "inherits_from": "电寿命试验(10%)",
           "parameter_overrides": {
             "操作顺序": "O-0.3s-CO-180s-CO",
