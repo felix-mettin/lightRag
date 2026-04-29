@@ -6222,7 +6222,7 @@ def _get_report_scope_test_whitelist(stand_type: str | None = None) -> dict[str,
             "CC2(60Hz)",
             "LC1(60Hz)",
             "LC2(60Hz)",
-            "作为状态检查的T10试验"
+            
         }
     short_tests = {
             "短时耐受电流试验",
