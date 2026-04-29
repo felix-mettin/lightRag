@@ -7,7 +7,7 @@
       "standard": "gb",
       "test_item": "工频耐受电压试验",
       "status": "active",
-      "remove_original": false,
+      "remove_original": true,
       "inputs": {
         "base_voltage_labels": [
           "额定短时工频耐受电压",
@@ -44,7 +44,7 @@
           "test_item": "工频耐受电压试验(断口)",
           "inherits_from": "工频耐受电压试验",
           "parameter_overrides": {
-            "试验部位": "开关断口",
+            "试验部位": "断口",
             "试验状态": "干"
           }
         }
@@ -57,7 +57,7 @@
       "standard": "gb",
       "test_item": "工频耐受电压试验",
       "status": "active",
-      "remove_original": false,
+      "remove_original": true,
       "inputs": {
         "trigger_when_any": [
           {
@@ -71,6 +71,17 @@
                 "unit": "kV"
               }
             ]
+          }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "has_any_numeric_label",
+            "labels": [
+              "额定短时工频耐受电压(断口)",
+              "额定工频耐受电压(断口)"
+            ],
+            "unit": "kV"
           }
         ]
       },
@@ -229,7 +240,7 @@
           "test_item": "雷电冲击耐受电压试验(断口)",
           "inherits_from": "雷电冲击耐受电压试验",
           "parameter_overrides": {
-            "试验部位": "开关断口",
+            "试验部位": "断口",
             "试验状态": "干"
           }
         }
@@ -242,7 +253,7 @@
       "standard": "gb",
       "test_item": "雷电冲击耐受电压试验",
       "status": "active",
-      "remove_original": false,
+      "remove_original": true,
       "inputs": {
         "trigger_when_any": [
           {
@@ -256,6 +267,16 @@
                 "unit": "kV"
               }
             ]
+          }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "has_any_numeric_label",
+            "labels": [
+              "额定雷电冲击耐受电压(断口)"
+            ],
+            "unit": "kV"
           }
         ]
       },
@@ -462,7 +483,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -485,7 +506,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -727,7 +748,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -1434,7 +1455,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?"
         }
        ],
         "inputs": {
@@ -1555,6 +1576,16 @@
               }
             ]
           }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "has_any_numeric_label",
+            "labels": [
+              "额定操作冲击耐受电压(断口)"
+            ],
+            "unit": "kV"
+          }
         ]
       },
       "single_output": {
@@ -1673,15 +1704,8 @@
               "source": "query",
               "type": "less_or_equal_numeric",
               "label": "额定电压",
-              "value": 40.5,
+              "value": 72.5,
               "unit": "kV"
-            },
-            {
-              "source": "query",
-              "type": "contains_any",
-              "labels": [
-                "真空"
-              ]
             }
           ]
         }
@@ -1709,15 +1733,8 @@
               "source": "query",
               "type": "less_or_equal_numeric",
               "label": "额定电压",
-              "value": 40.5,
+              "value": 72.5,
               "unit": "kV"
-            },
-            {
-              "source": "query",
-              "type": "contains_any",
-              "labels": [
-                "真空"
-              ]
             }
           ]
         }
@@ -2011,13 +2028,13 @@
       "domain": "switching",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "BC1(60HZ)",
+      "test_item": "BC1(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2051,13 +2068,13 @@
       "domain": "switching",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "BC2(60HZ)",
+      "test_item": "BC2(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2091,13 +2108,13 @@
       "domain": "switching",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "CC1(60HZ)",
+      "test_item": "CC1(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2195,13 +2212,13 @@
       "domain": "switching",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "CC2(60HZ)",
+      "test_item": "CC2(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2255,13 +2272,13 @@
       "domain": "short_circuit",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "L75(60HZ)",
+      "test_item": "L75(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2403,13 +2420,13 @@
       "domain": "short_circuit",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "L90(60HZ)",
+      "test_item": "L90(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2551,13 +2568,13 @@
       "domain": "switching",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "LC1(60HZ)",
+      "test_item": "LC1(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2662,13 +2679,13 @@
       "domain": "switching",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "LC2(60HZ)",
+      "test_item": "LC2(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2817,7 +2834,7 @@
               "type": "equals_numeric",
               "label": "额定频率",
               "value": 60.0,
-              "unit": "HZ"
+              "unit": "Hz"
             }
           ]
         }
@@ -2829,13 +2846,13 @@
       "domain": "short_circuit",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "T100A(60HZ)",
+      "test_item": "T100A(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2858,13 +2875,13 @@
       "domain": "short_circuit",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "T100S(60HZ)",
+      "test_item": "T100S(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2920,7 +2937,7 @@
             {
               "source": "query",
           "type": "regex_match",
-          "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+          "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "deny_when_no_match": true
@@ -2968,7 +2985,7 @@
           {
             "source": "query",
             "type": "regex_match",
-            "pattern": "(?s)^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+            "pattern": "(?s)^(?!.*额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?).*$"
           }
         ]
       },
@@ -3040,7 +3057,7 @@
           {
             "source": "query",
             "type": "regex_match",
-            "pattern": "(?s)^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+            "pattern": "(?s)^(?!.*额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?).*$"
           }
         ]
       },
@@ -3091,7 +3108,7 @@
             {
               "source": "query",
           "type": "regex_match",
-          "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+          "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "deny_when_no_match": true
@@ -3139,7 +3156,7 @@
           {
             "source": "query",
             "type": "regex_match",
-            "pattern": "(?s)^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+            "pattern": "(?s)^(?!.*额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?).*$"
           }
         ]
       },
@@ -3202,7 +3219,7 @@
           {
             "source": "query",
             "type": "regex_match",
-            "pattern": "(?s)^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+            "pattern": "(?s)^(?!.*额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?).*$"
           }
         ]
       },
@@ -3408,7 +3425,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -3568,13 +3585,13 @@
       "domain": "short_circuit",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "T60(60HZ)",
+      "test_item": "T60(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -3695,7 +3712,7 @@
           {
             "source": "query",
             "type": "regex_match",
-            "pattern": "(?s)^(?!.*额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz).*$"
+            "pattern": "(?s)^(?!.*额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?).*$"
           }
         ]
       },
@@ -3720,7 +3737,7 @@
       "domain": "short_circuit",
       "kind": "split",
       "standard": "gb",
-      "test_item": "T100A(60HZ)",
+      "test_item": "T100A(60Hz)",
       "status": "active",
       "remove_original": true,
       "inputs": {
@@ -3758,13 +3775,13 @@
         ]
       },
       "single_output": {
-        "test_item": "T100A(60HZ)",
+        "test_item": "T100A(60Hz)",
         "parameter_overrides": {}
       },
       "split_output": [
         {
-          "test_item": "T100A(60HZ)#共箱共机构",
-          "inherits_from": "T100A(60HZ)",
+          "test_item": "T100A(60Hz)#共箱共机构",
+          "inherits_from": "T100A(60Hz)",
           "parameter_overrides": {
             "试验相数": "三相",
             "操作顺序": "O",
@@ -3890,7 +3907,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -3919,7 +3936,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -3994,13 +4011,13 @@
       "domain": "temperature_rise",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "温升试验(60HZ)",
+      "test_item": "温升试验(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+              "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
             }
       ],
       "allow_when_any": [

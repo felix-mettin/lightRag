@@ -2107,13 +2107,6 @@ def _evaluate_domain_rule_decisions(
     for raw_rule in rules:
         if not isinstance(raw_rule, dict):
             continue
-        # If the rule explicitly targets a standard (gb/iec/dlt/etc.), skip it
-        # when the current evaluation stand_type is provided and does not match.
-        raw_rule_standard = str(raw_rule.get("standard", "") or "").strip()
-        if raw_rule_standard:
-            normalized_raw_standard = _normalize_operate_standard_type(raw_rule_standard)
-            if normalized_raw_standard and normalized_raw_standard != stand_type:
-                continue
 
         if not _rule_matches_current_scope(raw_rule):
             continue
@@ -6242,7 +6235,7 @@ def _get_report_scope_test_whitelist(stand_type: str | None = None) -> dict[str,
             "CC2(60Hz)",
             "LC1(60Hz)",
             "LC2(60Hz)",
-            
+
         }
     short_tests = {
             "短时耐受电流试验",
@@ -12769,6 +12762,87 @@ async def kg_query(
         stand_type or global_config.get("addon_params", {}).get("standard_type")
     )
     print("22222222222222222222222stand_type:", stand_type)
+    stand_type or global_config.get("addon_params", {}).get("standard_type")
+
+    # 真空断路器 + DLT 标准：替换 query 中的绝缘电压值为标准表值
+    if stand_type == "DLT" and "真空" in query:
+        rated_v_match = re.search(r"额定电压\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*kV", query)
+        if rated_v_match:
+            try:
+                from lightrag.dlt_voltage_extract import get_insulation_ge, extract_datas
+
+                rated_v = float(rated_v_match.group(1))
+                logger.info(f"额定电压:{rated_v}")
+                # 获取完整绝缘数据（包含所有字段的原始解析结果）
+                raw_data = get_insulation_ge(rated_v, extract_datas)
+                logger.info(f"raw_data:{raw_data}")
+
+                # 构建 {bare_key: {断口值, 非断口值}} 映射
+                # bare_key = 去掉括号内容后的名称，如"额定工频短时耐受电压"
+                fracture_keys = {"断口", "隔离", "闸口"}
+
+
+                def _bare_key(k: str) -> str:
+                    return re.sub(r"\s*\([^)]*\)\s*", "", k.strip())
+
+
+                val_map = {}  # {bare_key: {fracture: parsed, normal: parsed}}
+                for k, v in raw_data.items():
+                    bk = _bare_key(k)
+                    if bk not in val_map:
+                        val_map[bk] = {}
+                    has_fk = any(fk in k for fk in fracture_keys)
+                    if has_fk:
+                        val_map[bk]["fracture"] = v
+                    else:
+                        val_map[bk]["normal"] = v
+
+                logger.info(f"val_map:{val_map}")
+
+                # 先处理带括号的字段（断口），再处理不带括号的，避免前缀冲突
+                # query 中可能使用英文括号 () 或中文括号 （），统一匹配
+                replace_map = [
+                    (r"额定短时工频耐受电压\s*[（(]\s*断口\s*[）)]", ["额定工频短时耐受电压", "额定短时工频耐受电压"], "fracture"),
+                    (r"额定雷电冲击耐受电压\s*[（(]\s*断口\s*[）)]", ["额定雷电冲击耐受电压"], "fracture"),
+                    (r"额定操作冲击耐受电压\s*[（(]\s*断口\s*[）)]", ["额定操作冲击耐受电压"], "fracture"),
+                    ("额定短时工频耐受电压", ["额定工频短时耐受电压", "额定短时工频耐受电压"], "normal"),
+                    ("额定雷电冲击耐受电压", ["额定雷电冲击耐受电压"], "normal"),
+                    ("额定操作冲击耐受电压", ["额定操作冲击耐受电压"], "normal"),
+                ]
+
+                for query_pattern, bare_keys, val_type in replace_map:
+                    if not re.search(query_pattern, query):
+                        continue
+                    # 尝试多个可能的 bare_key
+                    parsed = None
+                    for bk in bare_keys:
+                        entry = val_map.get(bk)
+                        if entry:
+                            parsed = entry.get(val_type)
+                            if parsed is not None:
+                                break
+                    if parsed is None:
+                        continue
+                    # 格式化值为字符串
+                    tg = parsed.get("to_ground")
+                    if tg is None:
+                        continue
+                    aux = parsed.get("fracture_aux")
+                    if aux is not None:
+                        val_str = f"{int(tg)} (+{int(aux)})"
+                    else:
+                        val_str = str(int(tg))
+                    # 替换 query 中的值，保留字段名部分
+                    query = re.sub(
+                        rf"({query_pattern}\s*)[0-9]+(?:\s*\(\s*[+-]\s*[0-9]+\s*\))?",
+                        rf"\g<1>{val_str}",
+                        query,
+                    )
+                    logger.info(f"query:{query}")
+            except ImportError:
+                pass
+
+
     if not query:
         return QueryResult(content=PROMPTS["fail_response"])
 

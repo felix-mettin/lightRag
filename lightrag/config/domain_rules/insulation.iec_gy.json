@@ -389,7 +389,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?60(?:\\\\.0+)?(?:\\\\s*Hz)?"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -412,7 +412,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?60(?:\\\\.0+)?(?:\\\\s*Hz)?"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -654,7 +654,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?60(?:\\\\.0+)?(?:\\\\s*Hz)?"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -1257,7 +1257,7 @@
         {
           "source": "query",
           "type": "regex_match",
-          "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?60(?:\\\\.0+)?(?:\\\\s*Hz)?"
+          "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -1871,13 +1871,13 @@
       "domain": "switching",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "BC1(60HZ)",
+      "test_item": "BC1(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -1911,13 +1911,13 @@
       "domain": "switching",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "BC2(60HZ)",
+      "test_item": "BC2(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -1951,13 +1951,13 @@
       "domain": "switching",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "CC1(60HZ)",
+      "test_item": "CC1(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2055,13 +2055,13 @@
       "domain": "switching",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "CC2(60HZ)",
+      "test_item": "CC2(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2115,13 +2115,13 @@
       "domain": "short_circuit",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "L75(60HZ)",
+      "test_item": "L75(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2263,13 +2263,13 @@
       "domain": "short_circuit",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "L90(60HZ)",
+      "test_item": "L90(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2411,13 +2411,13 @@
       "domain": "switching",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "LC1(60HZ)",
+      "test_item": "LC1(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2522,13 +2522,13 @@
       "domain": "switching",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "LC2(60HZ)",
+      "test_item": "LC2(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2677,7 +2677,7 @@
               "type": "equals_numeric",
               "label": "额定频率",
               "value": 60.0,
-              "unit": "HZ"
+              "unit": "Hz"
             }
           ]
         }
@@ -2689,13 +2689,13 @@
       "domain": "short_circuit",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "T100A(60HZ)",
+      "test_item": "T100A(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2718,13 +2718,13 @@
       "domain": "short_circuit",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "T100S(60HZ)",
+      "test_item": "T100S(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -3268,7 +3268,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -3428,13 +3428,13 @@
       "domain": "short_circuit",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "T60(60HZ)",
+      "test_item": "T60(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
+             "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -3580,7 +3580,7 @@
       "domain": "short_circuit",
       "kind": "split",
       "standard": "gb",
-      "test_item": "T100A(60HZ)",
+      "test_item": "T100A(60Hz)",
       "status": "active",
       "remove_original": true,
       "inputs": {
@@ -3618,13 +3618,13 @@
         ]
       },
       "single_output": {
-        "test_item": "T100A(60HZ)",
+        "test_item": "T100A(60Hz)",
         "parameter_overrides": {}
       },
       "split_output": [
         {
-          "test_item": "T100A(60HZ)#共箱共机构",
-          "inherits_from": "T100A(60HZ)",
+          "test_item": "T100A(60Hz)#共箱共机构",
+          "inherits_from": "T100A(60Hz)",
           "parameter_overrides": {
             "试验相数": "三相",
             "操作顺序": "O",
@@ -3841,7 +3841,7 @@
               "source": "query",
               "type": "equals_numeric",
               "label": "额定频率",
-              "value": 50.0,
+              "value": 50,
               "unit": "Hz"
             }
           ]
@@ -3854,7 +3854,7 @@
       "domain": "temperature_rise",
       "kind": "applicability",
       "standard": "gb",
-      "test_item": "温升试验(60HZ)",
+      "test_item": "温升试验(60Hz)",
       "status": "active",
       "deny_when_any": [
             {
