@@ -5683,7 +5683,7 @@ def _apply_domain_rule_decisions_to_project_context(
                 "base_name": "电寿命试验(30%)",
                 "suffixes": [
                     ("#单分", "O", "84次"),
-                    ("#合分", "O-0.3s-CO", "14次"),
+                    ("#自动重合闸", "O-0.3s-CO", "14次"),
                     ("#循环", "O-0.3s-CO-180s-CO", "6次"),
                 ],
                 "short_circuit_checks": ["短路开断试验(T30)", "T30(60Hz)"],
@@ -5694,7 +5694,7 @@ def _apply_domain_rule_decisions_to_project_context(
                 "base_name": "电寿命试验(10%)",
                 "suffixes": [
                     ("#单分", "O", "84次"),
-                    ("#合分", "O-0.3s-CO", "14次"),
+                    ("#自动重合闸", "O-0.3s-CO", "14次"),
                     ("#循环", "O-0.3s-CO-180s-CO", "6次"),
                 ],
                 "short_circuit_checks": ["短路开断试验(T10)", "T10(60Hz)"],
@@ -6275,11 +6275,11 @@ def _get_report_scope_test_whitelist(stand_type: str | None = None) -> dict[str,
             "电寿命试验(60%)#循环",
             "电寿命试验(30%)",
             "电寿命试验(30%)#单分",
-            "电寿命试验(30%)#合分",
+            "电寿命试验(30%)#自动重合闸",
             "电寿命试验(30%)#循环",
             "电寿命试验(10%)",
             "电寿命试验(10%)#单分",
-            "电寿命试验(10%)#合分",
+            "电寿命试验(10%)#自动重合闸",
             "电寿命试验(10%)#循环",
         })
     elif normalized == "DLT":

@@ -3860,7 +3860,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
+         "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
             }
       ],
       "allow_when_any": [
@@ -4060,7 +4060,7 @@
           }
         },
         {
-          "test_item": "电寿命试验(30%)#合分",
+          "test_item": "电寿命试验(30%)#自动重合闸",
           "inherits_from": "电寿命试验(30%)",
           "parameter_overrides": {
             "操作顺序": "O-0.3s-CO",
@@ -4125,7 +4125,7 @@
           }
         },
         {
-          "test_item": "电寿命试验(10%)#合分",
+          "test_item": "电寿命试验(10%)#自动重合闸",
           "inherits_from": "电寿命试验(10%)",
           "parameter_overrides": {
             "操作顺序": "O-0.3s-CO",
