@@ -5415,7 +5415,7 @@ def _apply_domain_rule_decisions_to_project_context(
         iec_el_configs = [
             {
                 "base_name": "电寿命试验(100%)",
-                "suffixes": [("#O-CO-CO", "O-0.3s-CO-180s-CO", "2次")],
+                "suffixes": [("#循环", "O-0.3s-CO-180s-CO", "2次")],
                 "short_circuit_checks": ["短路开断试验(T100s)", "短路开断试验(T100S)", "T100S(60Hz)", "T100s(60Hz)"],
                 "current_ratio": 1.0,
                 "reduction_note": "已做过短路开断试验(T100s)或T100s(60Hz)，可减一次。",
@@ -5459,7 +5459,7 @@ def _apply_domain_rule_decisions_to_project_context(
             rated_voltage_kv is not None
             and rated_voltage_kv <= 40.5
             and not re.search(
-                r"断路器等级\s*(?:(?:[:：=]|为|是)\s*)?E1(?:级)?",
+                r"电寿命等级\s*(?:[:：=]\s*)?E1(?:级)?",
                 query_text,
                 flags=re.IGNORECASE,
             )
@@ -6017,7 +6017,7 @@ def _get_report_scope_test_whitelist(stand_type: str | None = None) -> dict[str,
     # so do NOT reassign the variable.
     if normalized == "IEC":
         insulation_tests.discard("局部放电试验")
-        insulation_tests.discard("电寿命试验")
+        short_tests.discard("电寿命试验")
         short_tests.update({
             "电寿命试验(100%)",
             "电寿命试验(100%)#循环",
@@ -6025,7 +6025,7 @@ def _get_report_scope_test_whitelist(stand_type: str | None = None) -> dict[str,
             "电寿命试验(60%)#单分",
             "电寿命试验(60%)#循环",
             "电寿命试验(30%)",
-            "电寿命试验(30%)#O",
+            "电寿命试验(30%)#单分",
             "电寿命试验(30%)#合分",
             "电寿命试验(30%)#循环",
             "电寿命试验(10%)",
@@ -13970,13 +13970,17 @@ async def _build_context_str(
                 or entity_name
             ).strip()
             normalized = _normalize_text_key(raw_name)
-            canonical_name = normalized_to_name.get(normalized, "")
+            canonical_name = normalized_to_name.get(normalized)
+            # If the configured test list did not include this test name, fall
+            # back to using the KG-provided raw name as the canonical name so
+            # that retrieved test-item entities are not ignored.
             if not canonical_name:
-                continue
+                canonical_name = raw_name
+                normalized_to_name[normalized] = canonical_name
             test_id = str(original.get("entity_id", "") or "").strip() or _stable_test_id(
                 canonical_name
             )
-            test_candidates[canonical_name] = test_id
+            test_candidates.setdefault(canonical_name, test_id)
 
         # Fallback from relation endpoints if entity list has no explicit test item.
         if not test_candidates:
@@ -13994,12 +13998,22 @@ async def _build_context_str(
             scoped_test_items: set[str] = set()
             for scope in current_report_scopes:
                 scoped_test_items.update(whitelist_map.get(str(scope).strip(), set()))
+            # Add configured tests that are in the scoped whitelist
             for test_name in configured_test_items:
                 canonical_name = str(test_name).strip()
                 if canonical_name and canonical_name in scoped_test_items:
                     test_candidates.setdefault(
                         canonical_name, _stable_test_id(canonical_name)
                     )
+            # Also ensure whitelist-scoped test items are present as candidates
+            # even when they are not listed in configured_test_items. This
+            # allows domain rules and fallback split logic to operate on
+            # expected IEC items (e.g. 电寿命试验(100%)) even if the
+            # per-project configuration omitted them.
+            for scoped_name in sorted(scoped_test_items):
+                canonical_scoped = str(scoped_name).strip()
+                if canonical_scoped and canonical_scoped not in test_candidates:
+                    test_candidates.setdefault(canonical_scoped, _stable_test_id(canonical_scoped))
 
         if not test_candidates:
             # Retrieval may miss explicit test-item entities. Fall back to config

@@ -3896,7 +3896,7 @@
       "standard": "iec",
       "test_item": "电寿命试验(100%)",
       "status": "active",
-      "remove_original": false,
+      "remove_original": true,
       "inputs": {
         "trigger_when_any": [
           {
@@ -3923,13 +3923,16 @@
           }
         ]
       },
-      "single_output": {
-        "test_item": "电寿命试验(100%)",
-        "parameter_overrides": {
+      "split_output": [
+        {
+          "test_item": "电寿命试验(100%)#循环",
+          "inherits_from": "电寿命试验(100%)",
+          "parameter_overrides": {
             "操作顺序": "O-0.3s-CO-180s-CO",
             "试验次数": "2次"
+          }
         }
-      }
+      ]
     },
     {
       "rule_id": "short_circuit.iec.electrical_life_split_60",
