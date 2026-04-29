@@ -2107,13 +2107,6 @@ def _evaluate_domain_rule_decisions(
     for raw_rule in rules:
         if not isinstance(raw_rule, dict):
             continue
-        # If the rule explicitly targets a standard (gb/iec/dlt/etc.), skip it
-        # when the current evaluation stand_type is provided and does not match.
-        raw_rule_standard = str(raw_rule.get("standard", "") or "").strip()
-        if raw_rule_standard:
-            normalized_raw_standard = _normalize_operate_standard_type(raw_rule_standard)
-            if normalized_raw_standard and normalized_raw_standard != stand_type:
-                continue
 
         if not _rule_matches_current_scope(raw_rule):
             continue
