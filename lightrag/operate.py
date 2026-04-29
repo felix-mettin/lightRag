@@ -5432,8 +5432,8 @@ def _apply_domain_rule_decisions_to_project_context(
             {
                 "base_name": "电寿命试验(60%)",
                 "suffixes": [
-                    ("#O", "O", "2次"),
-                    ("#O-CO-CO", "O-0.3s-CO-180s-CO", "2次"),
+                    ("#单分", "O", "2次"),
+                    ("#循环", "O-0.3s-CO-180s-CO", "2次"),
                 ],
                 "short_circuit_checks": ["短路开断试验(T60)", "T60(60Hz)"],
                 "current_ratio": 0.6,
@@ -5442,9 +5442,9 @@ def _apply_domain_rule_decisions_to_project_context(
             {
                 "base_name": "电寿命试验(30%)",
                 "suffixes": [
-                    ("#O", "O", "84次"),
-                    ("#O-CO", "O-0.3s-CO", "14次"),
-                    ("#O-CO-CO", "O-0.3s-CO-180s-CO", "6次"),
+                    ("#单分", "O", "84次"),
+                    ("#合分", "O-0.3s-CO", "14次"),
+                    ("#循环", "O-0.3s-CO-180s-CO", "6次"),
                 ],
                 "short_circuit_checks": ["短路开断试验(T30)", "T30(60Hz)"],
                 "current_ratio": 0.3,
@@ -5453,9 +5453,9 @@ def _apply_domain_rule_decisions_to_project_context(
             {
                 "base_name": "电寿命试验(10%)",
                 "suffixes": [
-                    ("#O", "O", "84次"),
-                    ("#O-CO", "O-0.3s-CO", "14次"),
-                    ("#O-CO-CO", "O-0.3s-CO-180s-CO", "6次"),
+                    ("#单分", "O", "84次"),
+                    ("#合分", "O-0.3s-CO", "14次"),
+                    ("#循环", "O-0.3s-CO-180s-CO", "6次"),
                 ],
                 "short_circuit_checks": ["短路开断试验(T10)", "T10(60Hz)"],
                 "current_ratio": 0.1,
@@ -6028,18 +6028,18 @@ def _get_report_scope_test_whitelist(stand_type: str | None = None) -> dict[str,
         insulation_tests.discard("局部放电试验")
         short_tests.update({
             "电寿命试验(100%)",
-            "电寿命试验(100%)#O-CO-CO",
+            "电寿命试验(100%)#循环",
             "电寿命试验(60%)",
-            "电寿命试验(60%)#O",
-            "电寿命试验(60%)#O-CO-CO",
+            "电寿命试验(60%)#单分",
+            "电寿命试验(60%)#循环",
             "电寿命试验(30%)",
             "电寿命试验(30%)#O",
-            "电寿命试验(30%)#O-CO",
-            "电寿命试验(30%)#O-CO-CO",
+            "电寿命试验(30%)#合分",
+            "电寿命试验(30%)#循环",
             "电寿命试验(10%)",
-            "电寿命试验(10%)#O",
-            "电寿命试验(10%)#O-CO",
-            "电寿命试验(10%)#O-CO-CO",
+            "电寿命试验(10%)#单分",
+            "电寿命试验(10%)#合分",
+            "电寿命试验(10%)#循环",
         })
     elif normalized == "DLT":
         insulation_tests.discard("局部放电试验")
