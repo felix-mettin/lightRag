@@ -5224,12 +5224,16 @@ def _apply_domain_rule_decisions_to_project_context(
         "工频耐受电压试验(湿)",
         "工频耐受电压试验(断口)",
         "工频耐受电压试验(相间及对地)",
+        "工频耐受电压试验(联合电压)",
         "作为状态检查的工频耐受电压试验",
         "雷电冲击耐受电压试验",
         "雷电冲击耐受电压试验(联合电压)",
         "雷电冲击耐受电压试验(断口)",
         "雷电冲击耐受电压试验(相间及对地)",
         "局部放电试验",
+        "操作冲击耐受电压试验(湿)",
+        "操作冲击耐受电压试验(联合电压)",
+        "操作冲击耐受电压试验(干)",
     ):
         _set_if_present(
             test_name,
@@ -5556,19 +5560,26 @@ def _apply_domain_rule_decisions_to_project_context(
             calc_rule=f"全套绝缘型式试验的开关相数由试验相数映射得到；当前试验相数为{insulation_phase_text}，因此开关相数为{'3' if insulation_phase_text == '三相' else '1'}；{insulation_phase_rule}",
         )
 
-        _set_entry_if_value_missing(
+        # 充：按是否充气/充油判断
+        chong_val = "是" if any(token in query_text for token in ("SF6", "六氟化硫", "充气断路器", "充油断路器")) else "否"
+        # 补：是否补气，默认否
+        bu_val = "否"
+        # 套：套管材质，陶瓷或复合，从query_text中提取
+        if any(token in query_text for token in ("陶瓷", "瓷")):
+            tao_val = "瓷"
+        elif any(token in query_text for token in ("复合", "复")):
+            tao_val = "复"
+        else:
+            tao_val = "瓷"  # 默认陶瓷
+        # 修：是否修正海拔系数，默认否
+        xiu_val = "否"
+        result_val = f"{chong_val}{bu_val}{tao_val}{xiu_val}"
+        _set_if_value_missing(
             test_name,
             "其他细则（充补套修）",
-            {
-                "value_text": "默认取值为：否否否; 充按照是否充气/充油判断，补（是否补气）默认否，套（指套管材质，陶瓷or复合）需用户输入，修（是否修正海拔系数）默认否，最后仅输出判断结果，不要有其他任何多余内容，取值案例：'是否瓷否'/'是否复否'",
-                "value_source": "standard",
-                "value_expr": "",
-                "unit": "",
-                "constraints": "默认取值为：否否否;充按照是否充气/充油判断，补（是否补气）默认否，套（指套管材质，陶瓷or复合）需用户输入，修（是否修正海拔系数）默认否，最后仅输出判断结果，不要有其他任何多余内容取值案例：'是否瓷否'/'是否复否'",
-                "calc_rule": "充按照是否充气/充油判断，补（是否补气）默认否，套（指套管材质，陶瓷or复合）需用户输入，修（是否修正海拔系数）默认否，最后仅输出判断结果，不要有其他任何多余内容，取值案例：'是否瓷否'/'是否复否',当前问题未给出可完全展开的充补套修细则时，回落到图谱默认说明。",
-                "derive_from_rated": "",
-                "resolution_mode": "needs_condition",
-            },
+            result_val,
+            value_source="rule",
+            calc_rule=f"充按照是否充气/充油判断（{chong_val}），补默认否（{bu_val}），套按套管材质（{tao_val}），修默认否（{xiu_val}），组合结果：{result_val}",
         )
 
         _set_entry_if_value_missing(

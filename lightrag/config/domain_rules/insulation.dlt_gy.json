@@ -91,9 +91,12 @@
       },
       "split_output": [
         {
-          "test_item": "工频耐受电压试验",
+          "test_item": "工频耐受电压试验(相间及对地)",
           "inherits_from": "工频耐受电压试验",
-          "parameter_overrides": {}
+          "parameter_overrides": {
+            "试验部位": "相间及对地",
+            "试验状态": "干"
+          }
         },
         {
           "test_item": "工频耐受电压试验(联合电压)",
@@ -1037,7 +1040,7 @@
         {
           "source": "query",
           "type": "regex_match",
-          "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
+          "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -1141,7 +1144,7 @@
         {
           "source": "query",
           "type": "regex_match",
-          "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
+          "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -1245,7 +1248,7 @@
         {
           "source": "query",
           "type": "regex_match",
-          "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
+          "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -1351,7 +1354,7 @@
         {
           "source": "query",
           "type": "regex_match",
-          "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
+          "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?60(?:\\.0+)?(?:\\s*Hz)?"
         }
       ],
       "allow_when_any": [
