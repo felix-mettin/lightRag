@@ -57,7 +57,7 @@
       "standard": "gb",
       "test_item": "工频耐受电压试验",
       "status": "active",
-      "remove_original": true,
+      "remove_original": false,
       "inputs": {
         "trigger_when_any": [
           {
@@ -91,9 +91,12 @@
       },
       "split_output": [
         {
-          "test_item": "工频耐受电压试验",
+          "test_item": "工频耐受电压试验(相间及对地)",
           "inherits_from": "工频耐受电压试验",
-          "parameter_overrides": {}
+          "parameter_overrides": {
+            "试验部位": "相间及对地",
+            "试验状态": "干"
+          }
         },
         {
           "test_item": "工频耐受电压试验(联合电压)",
@@ -253,7 +256,7 @@
       "standard": "gb",
       "test_item": "雷电冲击耐受电压试验",
       "status": "active",
-      "remove_original": true,
+      "remove_original": false,
       "inputs": {
         "trigger_when_any": [
           {
@@ -1764,7 +1767,7 @@
       "standard": "gb",
       "test_item": "操作冲击耐受电压试验",
       "status": "active",
-      "remove_original": true,
+      "remove_original": false,
       "inputs": {
         "trigger_when_any": [
           {

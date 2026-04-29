@@ -5453,6 +5453,12 @@ def _apply_domain_rule_decisions_to_project_context(
             "相间、对地及断口",
             calc_rule="低压状态下若试验相数为三相，工频耐受电压试验(干)的试验部位固定为相间、对地及断口。",
         )
+        _set_if_present(
+            "工频耐受电压试验(湿)",
+            "试验部位",
+            "相间及对地",
+            calc_rule="低压状态下若试验相数为三相，工频耐受电压试验(湿)的试验部位固定为相间及对地。",
+        )
 
     _set_insulation_normal_count(
         (
@@ -5613,18 +5619,32 @@ def _apply_domain_rule_decisions_to_project_context(
             ],
         )
         if not inherited_altitude:
+            explicit_altitude = _extract_named_scalar_local(
+                query_text,
+                ["最大(适用)的海拔", "最大适用海拔"],
+            )
+            altitude_value_text = (
+                f"{str(explicit_altitude).rstrip('0').rstrip('.')}m"
+                if explicit_altitude is not None
+                else "1000m"
+            )
+            altitude_calc_rule = (
+                f"用户已明确提供最大(适用)的海拔为 {altitude_value_text}，直接采用。"
+                if explicit_altitude is not None
+                else "当前未检测到用户提供的最大(适用)的海拔，默认按1000m回填。"
+            )
             _set_entry_if_value_missing(
                 test_name,
                 "最大(适用)的海拔",
                 {
-                    "value_text": "用户输入，未输入默认1000m",
-                    "value_source": "user_input",
-                    "value_expr": "用户输入，未输入默认1000m",
+                    "value_text": altitude_value_text,
+                    "value_source": "user_input" if explicit_altitude is not None else "default",
+                    "value_expr": altitude_value_text,
                     "unit": "m",
-                    "constraints": "用户输入，未输入默认1000m",
-                    "calc_rule": "",
-                    "derive_from_rated": "用户输入，未输入默认1000m",
-                    "resolution_mode": "needs_user_input",
+                    "constraints": "用户输入优先，未输入默认1000m",
+                    "calc_rule": altitude_calc_rule,
+                    "derive_from_rated": "",
+                    "resolution_mode": "graph_final",
                 },
             )
 
@@ -6528,6 +6548,19 @@ def _postprocess_electrical_markdown_response(
             return matched_keys[0]
         return name
 
+    def _resolve_canonical_test_names(test_name: str) -> list[str]:
+        name = str(test_name or "").strip()
+        if not name:
+            return []
+        if name in value_map or name in param_map:
+            return [name]
+        matched_keys = [
+            key for key, display_name in normalized_display_map.items() if display_name == name
+        ]
+        if matched_keys:
+            return matched_keys
+        return [name]
+
     def _display_test_name(test_name: str) -> str:
         canonical_name = _canonical_test_name(test_name)
         return normalized_display_map.get(canonical_name, canonical_name)
@@ -6757,8 +6790,28 @@ def _postprocess_electrical_markdown_response(
             nonlocal current_block, current_name
             if not current_block:
                 return
-            canonical_name = _canonical_test_name(current_name or "") if current_name else ""
-            display_name = _display_test_name(current_name or "") if current_name else ""
+            canonical_names = _resolve_canonical_test_names(current_name or "") if current_name else []
+            eligible_canonical_names = [
+                canonical_name
+                for canonical_name in canonical_names
+                if canonical_name and canonical_name in allowed_set
+            ]
+            if len(eligible_canonical_names) > 1:
+                rendered_any = False
+                for canonical_name in eligible_canonical_names:
+                    seen_items.add(canonical_name)
+                    missing_block = _build_missing_c_block(canonical_name)
+                    if missing_block:
+                        if rendered_any:
+                            _trim_trailing_blank_lines(filtered)
+                            filtered.append("")
+                        filtered.extend(missing_block)
+                        rendered_any = True
+                current_block = []
+                current_name = None
+                return
+            canonical_name = eligible_canonical_names[0] if eligible_canonical_names else ""
+            display_name = _display_test_name(canonical_name or current_name or "") if (canonical_name or current_name) else ""
             if canonical_name and (
                     canonical_name in allowed_set
                     or (display_name in allowed_display_set and display_name not in removed_display_set)
