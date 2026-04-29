@@ -5678,9 +5678,9 @@ def _apply_domain_rule_decisions_to_project_context(
             {
                 "base_name": "电寿命试验(100%)",
                 "suffixes": [("#循环", "O-0.3s-CO-180s-CO", "2次")],
-                "short_circuit_checks": ["短路开断试验(T100s)", "短路开断试验(T100S)", "T100S(60Hz)", "T100s(60Hz)"],
+                "short_circuit_checks": ["短路开断试验(T100S)", "T100S(60Hz)"],
                 "current_ratio": 1.0,
-                "reduction_note": "已做过短路开断试验(T100s)或T100s(60Hz)，可减一次。",
+                "reduction_note": "电寿命试验(100%)#循环 因做过短路开断试验(T100S)或T100S(60Hz)，试验次数可以减一次。",
             },
             {
                 "base_name": "电寿命试验(60%)",
@@ -5690,7 +5690,7 @@ def _apply_domain_rule_decisions_to_project_context(
                 ],
                 "short_circuit_checks": ["短路开断试验(T60)", "T60(60Hz)"],
                 "current_ratio": 0.6,
-                "reduction_note": "已做过短路开断试验(T60)或T60(60Hz)，可减一次。",
+                "reduction_note": "电寿命试验(60%)#循环 因做过短路开断试验(T60)或T60(60Hz)，试验次数可以减一次。",
             },
             {
                 "base_name": "电寿命试验(30%)",
@@ -5701,7 +5701,7 @@ def _apply_domain_rule_decisions_to_project_context(
                 ],
                 "short_circuit_checks": ["短路开断试验(T30)", "T30(60Hz)"],
                 "current_ratio": 0.3,
-                "reduction_note": "已做过短路开断试验(T30)或T30(60Hz)，可减一次。",
+                "reduction_note": "电寿命试验(30%)#循环 因做过短路开断试验(T30)或T30(60Hz)，试验次数可以减一次。",
             },
             {
                 "base_name": "电寿命试验(10%)",
@@ -5712,7 +5712,7 @@ def _apply_domain_rule_decisions_to_project_context(
                 ],
                 "short_circuit_checks": ["短路开断试验(T10)", "T10(60Hz)"],
                 "current_ratio": 0.1,
-                "reduction_note": "已做过短路开断试验(T10)或T10(60Hz)，可减一次。",
+                "reduction_note": "电寿命试验(10%)#循环 因做过短路开断试验(T10)或T10(60Hz)，试验次数可以减一次。",
             },
         ]
 
@@ -5799,18 +5799,6 @@ def _apply_domain_rule_decisions_to_project_context(
                             calc_rule=f"额定短路开断电流 {short_break_ka} kA 的{int(cfg['current_ratio'] * 100)}%为 {current_text}。",
                             resolution_mode="graph_final",
                         )
-                    # Reduction-once detection: check if corresponding short-circuit test exists
-                    has_reduction = any(
-                        sc_test in updated_param_map or sc_test in query_text
-                        for sc_test in cfg["short_circuit_checks"]
-                    )
-                    if has_reduction:
-                        tc_entry = updated_value_map.get(test_name, {}).get("试验次数")
-                        if isinstance(tc_entry, dict):
-                            existing_calc = str(tc_entry.get("calc_rule", "") or "").strip()
-                            note = cfg["reduction_note"]
-                            new_calc = f"{existing_calc} {note}" if existing_calc else note
-                            tc_entry["calc_rule"] = new_calc
 
     return updated_param_map, updated_value_map
 
@@ -6503,6 +6491,8 @@ def _postprocess_electrical_markdown_response(
     param_map = metadata.get("project_param_map", {}) or {}
     display_map = metadata.get("test_item_display_map", {}) or {}
     rule_query_text = str(metadata.get("rule_query_text", "") or "")
+    stand_type = metadata.get("stand_type")
+    normalized_stand_type = _normalize_operate_standard_type(stand_type)
     if not allowed_items and not removed_items:
         return response_text
 
@@ -6656,6 +6646,29 @@ def _postprocess_electrical_markdown_response(
     }
     op1_optional_required_item = "失步关合和开断试验(OP1)"
 
+    iec_el_reduction_notes = [
+        {
+            "test_name": "电寿命试验(100%)#循环",
+            "short_circuit_checks": ["短路开断试验(T100S)", "T100S(60Hz)"],
+            "reduction_note": "电寿命试验(100%)#循环 因做过短路开断试验(T100S)或T100S(60Hz)，试验次数可以减一次。",
+        },
+        {
+            "test_name": "电寿命试验(60%)#循环",
+            "short_circuit_checks": ["短路开断试验(T60)", "T60(60Hz)"],
+            "reduction_note": "电寿命试验(60%)#循环 因做过短路开断试验(T60)或T60(60Hz)，试验次数可以减一次。",
+        },
+        {
+            "test_name": "电寿命试验(30%)#循环",
+            "short_circuit_checks": ["短路开断试验(T30)", "T30(60Hz)"],
+            "reduction_note": "电寿命试验(30%)#循环 因做过短路开断试验(T30)或T30(60Hz)，试验次数可以减一次。",
+        },
+        {
+            "test_name": "电寿命试验(10%)#循环",
+            "short_circuit_checks": ["短路开断试验(T10)", "T10(60Hz)"],
+            "reduction_note": "电寿命试验(10%)#循环 因做过短路开断试验(T10)或T10(60Hz)，试验次数可以减一次。",
+        },
+    ]
+
     def _extract_note_rated_voltage_kv(query_text: str) -> float | None:
         text = str(query_text or "").strip()
         if not text:
@@ -6681,6 +6694,15 @@ def _postprocess_electrical_markdown_response(
                 and note_rated_voltage_kv is not None
                 and note_rated_voltage_kv >= 72.5
             )
+        for el_cfg in iec_el_reduction_notes:
+            if el_cfg["reduction_note"] in stripped:
+                if el_cfg["test_name"] not in allowed_set:
+                    return False
+                has_reduction = any(
+                    sc_test in param_map or sc_test in rule_query_text
+                    for sc_test in el_cfg["short_circuit_checks"]
+                )
+                return has_reduction
         return True
 
     def _build_required_a_section_notes(existing_lines: list[str]) -> list[str]:
@@ -6704,6 +6726,16 @@ def _postprocess_electrical_markdown_response(
             and "失步关合和开断试验(OP1)试验可免做" not in existing_text
         ):
             required_notes.append("失步关合和开断试验(OP1)试验可免做")
+
+        if normalized_stand_type == "IEC":
+            for el_cfg in iec_el_reduction_notes:
+                if el_cfg["test_name"] in allowed_set:
+                    has_reduction = any(
+                        sc_test in param_map or sc_test in rule_query_text
+                        for sc_test in el_cfg["short_circuit_checks"]
+                    )
+                    if has_reduction and el_cfg["reduction_note"] not in existing_text:
+                        required_notes.append(el_cfg["reduction_note"])
 
         return required_notes
 
@@ -7074,6 +7106,41 @@ def _build_electrical_a_section_note_patch(
         and "失步关合和开断试验(OP1)试验可免做" not in existing_text
     ):
         notes.append("失步关合和开断试验(OP1)试验可免做\n")
+
+    stand_type = metadata.get("stand_type")
+    normalized_stand_type = _normalize_operate_standard_type(stand_type)
+    if normalized_stand_type == "IEC":
+        iec_el_reduction_notes = [
+            {
+                "test_name": "电寿命试验(100%)#循环",
+                "short_circuit_checks": ["短路开断试验(T100S)", "T100S(60Hz)"],
+                "reduction_note": "电寿命试验(100%)#循环 因做过短路开断试验(T100S)或T100S(60Hz)，试验次数可以减一次。",
+            },
+            {
+                "test_name": "电寿命试验(60%)#循环",
+                "short_circuit_checks": ["短路开断试验(T60)", "T60(60Hz)"],
+                "reduction_note": "电寿命试验(60%)#循环 因做过短路开断试验(T60)或T60(60Hz)，试验次数可以减一次。",
+            },
+            {
+                "test_name": "电寿命试验(30%)#循环",
+                "short_circuit_checks": ["短路开断试验(T30)", "T30(60Hz)"],
+                "reduction_note": "电寿命试验(30%)#循环 因做过短路开断试验(T30)或T30(60Hz)，试验次数可以减一次。",
+            },
+            {
+                "test_name": "电寿命试验(10%)#循环",
+                "short_circuit_checks": ["短路开断试验(T10)", "T10(60Hz)"],
+                "reduction_note": "电寿命试验(10%)#循环 因做过短路开断试验(T10)或T10(60Hz)，试验次数可以减一次。",
+            },
+        ]
+        param_map = metadata.get("project_param_map", {}) or {}
+        for el_cfg in iec_el_reduction_notes:
+            if el_cfg["test_name"] in allowed_set:
+                has_reduction = any(
+                    sc_test in param_map or sc_test in rule_query_text
+                    for sc_test in el_cfg["short_circuit_checks"]
+                )
+                if has_reduction and el_cfg["reduction_note"] not in existing_text:
+                    notes.append(el_cfg["reduction_note"] + "\n")
 
     return notes
 
@@ -14818,6 +14885,7 @@ async def _build_context_str(
     final_data["metadata"]["removed_test_items_raw"] = removed_test_items
     final_data["metadata"]["removed_test_items"] = removed_test_items_display
     final_data["metadata"]["test_item_display_map"] = test_item_display_map
+    final_data["metadata"]["stand_type"] = stand_type
     final_data["metadata"]["project_split_rules"] = {
         "pf_fracture_enabled": fracture_pf_enabled,
         "li_fracture_enabled": fracture_li_enabled,
