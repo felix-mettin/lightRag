@@ -44,7 +44,7 @@
           "test_item": "工频耐受电压试验(断口)",
           "inherits_from": "工频耐受电压试验",
           "parameter_overrides": {
-            "试验部位": "开关断口",
+            "试验部位": "断口",
             "试验状态": "干"
           }
         }
@@ -57,7 +57,7 @@
       "standard": "gb",
       "test_item": "工频耐受电压试验",
       "status": "active",
-      "remove_original": false,
+      "remove_original": true,
       "inputs": {
         "trigger_when_any": [
           {
@@ -67,10 +67,21 @@
                 "source": "query",
                 "type": "greater_or_equal_numeric",
                 "label": "额定电压",
-                "value": 72.5,
+                "value": 300,
                 "unit": "kV"
               }
             ]
+          }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "has_any_numeric_label",
+            "labels": [
+              "额定短时工频耐受电压(断口)",
+              "额定工频耐受电压(断口)"
+            ],
+            "unit": "kV"
           }
         ]
       },
@@ -229,7 +240,7 @@
           "test_item": "雷电冲击耐受电压试验(断口)",
           "inherits_from": "雷电冲击耐受电压试验",
           "parameter_overrides": {
-            "试验部位": "开关断口",
+            "试验部位": "断口",
             "试验状态": "干"
           }
         }
@@ -378,7 +389,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?60(?:\\\\.0+)?(?:\\\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -401,7 +412,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?60(?:\\\\.0+)?(?:\\\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -643,7 +654,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?60(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?60(?:\\\\.0+)?(?:\\\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -1246,7 +1257,7 @@
         {
           "source": "query",
           "type": "regex_match",
-          "pattern": "额定频率\\s*(?:[:：=]|为)?\\s*60(?:\\.0+)?\\s*Hz\\b"
+          "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?60(?:\\\\.0+)?(?:\\\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -1471,6 +1482,16 @@
               }
             ]
           }
+        ],
+        "require_when_all": [
+          {
+            "source": "query",
+            "type": "has_any_numeric_label",
+            "labels": [
+              "额定操作冲击耐受电压(断口)"
+            ],
+            "unit": "kV"
+          }
         ]
       },
       "single_output": {
@@ -1502,7 +1523,7 @@
       "standard": "iec",
       "test_item": "操作冲击耐受电压试验",
       "status": "active",
-      "remove_original": false,
+      "remove_original": true,
       "inputs": {
         "trigger_when_any": [
           {
@@ -1856,7 +1877,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -1896,7 +1917,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -1936,7 +1957,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2040,7 +2061,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2100,7 +2121,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2248,7 +2269,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2396,7 +2417,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2507,7 +2528,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2674,7 +2695,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -2703,7 +2724,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -3247,7 +3268,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -3413,7 +3434,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
         }
       ],
       "allow_when_any": [
@@ -3839,7 +3860,7 @@
             {
              "source": "query",
              "type": "regex_match",
-             "pattern": "额定频率\\s*(?:[:：=]\\s*)?50(?:\\.0+)?\\s*Hz"
+             "pattern": "额定频率\\\\s*(?:(?:[:：=]|为)\\\\s*)?50(?:\\\\.0+)?(?:\\\\s*Hz)?"
             }
       ],
       "allow_when_any": [
