@@ -57,7 +57,7 @@
       "standard": "gb",
       "test_item": "工频耐受电压试验",
       "status": "active",
-      "remove_original": true,
+      "remove_original": false,
       "inputs": {
         "trigger_when_any": [
           {
@@ -67,7 +67,7 @@
                 "source": "query",
                 "type": "greater_or_equal_numeric",
                 "label": "额定电压",
-                "value": 363,
+                "value": 126,
                 "unit": "kV"
               }
             ]
@@ -253,7 +253,7 @@
       "standard": "gb",
       "test_item": "雷电冲击耐受电压试验",
       "status": "active",
-      "remove_original": true,
+      "remove_original": false,
       "inputs": {
         "trigger_when_any": [
           {
@@ -263,7 +263,7 @@
                 "source": "query",
                 "type": "greater_or_equal_numeric",
                 "label": "额定电压",
-                "value": 363,
+                "value": 126,
                 "unit": "kV"
               }
             ]

@@ -3851,7 +3851,8 @@ def _apply_domain_rule_decisions_to_project_context(
             dc_component = math.exp(
                 -((float(min_opening_time_ms) + frequency_offset_ms) / float(time_constant_ms))
             )
-            dc_component_text = f"{dc_component:.4f}".rstrip("0").rstrip(".")
+            dc_component_pct = dc_component * 100
+            dc_component_text = f"{dc_component_pct:.2f}%"
             resolved[test_name]["直流分量(试验)"] = (
                 dc_component_text,
                 f"{test_name}直流分量(试验)按 e^-[(最短分闸时间+a)/时间常数] 计算；最短分闸时间取 {min_opening_time_text}，时间常数取 {time_constant_text}，额定频率 {frequency_text} 对应 a={str(frequency_offset_ms).rstrip('0').rstrip('.')} ms，因此 e^(-(({str(min_opening_time_ms).rstrip('0').rstrip('.')}+{str(frequency_offset_ms).rstrip('0').rstrip('.')})/{str(time_constant_ms).rstrip('0').rstrip('.')})) = {dc_component_text}。",
