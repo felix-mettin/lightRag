@@ -6092,9 +6092,8 @@ def _apply_domain_rule_decisions_to_project_context(
                         resolution_mode="graph_final",
                     )
 
-        # Apply test currents and reduction notes to all IEC electrical-life children
-        # Only apply when short-circuit scope is present (same gating as the split above)
-        if short_circuit_scope_present:
+        # Apply test currents to IEC electrical-life children only under the same gate.
+        if iec_el_enabled and short_circuit_scope_present:
             for cfg in iec_el_configs:
                 for suffix, op_seq, count_text in cfg["suffixes"]:
                     test_name = cfg["base_name"] + suffix
@@ -6252,6 +6251,13 @@ def _build_final_test_item_scope(
         project_param_map: dict[str, list[str]],
         domain_rule_decisions: dict[str, Any],
 ) -> tuple[list[str], list[str]]:
+    iec_electrical_life_split_rule_ids = {
+        "short_circuit.iec.electrical_life_split_100",
+        "short_circuit.iec.electrical_life_split_60",
+        "short_circuit.iec.electrical_life_split_30",
+        "short_circuit.iec.electrical_life_split_10",
+    }
+
     def _normalize_test_item_scope_key(value: str) -> str:
         text = _normalize_text_key(str(value))
         return text.replace("（", "(").replace("）", ")").lower()
@@ -6276,6 +6282,7 @@ def _build_final_test_item_scope(
         if not isinstance(decision, dict):
             continue
         test_item = _resolve_scope_item_name(str(decision.get("test_item", "") or "").strip())
+        rule_id = str(decision.get("rule_id", "") or "").strip()
         if not test_item:
             continue
         rule_kind = str(decision.get("kind", "") or "").strip()
@@ -6309,6 +6316,22 @@ def _build_final_test_item_scope(
             if bool(decision.get("remove_original", True)) and not original_reused_as_split_output:
                 removed_items.append(test_item)
                 hard_removed_items.add(test_item)
+        if (
+            rule_kind == "split"
+            and not decision.get("enabled")
+            and rule_id in iec_electrical_life_split_rule_ids
+        ):
+            removed_items.append(test_item)
+            hard_removed_items.add(test_item)
+            for split_output in decision.get("split_output", []) or []:
+                if not isinstance(split_output, dict):
+                    continue
+                split_test_item = _resolve_scope_item_name(
+                    str(split_output.get("test_item", "") or "").strip()
+                )
+                if split_test_item:
+                    removed_items.append(split_test_item)
+                    hard_removed_items.add(split_test_item)
     # Guard against stale project_param_map entries leaking into the final whitelist.
     # If runtime rule decisions explicitly removed an item, it must never remain allowed.
     allowed_deduped = list(
