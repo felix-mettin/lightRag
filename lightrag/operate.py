@@ -3244,98 +3244,35 @@ def _apply_domain_rule_decisions_to_project_context(
     _extracted_params = _extracted_result["values"]
     _extracted_descs = _extracted_result["descriptions"]
 
-    rated_voltage_kv = _extracted_params.get("rated_voltage_kv")
-    rated_current_match = re.search(
-        r"额定电流\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*A\b",
-        query_text,
-        flags=re.IGNORECASE,
-    )
-    rated_current_a = float(rated_current_match.group(1)) if rated_current_match else None
-    rated_frequency_match = re.search(
-        r"额定频率\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*Hz\b",
-        query_text,
-        flags=re.IGNORECASE,
-    )
-    rated_frequency_hz = (
-        float(rated_frequency_match.group(1)) if rated_frequency_match else 50.0
-    )
-    normalized_query_text = query_text.replace("（", "(").replace("）", ")")
-    rated_closing_ka = _extract_named_current_ka_local(
-        query_text,
-        ["额定短路关合电流", "短路关合电流", "关合电流"],
-    )
-    short_break_ka = _extract_named_current_ka_local(
-        query_text,
-        ["额定短路开断电流", "短路开断电流"],
-    )
-    rated_short_time_withstand_ka = _extract_named_current_ka_local(
-        query_text,
-        ["额定短时耐受电流", "短时耐受电流"],
-    )
-    rated_peak_withstand_ka = _extract_named_current_ka_local(
-        query_text,
-        ["额定峰值耐受电流", "峰值耐受电流", "额定峰值电流", "峰值电流"],
-    )
-    rated_short_circuit_duration_s = _extract_named_scalar_local(
-        query_text,
-        ["额定短路持续时间", "短路持续时间"],
-    )
-    rated_out_of_step_break_ka = _extract_named_current_ka_local(
-        query_text,
-        ["额定失步开断电流", "失步开断电流"],
-    )
+    # ---- 统一从 QueryParamExtractor 提取的值中获取 ----
+    ep = _extracted_params
+    rated_voltage_kv = ep.get("rated_voltage_kv")  # 额定电压 kV
+    rated_current_a = ep.get("rated_current_a")  # 额定电流 A
+    rated_frequency_hz = ep.get("rated_frequency_hz", 50.0)  # 额定频率 Hz
+    rated_closing_ka = ep.get("rated_closing_ka")  # 额定短路关合电流 kA
+    short_break_ka = ep.get("short_break_ka")  # 额定短路开断电流 kA
+    rated_short_time_withstand_ka = ep.get("rated_short_time_withstand_ka")  # 额定短时耐受电流 kA
+    rated_peak_withstand_ka = ep.get("rated_peak_withstand_ka")  # 额定峰值耐受电流 kA
+    rated_short_circuit_duration_s = ep.get("rated_short_circuit_duration_s")  # 额定短路持续时间 s
+    rated_out_of_step_break_ka = ep.get("rated_out_of_step_break_ka")  # 额定失步开断电流 kA
 
     # ---- 首开极系数：优先用 extractor 提取/计算的结果 ----
-    first_pole_kpp = _extracted_params.get("first_pole_kpp")
-    first_pole_kpp_from_user = _extracted_params.get("first_pole_kpp") is not None
+    first_pole_kpp = ep.get("first_pole_kpp")  # 首开极系数
+    first_pole_kpp_from_user = ep.get("first_pole_kpp") is not None
     first_pole_kpp_rule = _extracted_descs.get("first_pole_kpp", "")
     is_low_voltage = rated_voltage_kv is not None and rated_voltage_kv <= 40.5
     is_breaker_class_not_applicable = rated_voltage_kv is not None and rated_voltage_kv > 72.5
-    pf_withstand_kv = _extract_named_voltage_kv_local(
-        query_text,
-        ["额定短时工频耐受电压", "额定工频耐受电压"],
-    )
-    pf_fracture_withstand_kv = _extract_named_voltage_kv_local(
-        query_text,
-        ["额定短时工频耐受电压(断口)", "额定工频耐受电压(断口)"],
-    )
-    li_withstand_kv = _extract_named_voltage_kv_local(
-        query_text,
-        ["额定雷电冲击耐受电压"],
-    )
-    li_fracture_withstand_kv = _extract_named_voltage_kv_local(
-        query_text,
-        ["额定雷电冲击耐受电压(断口)"],
-    )
-    pf_joint_voltage_parts = _extract_named_joint_voltage_parts_local(
-        query_text,
-        ["额定短时工频耐受电压(断口)", "额定工频耐受电压(断口)"],
-    )
-    li_joint_voltage_parts = _extract_named_joint_voltage_parts_local(
-        query_text,
-        ["额定雷电冲击耐受电压(断口)"],
-    )
-    si_withstand_kv = _extract_named_voltage_kv_local(
-        query_text,
-        ["额定操作冲击耐受电压"],
-    )
-    si_joint_voltage_parts = _extract_named_joint_voltage_parts_local(
-        query_text,
-        ["额定操作冲击耐受电压(断口)"],
-    )
-    bc_current_a = _extract_named_scalar_local(
-        query_text,
-        [
-            "额定电容器组电流",
-            "电容器组开断电流",
-            "电容器组开合电流",
-            "电容器电流",
-            "额定背对背电容器组开断电流",
-            "背对背电容器组开断电流",
-            "额定单个电容器组开断电流",
-            "单个电容器组开断电流",
-        ],
-    )
+    pf_withstand_kv = ep.get("pf_withstand_kv")  # 额定短时工频耐受电压 kV
+    pf_fracture_withstand_kv = ep.get("pf_fracture_withstand_kv")  # 额定短时工频耐受电压(断口) kV
+    li_withstand_kv = ep.get("li_withstand_kv")  # 额定雷电冲击耐受电压 kV
+    li_fracture_withstand_kv = ep.get("li_fracture_withstand_kv")  # 额定雷电冲击耐受电压(断口) kV
+    pf_joint_voltage_parts = ep.get("pf_joint_voltage_parts")  # 额定短时工频耐受电压(断口)联合电压 (主值, 辅值)
+    li_joint_voltage_parts = ep.get("li_joint_voltage_parts")  # 额定雷电冲击耐受电压(断口)联合电压 (主值, 辅值)
+    si_withstand_kv = ep.get("si_withstand_kv")  # 额定操作冲击耐受电压 kV
+    si_fracture_withstand_kv = ep.get("si_fracture_withstand_kv")  # 额定操作冲击耐受电压(断口) kV
+    si_joint_voltage_parts = ep.get("si_joint_voltage_parts")  # 额定操作冲击耐受电压(断口)联合电压 (主值, 辅值)
+    bc_current_a = ep.get("bc_current_a")  # 额定电容器组电流 A
+
     bc_test_category = ""
     if bc_current_a is not None:
         if any(token in query_text for token in ("背对背", "Ibb")):
@@ -3628,7 +3565,7 @@ def _apply_domain_rule_decisions_to_project_context(
 
     def _resolve_op2_current_local(resolved: dict[str, tuple[str, str]]) -> None:
         """OP2 试验电流 = 额定失步开断电流（100%）"""
-        out_of_step_ka = _extracted_params.get("rated_out_of_step_ka")
+        out_of_step_ka = _extracted_params.get("rated_out_of_step_break_ka")  # 额定失步开断电流 kA
         if out_of_step_ka is not None:
             resolved["试验电流kA"] = (
                 f"{out_of_step_ka} kA",
@@ -3707,7 +3644,7 @@ def _apply_domain_rule_decisions_to_project_context(
         )
 
         # 试验电流 = 额定失步开断电流 × 30%
-        out_of_step_ka = _extracted_params.get("rated_out_of_step_ka")
+        out_of_step_ka = _extracted_params.get("rated_out_of_step_break_ka")  # 额定失步开断电流 kA
         if out_of_step_ka is not None:
             op1_current_ka = round(out_of_step_ka * 0.3, 3)
             resolved["试验电流kA"] = (
@@ -3844,7 +3781,7 @@ def _apply_domain_rule_decisions_to_project_context(
         )
 
         # 试验电流 = 额定失步开断电流（OP2关合用 100%，不同于 OP1 的 30%）
-        out_of_step_ka = _extracted_params.get("rated_out_of_step_ka")
+        out_of_step_ka = _extracted_params.get("rated_out_of_step_break_ka")  # 额定失步开断电流 kA
         if out_of_step_ka is not None:
             resolved["试验电流kA"] = (
                 f"{out_of_step_ka} kA",
@@ -5777,7 +5714,7 @@ def _apply_domain_rule_decisions_to_project_context(
             若不存在则回退到 _extract_named_scalar_local 直接提取。
             描述文本优先使用 _extracted_descs（由 QueryParamExtractor 生成）。
         """
-        altitude_m = _extracted_params.get("altitude_m")
+        altitude_m = _extracted_params.get("altitude_m")  # 最大(适用)的海拔 m
         if altitude_m is None:
             altitude_m = _extract_named_scalar_local(
                 query_text,
@@ -13215,12 +13152,12 @@ async def kg_query(
 
         Returns None when no relevant context could be constructed for the query.
     """
-    print("111111111111111111111111111stand_type:", stand_type)
     stand_type = _normalize_operate_standard_type(
         stand_type or global_config.get("addon_params", {}).get("standard_type")
     )
-    print("22222222222222222222222stand_type:", stand_type)
-    stand_type or global_config.get("addon_params", {}).get("standard_type")
+
+    # ---- 统一预处理：去除换行符，后续所有方法直接使用处理后的文本 ----
+    query = re.sub(r"[\r\n]+", " ", str(query or "")).strip()
 
     # 真空断路器 + DLT 标准：替换 query 中的绝缘电压值为标准表值
     if stand_type == "DLT" and "真空" in query:
@@ -13304,7 +13241,7 @@ async def kg_query(
     if not query:
         return QueryResult(content=PROMPTS["fail_response"])
 
-    cleaned_rule_query = re.sub(r"[\r\n]+", " ", query).strip()
+    cleaned_rule_query = query  # 已在入口统一去换行
 
     if query_param.model_func:
         use_model_func = query_param.model_func
@@ -13465,6 +13402,11 @@ async def kg_query(
                 deduped.append(item)
         return deduped
 
+    # ---- 统一参数提取：通过 QueryParamExtractor 提前提取参数，后续优先使用 ----
+    _extracted_result = QueryParamExtractor(stand_type).extract(cleaned_rule_query)
+    _extracted_params = _extracted_result["values"]
+    _extracted_descs = _extracted_result["descriptions"]
+
     # Build query context (unified interface)
     context_result = await _build_query_context(
         retrieval_query,
@@ -13477,7 +13419,9 @@ async def kg_query(
         text_chunks_db,
         query_param,
         chunks_vdb,
-        stand_type=stand_type
+        stand_type=stand_type,
+        extracted_params=_extracted_params,
+        extracted_descs=_extracted_descs,
     )
     # logger.info(f"context_result:{context_result}")
     if context_result is None:
@@ -14626,7 +14570,9 @@ async def _build_context_str(
         entity_id_to_original: dict = None,
         relation_id_to_original: dict = None,
         knowledge_graph_inst: BaseGraphStorage | None = None,
-        stand_type: str = None
+        stand_type: str = None,
+        extracted_params: dict | None = None,
+        extracted_descs: dict | None = None,
 ) -> tuple[str, dict[str, Any]]:
     """
     Build the final LLM context string with token processing.
@@ -14670,54 +14616,15 @@ async def _build_context_str(
     addon_params = global_config.get("addon_params", {}) or {}
     schema_cfg = addon_params.get("electrical_schema", {}) or {}
 
-    def _extract_named_voltage_kv(query_text: str, labels: list[str]) -> float | None:
-        text = str(query_text or "").strip()
-        if not text:
-            return None
-        normalized = text.replace("（", "(").replace("）", ")")
-        for label in labels:
-            pattern = rf"{re.escape(label)}\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?(?:\s*\+\s*[0-9]+(?:\.[0-9]+)?)*)\s*(?:kV)?"
-            match = re.search(pattern, normalized, flags=re.IGNORECASE)
-            if match:
-                parts = re.findall(r"[0-9]+(?:\.[0-9]+)?", match.group(1))
-                if parts:
-                    return sum(float(part) for part in parts)
-        return None
-
-    def _extract_model_prefix(query_text: str) -> str | None:
-        text = str(query_text or "").strip()
-        if not text:
-            return None
-        match = re.search(r"(?:型号名称|型号)\s*[：:=]\s*([A-Za-z0-9]+)", text)
-        return match.group(1).upper() if match else None
-
-    def _extract_rated_current_amp(query_text: str) -> int | None:
-        text = str(query_text or "").strip()
-        if not text:
-            return None
-        match = re.search(r"额定电流\s*(?:[:：=]\s*)?([0-9]+)\s*A\b", text, flags=re.IGNORECASE)
-        return int(match.group(1)) if match else None
-
-    def _extract_rated_voltage_kv(query_text: str) -> float | None:
-        text = str(query_text or "").strip()
-        if not text:
-            return None
-        match = re.search(
-            r"额定电压\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*kV\b", text, flags=re.IGNORECASE
-        )
-        return float(match.group(1)) if match else None
-
-    def _query_has_explicit_solid_sealed_pole(query_text: str) -> bool:
-        text = str(query_text or "").strip()
-        if not text:
-            return False
-        return bool(re.search(r"元件中含固封极柱", text))
-
     rule_query_text = str(rule_query or query or "").strip()
-    model_prefix = _extract_model_prefix(rule_query_text)
-    rated_current_amp = _extract_rated_current_amp(rule_query_text)
-    rated_voltage_kv = _extract_rated_voltage_kv(rule_query_text)
-    explicit_solid_sealed_pole = _query_has_explicit_solid_sealed_pole(rule_query_text)
+    # 统一从 QueryParamExtractor 提取的值中获取，避免重复正则提取
+    ep = extracted_params or {}
+    rated_voltage_kv = ep.get("rated_voltage_kv")  # 额定电压 kV
+    rated_current_amp = ep.get("rated_current_a")  # 额定电流 A
+    model_prefix = ep.get("model_prefix")  # 型号前缀
+    if model_prefix:
+        model_prefix = model_prefix.upper()
+    explicit_solid_sealed_pole = bool(re.search(r"元件中含固封极柱", rule_query_text))
     domain_rule_decisions = _evaluate_domain_rule_decisions(rule_query_text, schema_cfg, stand_type=stand_type)
     normalized_stand_type = _normalize_operate_standard_type(stand_type)
     if normalized_stand_type == "DLT":
@@ -15307,7 +15214,9 @@ async def _build_query_context(
         text_chunks_db: BaseKVStorage,
         query_param: QueryParam,
         chunks_vdb: BaseVectorStorage = None,
-        stand_type: str | None = None
+        stand_type: str | None = None,
+        extracted_params: dict | None = None,
+        extracted_descs: dict | None = None,
 ) -> QueryContextResult | None:
     """
     Main query context building function using the new 4-stage architecture:
@@ -15389,6 +15298,8 @@ async def _build_query_context(
         relation_id_to_original=truncation_result["relation_id_to_original"],
         knowledge_graph_inst=knowledge_graph_inst,
         stand_type=stand_type,
+        extracted_params=extracted_params,
+        extracted_descs=extracted_descs,
     )
 
     # Convert keywords strings to lists and add complete metadata to raw_data

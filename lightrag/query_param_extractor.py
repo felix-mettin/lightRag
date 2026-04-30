@@ -42,7 +42,8 @@ class QueryParamExtractor:
         altitude_desc = result["descriptions"]["altitude_m"]
     """
 
-    def __init__(self) -> None:
+    def __init__(self, stand_type: str = "") -> None:
+        self._stand_type = stand_type
         # ---- simple params (fixed default) ----
         self._param_defs: list[dict[str, Any]] = [
             {
@@ -79,15 +80,213 @@ class QueryParamExtractor:
                 "user_desc": "用户已明确提供{description}为 {value_display}，直接采用。",
             },
             {
-                "key": "rated_out_of_step_ka",
+                "key": "rated_current_a",
                 "pattern": re.compile(
-                    r"额定失步开断电流\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*kA"
+                    r"额定电流\s*(?:[:：=]\s*)?([0-9]+)\s*A\b"
+                ),
+                "default": None,
+                "cast": int,
+                "description": "额定电流",
+                "default_desc": "当前未检测到用户提供的{description}，需后续补充。",
+                "user_desc": "用户已明确提供{description}为 {value_display} A，直接采用。",
+            },
+            {
+                "key": "model_prefix",
+                "pattern": re.compile(
+                    r"(?:型号名称|型号)\s*[：:=]\s*([A-Za-z0-9]+)"
+                ),
+                "default": None,
+                "cast": str,
+                "description": "型号前缀",
+                "default_desc": "当前未检测到用户提供的{description}，需后续补充。",
+                "user_desc": "用户已明确提供{description}为 {value_display}，直接采用。",
+            },
+            {
+                "key": "rated_frequency_hz",
+                "pattern": re.compile(
+                    r"额定频率\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*Hz\b"
+                ),
+                "default": 50.0,
+                "cast": float,
+                "description": "额定频率",
+                "default_desc": "当前未检测到用户提供的{description}，默认按{default_display} Hz 回填。",
+                "user_desc": "用户已明确提供{description}为 {value_display} Hz，直接采用。",
+            },
+            {
+                "key": "rated_closing_ka",
+                "pattern": re.compile(
+                    r"(?:额定短路关合电流|短路关合电流|关合电流)\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*(?:kA)?"
+                ),
+                "default": None,
+                "cast": float,
+                "description": "额定短路关合电流",
+                "default_desc": "当前未检测到用户提供的{description}，需后续补充。",
+                "user_desc": "用户已明确提供{description}为 {value_display} kA，直接采用。",
+            },
+            {
+                "key": "short_break_ka",
+                "pattern": re.compile(
+                    r"(?:额定短路开断电流|短路开断电流)\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*(?:kA)?"
+                ),
+                "default": None,
+                "cast": float,
+                "description": "额定短路开断电流",
+                "default_desc": "当前未检测到用户提供的{description}，需后续补充。",
+                "user_desc": "用户已明确提供{description}为 {value_display} kA，直接采用。",
+            },
+            {
+                "key": "rated_short_time_withstand_ka",
+                "pattern": re.compile(
+                    r"(?:额定短时耐受电流|短时耐受电流)\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*(?:kA)?"
+                ),
+                "default": None,
+                "cast": float,
+                "description": "额定短时耐受电流",
+                "default_desc": "当前未检测到用户提供的{description}，需后续补充。",
+                "user_desc": "用户已明确提供{description}为 {value_display} kA，直接采用。",
+            },
+            {
+                "key": "rated_peak_withstand_ka",
+                "pattern": re.compile(
+                    r"(?:额定峰值耐受电流|峰值耐受电流|额定峰值电流|峰值电流)\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*(?:kA)?"
+                ),
+                "default": None,
+                "cast": float,
+                "description": "额定峰值耐受电流",
+                "default_desc": "当前未检测到用户提供的{description}，需后续补充。",
+                "user_desc": "用户已明确提供{description}为 {value_display} kA，直接采用。",
+            },
+            {
+                "key": "rated_short_circuit_duration_s",
+                "pattern": re.compile(
+                    r"(?:额定短路持续时间|短路持续时间)\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)"
+                ),
+                "default": None,
+                "cast": float,
+                "description": "额定短路持续时间",
+                "default_desc": "当前未检测到用户提供的{description}，需后续补充。",
+                "user_desc": "用户已明确提供{description}为 {value_display} s，直接采用。",
+            },
+            {
+                "key": "rated_out_of_step_break_ka",
+                "pattern": re.compile(
+                    r"(?:额定失步开断电流|失步开断电流)\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*(?:kA)?"
                 ),
                 "default": None,
                 "cast": float,
                 "description": "额定失步开断电流",
                 "default_desc": "当前未检测到用户提供的{description}，需后续补充。",
                 "user_desc": "用户已明确提供{description}为 {value_display} kA，直接采用。",
+            },
+            {
+                "key": "pf_withstand_kv",
+                "pattern": re.compile(
+                    r"(?:额定短时工频耐受电压|额定工频耐受电压)\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?(?:\s*\+\s*[0-9]+(?:\.[0-9]+)?)*)\s*(?:kV)?"
+                ),
+                "default": None,
+                "cast": float,
+                "description": "额定短时工频耐受电压",
+                "default_desc": "当前未检测到用户提供的{description}，需后续补充。",
+                "user_desc": "用户已明确提供{description}为 {value_display} kV，直接采用。",
+            },
+            {
+                "key": "pf_fracture_withstand_kv",
+                "pattern": re.compile(
+                    r"(?:额定短时工频耐受电压\s*[（(]\s*断口\s*[）)]|额定工频耐受电压\s*[（(]\s*断口\s*[）)])\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?(?:\s*\+\s*[0-9]+(?:\.[0-9]+)?)*)\s*(?:kV)?"
+                ),
+                "default": None,
+                "cast": float,
+                "description": "额定短时工频耐受电压(断口)",
+                "default_desc": "当前未检测到用户提供的{description}，需后续补充。",
+                "user_desc": "用户已明确提供{description}为 {value_display} kV，直接采用。",
+            },
+            {
+                "key": "li_withstand_kv",
+                "pattern": re.compile(
+                    r"额定雷电冲击耐受电压\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?(?:\s*\+\s*[0-9]+(?:\.[0-9]+)?)*)\s*(?:kV)?"
+                ),
+                "default": None,
+                "cast": float,
+                "description": "额定雷电冲击耐受电压",
+                "default_desc": "当前未检测到用户提供的{description}，需后续补充。",
+                "user_desc": "用户已明确提供{description}为 {value_display} kV，直接采用。",
+            },
+            {
+                "key": "li_fracture_withstand_kv",
+                "pattern": re.compile(
+                    r"额定雷电冲击耐受电压\s*[（(]\s*断口\s*[）)]\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?(?:\s*\+\s*[0-9]+(?:\.[0-9]+)?)*)\s*(?:kV)?"
+                ),
+                "default": None,
+                "cast": float,
+                "description": "额定雷电冲击耐受电压(断口)",
+                "default_desc": "当前未检测到用户提供的{description}，需后续补充。",
+                "user_desc": "用户已明确提供{description}为 {value_display} kV，直接采用。",
+            },
+            {
+                "key": "si_withstand_kv",
+                "pattern": re.compile(
+                    r"额定操作冲击耐受电压\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?(?:\s*\+\s*[0-9]+(?:\.[0-9]+)?)*)\s*(?:kV)?"
+                ),
+                "default": None,
+                "cast": float,
+                "description": "额定操作冲击耐受电压",
+                "default_desc": "当前未检测到用户提供的{description}，需后续补充。",
+                "user_desc": "用户已明确提供{description}为 {value_display} kV，直接采用。",
+            },
+            {
+                "key": "si_fracture_withstand_kv",
+                "pattern": re.compile(
+                    r"额定操作冲击耐受电压\s*[（(]\s*断口\s*[）)]\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?(?:\s*\+\s*[0-9]+(?:\.[0-9]+)?)*)\s*(?:kV)?"
+                ),
+                "default": None,
+                "cast": float,
+                "description": "额定操作冲击耐受电压(断口)",
+                "default_desc": "当前未检测到用户提供的{description}，需后续补充。",
+                "user_desc": "用户已明确提供{description}为 {value_display} kV，直接采用。",
+            },
+            {
+                "key": "bc_current_a",
+                "pattern": re.compile(
+                    r"(?:额定电容器组电流|电容器组开断电流|电容器组开合电流|电容器电流|额定背对背电容器组开断电流|背对背电容器组开断电流|额定单个电容器组开断电流|单个电容器组开断电流)\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*(?:A)?"
+                ),
+                "default": None,
+                "cast": float,
+                "description": "额定电容器组电流",
+                "default_desc": "当前未检测到用户提供的{description}，需后续补充。",
+                "user_desc": "用户已明确提供{description}为 {value_display} A，直接采用。",
+            },
+            {
+                "key": "pf_joint_voltage_parts",
+                "pattern": re.compile(
+                    r"(?:额定短时工频耐受电压|额定工频耐受电压)\s*[（(]\s*断口\s*[）)]\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*[（(]\s*\+\s*([0-9]+(?:\.[0-9]+)?)\s*[）)]"
+                ),
+                "default": None,
+                "cast": self._to_voltage_pair,
+                "description": "额定短时工频耐受电压(断口)联合电压",
+                "default_desc": "当前未检测到用户提供的{description}，需后续补充。",
+                "user_desc": "用户已明确提供{description}为 {value_display}，直接采用。",
+            },
+            {
+                "key": "li_joint_voltage_parts",
+                "pattern": re.compile(
+                    r"额定雷电冲击耐受电压\s*[（(]\s*断口\s*[）)]\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*[（(]\s*\+\s*([0-9]+(?:\.[0-9]+)?)\s*[）)]"
+                ),
+                "default": None,
+                "cast": self._to_voltage_pair,
+                "description": "额定雷电冲击耐受电压(断口)联合电压",
+                "default_desc": "当前未检测到用户提供的{description}，需后续补充。",
+                "user_desc": "用户已明确提供{description}为 {value_display}，直接采用。",
+            },
+            {
+                "key": "si_joint_voltage_parts",
+                "pattern": re.compile(
+                    r"额定操作冲击耐受电压\s*[（(]\s*断口\s*[）)]\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*[（(]\s*\+\s*([0-9]+(?:\.[0-9]+)?)\s*[）)]"
+                ),
+                "default": None,
+                "cast": self._to_voltage_pair,
+                "description": "额定操作冲击耐受电压(断口)联合电压",
+                "default_desc": "当前未检测到用户提供的{description}，需后续补充。",
+                "user_desc": "用户已明确提供{description}为 {value_display}，直接采用。",
             },
         ]
 
@@ -96,6 +295,21 @@ class QueryParamExtractor:
         self._computed_params: dict[str, tuple[Callable, Callable]] = {
             "first_pole_kpp": (self._default_first_pole_kpp, self._describe_first_pole_kpp),
         }
+
+
+    @staticmethod
+    def _sum_voltage_parts(raw: str) -> str:
+        """电压值原样返回，不做求和。"""
+        return raw.strip()
+
+    @staticmethod
+    def _to_voltage_pair(*groups: str) -> tuple[float, float | None]:
+        """将 '(230)(+92)' 格式转为 (230.0, 92.0) 元组。"""
+        if len(groups) >= 2 and groups[1]:
+            return (float(groups[0]), float(groups[1]))
+        if groups:
+            return (float(groups[0]), None)
+        return (None, None)
 
     # ============================================================
     # 首开极系数：默认值计算 & 描述生成
@@ -155,14 +369,18 @@ class QueryParamExtractor:
         values: dict[str, Any] = {}
         descriptions: dict[str, str] = {}
         text = str(query_text or "").strip()
+        # 统一预处理：中文括号 → 英文括号
+        text = text.replace("（", "(").replace("）", ")")
 
         # ---- first pass: simple regex extraction ----
         for param_def in self._param_defs:
             match = param_def["pattern"].search(text)
             if match:
-                raw = match.group(1)
+                groups = match.groups()
+                raw = groups[0] if groups else ""
                 try:
-                    values[param_def["key"]] = param_def["cast"](raw)
+                    # 传所有分组给 cast，支持多分组提取（如联合电压元组）
+                    values[param_def["key"]] = param_def["cast"](*groups)
                 except (ValueError, TypeError):
                     values[param_def["key"]] = param_def["default"]
                 # 用户明确提供 → 用 user_desc 模板
@@ -202,6 +420,47 @@ class QueryParamExtractor:
                     values[key] = computed
             # 生成描述（无论是否使用默认值，都由 describer 统一处理）
             descriptions[key] = describer(values, values.get(key), used_default)
+
+        # 将 stand_type 也加入返回结果
+        values["stand_type"] = self._stand_type
+        descriptions["stand_type"] = f"标准类型：{self._stand_type}"
+
+        # ---- 中文参数名映射（用于日志输出） ----
+        _PARAM_CN = {
+            "altitude_m": "最大(适用)的海拔",
+            "rated_voltage_kv": "额定电压",
+            "rated_current_a": "额定电流",
+            "rated_frequency_hz": "额定频率",
+            "rated_closing_ka": "额定短路关合电流",
+            "short_break_ka": "额定短路开断电流",
+            "rated_short_time_withstand_ka": "额定短时耐受电流",
+            "rated_peak_withstand_ka": "额定峰值耐受电流",
+            "rated_short_circuit_duration_s": "额定短路持续时间",
+            "rated_out_of_step_break_ka": "额定失步开断电流",
+            "first_pole_kpp": "首开极系数",
+            "pf_withstand_kv": "额定短时工频耐受电压",
+            "pf_fracture_withstand_kv": "额定短时工频耐受电压(断口)",
+            "li_withstand_kv": "额定雷电冲击耐受电压",
+            "li_fracture_withstand_kv": "额定雷电冲击耐受电压(断口)",
+            "pf_joint_voltage_parts": "工频断口联合电压",
+            "li_joint_voltage_parts": "雷电冲击断口联合电压",
+            "si_withstand_kv": "额定操作冲击耐受电压",
+            "si_fracture_withstand_kv": "额定操作冲击耐受电压(断口)",
+            "si_joint_voltage_parts": "操作冲击断口联合电压",
+            "bc_current_a": "额定电容器组电流",
+            "model_prefix": "型号前缀",
+        }
+        _log_lines = [
+            f"  {_PARAM_CN.get(k, k)} = {v!r}"
+            for k, v in sorted(values.items())
+            if v is not None and k != "stand_type"
+        ]
+        if _log_lines:
+            import logging
+            logging.getLogger(self.__class__.__name__).info(
+                "【参数提取】QueryParamExtractor 提取结果:\n%s",
+                "\n".join(_log_lines),
+            )
 
         return {"values": values, "descriptions": descriptions}
 
@@ -251,3 +510,4 @@ class QueryParamExtractor:
             "default_desc": default_desc,
             "user_desc": user_desc,
         })
+
