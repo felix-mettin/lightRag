@@ -5493,6 +5493,63 @@ def _apply_domain_rule_decisions_to_project_context(
         family_label="操作冲击耐受电压试验族",
     )
 
+    def _resolve_altitude_entry() -> dict[str, Any]:
+        """
+        独立计算 最大(适用)的海拔 的取值，返回标准 entry 字典。
+
+        计算规则（优先级从高到低）：
+          1. 从用户 query 中提取"最大(适用)的海拔"或"最大适用海拔"的值
+          2. 用户未提供时，默认回填 1000m
+
+        各试验项需要海拔参数时，统一调用此方法获取，避免相互复制依赖。
+        """
+        explicit_altitude = _extract_named_scalar_local(
+            query_text,
+            ["最大(适用)的海拔", "最大适用海拔"],
+        )
+        altitude_value_text = (
+            f"{str(explicit_altitude).rstrip('0').rstrip('.')}m"
+            if explicit_altitude is not None
+            else "1000m"
+        )
+        altitude_calc_rule = (
+            f"用户已明确提供最大(适用)的海拔为 {altitude_value_text}，直接采用。"
+            if explicit_altitude is not None
+            else "当前未检测到用户提供的最大(适用)的海拔，默认按1000m回填。"
+        )
+        return {
+            "value_text": altitude_value_text,
+            "value_source": "user_input" if explicit_altitude is not None else "default",
+            "value_expr": altitude_value_text,
+            "unit": "m",
+            "constraints": "用户输入优先，未输入默认1000m",
+            "calc_rule": altitude_calc_rule,
+            "derive_from_rated": "",
+            "resolution_mode": "graph_final",
+        }
+
+    def _set_altitude_if_missing(test_item_name: str) -> None:
+        """
+        如果指定试验项缺少海拔参数，用 _resolve_altitude_entry() 计算结果回填。
+
+        调用条件：
+          - 试验项已存在于 updated_param_map 中
+          - 试验项的参数清单包含"最大(适用)的海拔"或"最大适用海拔"
+          - 该参数尚未被赋值（_set_entry_if_value_missing 内部判断）
+
+        各试验项独立计算，不依赖其他试验项的海拔值。
+        """
+        if test_item_name not in updated_param_map:
+            return
+        params = updated_param_map.get(test_item_name, []) or []
+        if "最大(适用)的海拔" not in params and "最大适用海拔" not in params:
+            return
+        _set_entry_if_value_missing(
+            test_item_name,
+            "最大(适用)的海拔",
+            deepcopy(_resolve_altitude_entry()),
+        )
+
     def _recall_full_insulation_type_test_parameters() -> None:
         test_name = "全套绝缘型式试验"
         if test_name not in updated_param_map and test_name not in updated_value_map:
@@ -5611,49 +5668,15 @@ def _apply_domain_rule_decisions_to_project_context(
             },
         )
 
-        inherited_altitude = _copy_param_entry_if_missing(
-            test_name,
-            "最大(适用)的海拔",
-            [
-                ("工频耐受电压试验", ["最大(适用)的海拔", "最大(适用)的海拔"]),
-                ("雷电冲击耐受电压试验", ["最大(适用)的海拔", "最大(适用)的海拔"]),
-                ("操作冲击耐受电压试验", ["最大(适用)的海拔", "最大(适用)的海拔"]),
-                ("工频耐受电压试验(联合电压)", ["最大(适用)的海拔", "最大(适用)的海拔"]),
-                ("雷电冲击耐受电压试验(联合电压)", ["最大(适用)的海拔", "最大(适用)的海拔"]),
-                ("操作冲击耐受电压试验(联合电压)", ["最大(适用)的海拔", "最大(适用)的海拔"]),
-            ],
-        )
-        if not inherited_altitude:
-            explicit_altitude = _extract_named_scalar_local(
-                query_text,
-                ["最大(适用)的海拔", "最大适用海拔"],
-            )
-            altitude_value_text = (
-                f"{str(explicit_altitude).rstrip('0').rstrip('.')}m"
-                if explicit_altitude is not None
-                else "1000m"
-            )
-            altitude_calc_rule = (
-                f"用户已明确提供最大(适用)的海拔为 {altitude_value_text}，直接采用。"
-                if explicit_altitude is not None
-                else "当前未检测到用户提供的最大(适用)的海拔，默认按1000m回填。"
-            )
-            _set_entry_if_value_missing(
-                test_name,
-                "最大(适用)的海拔",
-                {
-                    "value_text": altitude_value_text,
-                    "value_source": "user_input" if explicit_altitude is not None else "default",
-                    "value_expr": altitude_value_text,
-                    "unit": "m",
-                    "constraints": "用户输入优先，未输入默认1000m",
-                    "calc_rule": altitude_calc_rule,
-                    "derive_from_rated": "",
-                    "resolution_mode": "graph_final",
-                },
-            )
+        _set_altitude_if_missing(test_name)
 
     _recall_full_insulation_type_test_parameters()
+
+    # 为所有需要海拔参数的试验项独立计算并回填。
+    # 每个试验项各自调用 _resolve_altitude_entry() 从 query 提取或默认 1000m，
+    # 互不依赖，避免试验项之间相互复制导致遗漏。
+    for test_item_name in list(updated_param_map.keys()):
+        _set_altitude_if_missing(test_item_name)
 
     if "空载特性测量" in updated_param_map and "空载特性测量#1" not in updated_param_map:
         source_params = list(updated_param_map.get("空载特性测量", []) or [])
@@ -12917,7 +12940,7 @@ async def kg_query(
                         rf"\g<1>{val_str}",
                         query,
                     )
-                    logger.info(f"query:{query}")
+                    logger.info(f"query_replace:{query}")
             except ImportError:
                 pass
 
