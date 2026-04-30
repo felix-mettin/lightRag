@@ -3264,6 +3264,26 @@ def _apply_domain_rule_decisions_to_project_context(
         query_text,
         ["额定短路关合电流", "短路关合电流", "关合电流"],
     )
+    short_break_ka = _extract_named_current_ka_local(
+        query_text,
+        ["额定短路开断电流", "短路开断电流"],
+    )
+    rated_short_time_withstand_ka = _extract_named_current_ka_local(
+        query_text,
+        ["额定短时耐受电流", "短时耐受电流"],
+    )
+    rated_peak_withstand_ka = _extract_named_current_ka_local(
+        query_text,
+        ["额定峰值耐受电流", "峰值耐受电流", "额定峰值电流", "峰值电流"],
+    )
+    rated_short_circuit_duration_s = _extract_named_scalar_local(
+        query_text,
+        ["额定短路持续时间", "短路持续时间"],
+    )
+    rated_out_of_step_break_ka = _extract_named_current_ka_local(
+        query_text,
+        ["额定失步开断电流", "失步开断电流"],
+    )
 
     # ---- 首开极系数：优先用 extractor 提取/计算的结果 ----
     first_pole_kpp = _extracted_params.get("first_pole_kpp")
