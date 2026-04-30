@@ -2271,6 +2271,62 @@
       "deny_when_no_match": true
     },
     {
+      "rule_id": "switching.gb.cc2_60hz_final_split",
+      "domain": "switching",
+      "kind": "split",
+      "standard": "gb",
+      "test_item": "CC2(60Hz)",
+      "status": "active",
+      "deny_when_any": [
+        {
+          "source": "query",
+          "type": "regex_match",
+          "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
+        }
+      ],
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "开合性能型式试验"
+              },
+              {
+                "source": "query",
+                "type": "equals_numeric",
+                "label": "额定频率",
+                "value": 60.0,
+                "unit": "Hz"
+              }
+            ]
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "CC2(60Hz)",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "CC2(60Hz)#1",
+          "inherits_from": "CC2(60Hz)",
+          "parameter_overrides": {
+            "操作顺序": "O"
+          }
+        },
+        {
+          "test_item": "CC2(60Hz)#2",
+          "inherits_from": "CC2(60Hz)",
+          "parameter_overrides": {
+            "操作顺序": "CO"
+          }
+        }
+      ]
+    },
+    {
       "rule_id": "short_circuit.gb.l75_60hz_applicability",
       "domain": "short_circuit",
       "kind": "applicability",
@@ -2780,6 +2836,62 @@
         }
       ],
       "deny_when_no_match": true
+    },
+    {
+      "rule_id": "switching.gb.lc2_60hz_final_split",
+      "domain": "switching",
+      "kind": "split",
+      "standard": "gb",
+      "test_item": "LC2(60Hz)",
+      "status": "active",
+      "deny_when_any": [
+        {
+          "source": "query",
+          "type": "regex_match",
+          "pattern": "额定频率\\s*(?:(?:[:：=]|为)\\s*)?50(?:\\.0+)?(?:\\s*Hz)?"
+        }
+      ],
+      "inputs": {
+        "trigger_when_any": [
+          {
+            "type": "all",
+            "conditions": [
+              {
+                "source": "query",
+                "type": "contains",
+                "label": "开合性能型式试验"
+              },
+              {
+                "source": "query",
+                "type": "equals_numeric",
+                "label": "额定频率",
+                "value": 60.0,
+                "unit": "Hz"
+              }
+            ]
+          }
+        ]
+      },
+      "single_output": {
+        "test_item": "LC2(60Hz)",
+        "parameter_overrides": {}
+      },
+      "split_output": [
+        {
+          "test_item": "LC2(60Hz)#1",
+          "inherits_from": "LC2(60Hz)",
+          "parameter_overrides": {
+            "操作顺序": "O"
+          }
+        },
+        {
+          "test_item": "LC2(60Hz)#2",
+          "inherits_from": "LC2(60Hz)",
+          "parameter_overrides": {
+            "操作顺序": "CO"
+          }
+        }
+      ]
     },
     {
       "rule_id": "short_circuit.gb.op2_making_applicability",

@@ -426,6 +426,7 @@ def _extract_missing_feature_params(note_text: str) -> list[tuple[str, str]]:
     items: list[tuple[str, str]] = []
     known_prefixes = (
         "首开极系数kpp",
+        "首开极系数",
         "SF6气体的最低功能压力(20℃表压)",
         "SF6气体的额定压力(20℃表压)",
         "额定短路关合电流",
@@ -1642,12 +1643,18 @@ def _evaluate_domain_rule_decisions(
             return r"(?:\s*(?:p\.?\s*u\.?))?"
         return r"(?:\s*(?:kV|KV|kv|kA|KA|ka|A|Hz|HZ|hz|p\.?\s*u\.?))?"
 
+    def _normalize_query_linebreaks(query_text: str | None) -> str:
+        text = str(query_text or "")
+        if not text:
+            return ""
+        return re.sub(r"[\r\n]+", " ", text).strip()
+
     def _extract_named_numeric(
         query_text: str,
         labels: list[str],
         unit: str = "",
     ) -> float | None:
-        text = str(query_text or "").strip()
+        text = _normalize_query_linebreaks(query_text)
         if not text:
             return None
         normalized = text.replace("（", "(").replace("）", ")")
@@ -1671,7 +1678,7 @@ def _evaluate_domain_rule_decisions(
         labels: list[str],
         unit: str = "",
     ) -> float | None:
-        text = str(query_text or "").strip()
+        text = _normalize_query_linebreaks(query_text)
         if not text:
             return None
         normalized = text.replace("（", "(").replace("）", ")")
@@ -2158,7 +2165,12 @@ def _evaluate_domain_rule_decisions(
                         split_enabled = False
                         reason_code = "split_constraints_not_met"
                         reason_text = "已命中拆分触发词，但未满足全部附加约束条件，保持未拆分。"
-                if rule_id in {"switching.gb.cc2_final_split", "switching.gb.lc2_final_split"}:
+                if rule_id in {
+                    "switching.gb.cc2_final_split",
+                    "switching.gb.lc2_final_split",
+                    "switching.gb.cc2_60hz_final_split",
+                    "switching.gb.lc2_60hz_final_split",
+                }:
                     if capacitive_grade == "C1":
                         split_enabled = False
                         reason_code = "capacitive_grade_c1_single"
@@ -2866,6 +2878,18 @@ def _apply_domain_rule_decisions_to_project_context(
         text = f"{result:.2f}".rstrip("0").rstrip(".")
         return f"{text} A"
 
+    def _format_current_ka_local(value: float) -> str:
+        if float(value).is_integer():
+            return f"{int(value)} kA"
+        text = f"{value:.3f}".rstrip("0").rstrip(".")
+        return f"{text} kA"
+
+    def _format_duration_s_local(value: float) -> str:
+        if float(value).is_integer():
+            return f"{int(value)}s"
+        text = f"{value:.3f}".rstrip("0").rstrip(".")
+        return f"{text}s"
+
     def _parse_current_amp_value(value_text: str) -> float | None:
         text = str(value_text or "").strip()
         if not text:
@@ -2873,8 +2897,14 @@ def _apply_domain_rule_decisions_to_project_context(
         match = re.search(r"([0-9]+(?:\.[0-9]+)?)\s*A\b", text, flags=re.IGNORECASE)
         return float(match.group(1)) if match else None
 
+    def _normalize_query_linebreaks(query_text: str | None) -> str:
+        text = str(query_text or "")
+        if not text:
+            return ""
+        return re.sub(r"[\r\n]+", " ", text).strip()
+
     def _extract_named_current_ka_local(query_text: str, labels: list[str]) -> float | None:
-        text = str(query_text or "").strip()
+        text = _normalize_query_linebreaks(query_text)
         if not text:
             return None
         normalized = text.replace("（", "(").replace("）", ")")
@@ -2886,7 +2916,7 @@ def _apply_domain_rule_decisions_to_project_context(
         return None
 
     def _extract_named_voltage_kv_local(query_text: str, labels: list[str]) -> float | None:
-        text = str(query_text or "").strip()
+        text = _normalize_query_linebreaks(query_text)
         if not text:
             return None
         normalized = text.replace("（", "(").replace("）", ")")
@@ -2902,36 +2932,75 @@ def _apply_domain_rule_decisions_to_project_context(
     def _extract_named_joint_voltage_parts_local(
         query_text: str, labels: list[str]
     ) -> tuple[float, float | None] | None:
-        text = str(query_text or "").strip()
+        text = _normalize_query_linebreaks(query_text)
         if not text:
             return None
         normalized = text.replace("（", "(").replace("）", ")")
-        for label in labels:
-            pattern = (
-                rf"{re.escape(label)}\s*(?:[:：=]\s*)?"
-                rf"([0-9\.\+\(\)\s]+?)"
-                rf"(?:\s*(?:kV|KV|kv)\b|(?=\s*(?:[,，、;；。]|$|[A-Za-z\u4e00-\u9fff])))"
+
+        def _extract_candidate_slice(source_text: str, label_text: str) -> str:
+            label_match = re.search(
+                rf"{re.escape(label_text)}\s*(?:[:：=]\s*)?",
+                source_text,
+                flags=re.IGNORECASE,
             )
-            match = re.search(pattern, normalized, flags=re.IGNORECASE)
-            if not match:
-                continue
-            value_text = re.sub(r"\s+", "", str(match.group(1) or ""))
+            if not label_match:
+                return ""
+            tail = source_text[label_match.end() :].lstrip()
+            if not tail:
+                return ""
+            stop_indexes: list[int] = []
+            next_line_match = re.search(r"[\r\n]", tail)
+            if next_line_match:
+                stop_indexes.append(next_line_match.start())
+            next_field_match = re.search(r"[,，、;；。]\s*(?=[A-Za-z\u4e00-\u9fff])", tail)
+            if next_field_match:
+                stop_indexes.append(next_field_match.start())
+            candidate = tail[: min(stop_indexes)] if stop_indexes else tail
+            return candidate[:48].strip()
+
+        def _looks_like_voltage_suffix(suffix_text: str) -> bool:
+            suffix = str(suffix_text or "").lstrip().lower()
+            if not suffix:
+                return True
+            if suffix.startswith(("kv", "v")):
+                return True
+            blocked_units = ("mpa", "hz", "ka", "a", "ma", "%", "min", "s", "℃", "°c")
+            return not suffix.startswith(blocked_units)
+
+        for label in labels:
+            value_text = _extract_candidate_slice(normalized, label)
             if not value_text:
                 continue
+            compact_value_text = re.sub(r"\s+", "", value_text)
 
             pair_match = re.fullmatch(
                 r"([0-9]+(?:\.[0-9]+)?)\(\+([0-9]+(?:\.[0-9]+)?)\)",
-                value_text,
+                compact_value_text,
             )
             if not pair_match:
                 pair_match = re.fullmatch(
                     r"\(([0-9]+(?:\.[0-9]+)?)\+([0-9]+(?:\.[0-9]+)?)\)",
-                    value_text,
+                    compact_value_text,
                 )
             if not pair_match:
                 pair_match = re.fullmatch(
                     r"([0-9]+(?:\.[0-9]+)?)\+([0-9]+(?:\.[0-9]+)?)",
-                    value_text,
+                    compact_value_text,
+                )
+            if not pair_match:
+                pair_match = re.fullmatch(
+                    r"([0-9]+(?:\.[0-9]+)?)\(\+([0-9]+(?:\.[0-9]+)?)\)(?:k[vV]?|K[Vv]?)?",
+                    compact_value_text,
+                )
+            if not pair_match:
+                pair_match = re.fullmatch(
+                    r"\(([0-9]+(?:\.[0-9]+)?)\+([0-9]+(?:\.[0-9]+)?)\)(?:k[vV]?|K[Vv]?)?",
+                    compact_value_text,
+                )
+            if not pair_match:
+                pair_match = re.fullmatch(
+                    r"([0-9]+(?:\.[0-9]+)?)\+([0-9]+(?:\.[0-9]+)?)(?:k[vV]?|K[Vv]?)?",
+                    compact_value_text,
                 )
 
             if pair_match:
@@ -2939,16 +3008,23 @@ def _apply_domain_rule_decisions_to_project_context(
                 auxiliary_value = float(pair_match.group(2))
                 return primary_value, auxiliary_value
 
-            single_match = re.fullmatch(r"([0-9]+(?:\.[0-9]+)?)", value_text)
-            if not single_match:
+            numeric_parts: list[float] = []
+            for numeric_match in re.finditer(r"[0-9]+(?:\.[0-9]+)?", value_text):
+                if not _looks_like_voltage_suffix(value_text[numeric_match.end() :]):
+                    continue
+                numeric_parts.append(float(numeric_match.group(0)))
+                if len(numeric_parts) >= 2:
+                    return numeric_parts[0], numeric_parts[1]
+
+            if not numeric_parts:
                 continue
-            primary_value = float(single_match.group(1))
+            primary_value = numeric_parts[0]
             auxiliary_value = None
             return primary_value, auxiliary_value
         return None
 
     def _extract_named_scalar_local(query_text: str, labels: list[str]) -> float | None:
-        text = str(query_text or "").strip()
+        text = _normalize_query_linebreaks(query_text)
         if not text:
             return None
         normalized = text.replace("（", "(").replace("）", ")")
@@ -3160,7 +3236,7 @@ def _apply_domain_rule_decisions_to_project_context(
                     return value
         return _preferred_capacitive_current_a_local(fallback_kind, rated_voltage_kv)
 
-    query_text = str(rule_query_text or "").strip()
+    query_text = _normalize_query_linebreaks(rule_query_text)
     rated_voltage_match = re.search(
         r"额定电压\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*kV\b", query_text, flags=re.IGNORECASE
     )
@@ -3183,6 +3259,22 @@ def _apply_domain_rule_decisions_to_project_context(
     rated_closing_ka = _extract_named_current_ka_local(
         query_text,
         ["额定短路关合电流", "短路关合电流", "关合电流"],
+    )
+    rated_short_time_withstand_ka = _extract_named_current_ka_local(
+        query_text,
+        ["额定短时耐受电流", "短时耐受电流"],
+    )
+    rated_peak_withstand_ka = _extract_named_current_ka_local(
+        query_text,
+        ["额定峰值耐受电流", "峰值耐受电流", "额定峰值电流", "峰值电流"],
+    )
+    rated_short_circuit_duration_s = _extract_named_scalar_local(
+        query_text,
+        ["额定短路持续时间", "短路持续时间"],
+    )
+    rated_out_of_step_break_ka = _extract_named_current_ka_local(
+        query_text,
+        ["额定失步开断电流", "失步开断电流"],
     )
     explicit_first_pole_kpp = _extract_named_scalar_local(
         query_text,
@@ -3347,8 +3439,12 @@ def _apply_domain_rule_decisions_to_project_context(
         "BC2(60Hz)",
         "CC1(60Hz)",
         "CC2(60Hz)",
+        "CC2(60Hz)#1",
+        "CC2(60Hz)#2",
         "LC1(60Hz)",
         "LC2(60Hz)",
+        "LC2(60Hz)#1",
+        "LC2(60Hz)#2",
     )
     is_three_phase_default = rated_voltage_kv is not None and rated_voltage_kv <= 40.5
 
@@ -3540,6 +3636,12 @@ def _apply_domain_rule_decisions_to_project_context(
             return resolved
 
         nonuniform_text = str(capacitive_nonuniform_value).rstrip("0").rstrip(".")
+        if rated_out_of_step_break_ka is not None:
+            current_text = f"{str(rated_out_of_step_break_ka).rstrip('0').rstrip('.')} kA"
+            resolved["试验电流kA"] = (
+                current_text,
+                f"用户已明确提供额定失步开断电流 {current_text}，失步关合和开断试验(OP2)试验电流直接采用该值。",
+            )
 
         if rated_voltage_kv <= 40.5:
             resolved["试验相数"] = (
@@ -3594,6 +3696,13 @@ def _apply_domain_rule_decisions_to_project_context(
             _format_voltage_value(test_voltage),
             f"失步关合和开断试验(OP1)试验电压按 额定电压 × 2.5 / √3 计算，即 {rated_voltage_kv} × 2.5 / √3 = {_format_voltage_value(test_voltage)}。",
         )
+        if rated_out_of_step_break_ka is not None:
+            test_current = round(rated_out_of_step_break_ka * 0.3, 3)
+            current_text = f"{str(test_current).rstrip('0').rstrip('.')} kA"
+            resolved["试验电流kA"] = (
+                current_text,
+                f"失步关合和开断试验(OP1)试验电流取额定失步开断电流的30%，即 {rated_out_of_step_break_ka} kA × 30% = {current_text}。",
+            )
         return resolved
 
     def _resolve_t100s_ab_parameters_local() -> dict[str, dict[str, tuple[str, str]]]:
@@ -3615,6 +3724,22 @@ def _apply_domain_rule_decisions_to_project_context(
         )
         resolved["T100s(a)"] = {"试验电压": t100s_a_value}
         resolved["T100s(a)(60Hz)"] = {"试验电压": t100s_a_value}
+        if short_break_ka is not None:
+            current_text = f"{str(short_break_ka).rstrip('0').rstrip('.')} kA"
+            current_value = (
+                current_text,
+                f"T100s(a)试验电流直接取额定短路开断电流 {current_text}。",
+            )
+            resolved["T100s(a)"]["试验电流kA"] = current_value
+            resolved["T100s(a)(60Hz)"]["试验电流kA"] = current_value
+        if rated_closing_ka is not None:
+            closing_text = f"{str(rated_closing_ka).rstrip('0').rstrip('.')} kA"
+            closing_value = (
+                closing_text,
+                f"用户已明确提供额定短路关合电流 {closing_text}，T100s(a)关合电流直接采用该值。",
+            )
+            resolved["T100s(a)"]["关合电流"] = closing_value
+            resolved["T100s(a)(60Hz)"]["关合电流"] = closing_value
 
         if first_pole_kpp is not None:
             kpp_text = str(first_pole_kpp).rstrip("0").rstrip(".")
@@ -3630,11 +3755,43 @@ def _apply_domain_rule_decisions_to_project_context(
             )
             resolved["T100s(b)"] = {"试验电压": t100s_b_value}
             resolved["T100s(b)(60Hz)"] = {"试验电压": t100s_b_value}
+            if short_break_ka is not None:
+                current_text = f"{str(short_break_ka).rstrip('0').rstrip('.')} kA"
+                current_value = (
+                    current_text,
+                    f"T100s(b)试验电流直接取额定短路开断电流 {current_text}。",
+                )
+                resolved["T100s(b)"]["试验电流kA"] = current_value
+                resolved["T100s(b)(60Hz)"]["试验电流kA"] = current_value
+            if rated_closing_ka is not None:
+                closing_text = f"{str(rated_closing_ka).rstrip('0').rstrip('.')} kA"
+                closing_value = (
+                    closing_text,
+                    f"用户已明确提供额定短路关合电流 {closing_text}，T100s(b)关合电流直接采用该值。",
+                )
+                resolved["T100s(b)"]["关合电流"] = closing_value
+                resolved["T100s(b)(60Hz)"]["关合电流"] = closing_value
 
         return resolved
 
     def _resolve_single_phase_ground_fault_parameters_local() -> dict[str, tuple[str, str]]:
         resolved: dict[str, tuple[str, str]] = {}
+        operation_sequence_match = re.search(
+            r"(?:额定操作顺序|操作顺序)\s*(?:[:：=]|为|是)?\s*([A-Za-z0-9\.\-\s]+(?:CO|O))",
+            query_text.replace("（", "(").replace("）", ")"),
+            flags=re.IGNORECASE,
+        )
+        operation_sequence_text = (
+            re.sub(r"\s+", "", operation_sequence_match.group(1))
+            if operation_sequence_match
+            else "O-0.3s-CO-180s-CO"
+        )
+        operation_sequence_rule = (
+            "用户已明确提供额定操作顺序，单相接地故障试验直接采用该值。"
+            if operation_sequence_match
+            else "未提供额定操作顺序时，单相接地故障试验默认按 O-0.3s-CO-180s-CO 执行。"
+        )
+        resolved["操作顺序"] = (operation_sequence_text, operation_sequence_rule)
         if rated_voltage_kv is None or capacitive_nonuniform_value is None:
             return resolved
 
@@ -3655,6 +3812,13 @@ def _apply_domain_rule_decisions_to_project_context(
         resolved: dict[str, tuple[str, str]] = {}
         if rated_voltage_kv is None or capacitive_nonuniform_value is None:
             return resolved
+
+        if rated_out_of_step_break_ka is not None:
+            current_text = _format_current_ka_local(rated_out_of_step_break_ka)
+            resolved["试验电流kA"] = (
+                current_text,
+                f"用户已明确提供额定失步开断电流 {current_text}，OP2关合试验电流直接采用该值。",
+            )
 
         break_count, break_count_rule = _resolve_break_count_local(query_text)
         nonuniform_text = str(capacitive_nonuniform_value).rstrip("0").rstrip(".")
@@ -4490,6 +4654,24 @@ def _apply_domain_rule_decisions_to_project_context(
                 ),
             )
 
+    if si_withstand_kv is not None:
+        si_withstand_text = _format_voltage_value(si_withstand_kv)
+        for test_name in (
+            "操作冲击耐受电压试验",
+            "操作冲击耐受电压试验(干)",
+            "操作冲击耐受电压试验(湿)",
+        ):
+            for param_name in ("操作冲击电压", "操作冲击耐受电压", "试验电压"):
+                _set_if_present(
+                    test_name,
+                    param_name,
+                    si_withstand_text,
+                    calc_rule=(
+                        "用户已明确提供额定操作冲击耐受电压，"
+                        f"{test_name}{param_name}直接采用该值 {si_withstand_text}。"
+                    ),
+                )
+
     if bc_current_a is not None:
         bc1_current_text = (
             f"{_format_current_a_local(bc_current_a * 0.1)}~{_format_current_a_local(bc_current_a * 0.4)}"
@@ -4640,6 +4822,12 @@ def _apply_domain_rule_decisions_to_project_context(
             "容性电流开断试验(CC2)",
             "容性电流开断试验(BC1)",
             "容性电流开断试验(BC2)",
+            "CC2(60Hz)",
+            "CC2(60Hz)#1",
+            "CC2(60Hz)#2",
+            "LC2(60Hz)",
+            "LC2(60Hz)#1",
+            "LC2(60Hz)#2",
         ):
             _set_if_present(
                 test_name,
@@ -4789,6 +4977,8 @@ def _apply_domain_rule_decisions_to_project_context(
         "容性电流开断试验(CC2)#1",
         "容性电流开断试验(CC2)#2",
         "CC2(60Hz)",
+        "CC2(60Hz)#1",
+        "CC2(60Hz)#2",
     ):
         if cc_current_a is not None:
             _set_capacitive_current_local(test_name, cc_current_a, 1.0, "额定电缆充电电流")
@@ -4807,6 +4997,8 @@ def _apply_domain_rule_decisions_to_project_context(
         "容性电流开断试验(LC2)#1",
         "容性电流开断试验(LC2)#2",
         "LC2(60Hz)",
+        "LC2(60Hz)#1",
+        "LC2(60Hz)#2",
     ):
         if lc_current_a is not None:
             _set_capacitive_current_local(test_name, lc_current_a, 1.0, "额定线路充电电流")
@@ -4824,6 +5016,12 @@ def _apply_domain_rule_decisions_to_project_context(
         "容性电流开断试验(CC2)",
         "容性电流开断试验(CC2)#1",
         "容性电流开断试验(CC2)#2",
+        "CC2(60Hz)",
+        "CC2(60Hz)#1",
+        "CC2(60Hz)#2",
+        "LC2(60Hz)",
+        "LC2(60Hz)#1",
+        "LC2(60Hz)#2",
     ):
         _set_if_present(
             test_name,
@@ -4842,6 +5040,10 @@ def _apply_domain_rule_decisions_to_project_context(
         "容性电流开断试验(LC2)#2",
         "容性电流开断试验(CC2)#1",
         "容性电流开断试验(CC2)#2",
+        "LC2(60Hz)#1",
+        "LC2(60Hz)#2",
+        "CC2(60Hz)#1",
+        "CC2(60Hz)#2",
     ):
         _set_if_present(
             test_name,
@@ -4953,25 +5155,74 @@ def _apply_domain_rule_decisions_to_project_context(
         _set_if_present(test_name, "试验相数", "三相", calc_rule="40.5kV及以下默认三相。")
         _set_if_present(test_name, "额定频率", f"{str(rated_frequency_hz).rstrip('0').rstrip('.')} Hz", calc_rule="用户已明确提供额定频率，问答阶段直接采用该值。")
 
+    short_withstand_tests = (
+        "短时耐受电流试验",
+        "峰值耐受电流试验",
+        "短时耐受电流和峰值耐受电流试验",
+    )
+    if rated_short_time_withstand_ka is not None:
+        short_time_current_text = _format_current_ka_local(rated_short_time_withstand_ka)
+        for test_name in short_withstand_tests:
+            _set_if_present(
+                test_name,
+                "短时耐受电流",
+                short_time_current_text,
+                calc_rule=(
+                    "用户已明确提供额定短时耐受电流，"
+                    f"{test_name}短时耐受电流直接采用 {short_time_current_text}。"
+                ),
+            )
+    if rated_peak_withstand_ka is not None:
+        peak_current_text = _format_current_ka_local(rated_peak_withstand_ka)
+        for test_name in short_withstand_tests:
+            _set_if_present(
+                test_name,
+                "峰值电流kA",
+                peak_current_text,
+                calc_rule=(
+                    "用户已明确提供额定峰值耐受电流，"
+                    f"{test_name}峰值电流kA直接采用 {peak_current_text}。"
+                ),
+            )
+    if rated_short_circuit_duration_s is not None:
+        duration_text = _format_duration_s_local(rated_short_circuit_duration_s)
+        for test_name in short_withstand_tests:
+            _set_if_present(
+                test_name,
+                "短路持续时间",
+                duration_text,
+                calc_rule=(
+                    "用户已明确提供额定短路持续时间，"
+                    f"{test_name}短路持续时间直接采用 {duration_text}。"
+                ),
+            )
+
     if first_pole_kpp is not None:
         first_pole_kpp_text = str(first_pole_kpp).rstrip("0").rstrip(".")
+        first_pole_kpp_param_names = ("首开极系数kpp", "首开极系数")
         for test_name, param_names in tuple(updated_param_map.items()):
-            if "首开极系数kpp" not in (param_names or []):
+            if not any(
+                param_name in (param_names or [])
+                for param_name in first_pole_kpp_param_names
+            ):
                 continue
-            if first_pole_kpp_from_user:
-                _set_if_present(
-                    test_name,
-                    "首开极系数kpp",
-                    first_pole_kpp_text,
-                    calc_rule=first_pole_kpp_rule,
-                )
-            else:
-                _set_if_value_missing(
-                    test_name,
-                    "首开极系数kpp",
-                    first_pole_kpp_text,
-                    calc_rule=first_pole_kpp_rule,
-                )
+            for param_name in first_pole_kpp_param_names:
+                if param_name not in (param_names or []):
+                    continue
+                if first_pole_kpp_from_user:
+                    _set_if_present(
+                        test_name,
+                        param_name,
+                        first_pole_kpp_text,
+                        calc_rule=first_pole_kpp_rule,
+                    )
+                else:
+                    _set_if_value_missing(
+                        test_name,
+                        param_name,
+                        first_pole_kpp_text,
+                        calc_rule=first_pole_kpp_rule,
+                    )
 
     if capacitive_nonuniform_text:
         for test_name, param_names in tuple(updated_param_map.items()):
@@ -5095,7 +5346,7 @@ def _apply_domain_rule_decisions_to_project_context(
     )
 
     op2_parameters = _resolve_op2_parameters_local()
-    for param_name in ("试验相数", "试验电压"):
+    for param_name in ("试验相数", "试验电压", "试验电流kA"):
         resolved_value = op2_parameters.get(param_name)
         if not resolved_value:
             continue
@@ -5108,7 +5359,7 @@ def _apply_domain_rule_decisions_to_project_context(
         )
 
     op1_parameters = _resolve_op1_parameters_local()
-    for param_name in ("试验电压",):
+    for param_name in ("试验电压", "试验电流kA"):
         resolved_value = op1_parameters.get(param_name)
         if not resolved_value:
             continue
@@ -5140,7 +5391,7 @@ def _apply_domain_rule_decisions_to_project_context(
         )
 
     op2_making_parameters = _resolve_op2_making_parameters_local()
-    for param_name in ("试验电压",):
+    for param_name in ("试验电流kA", "试验电压"):
         resolved_value = op2_making_parameters.get(param_name)
         if not resolved_value:
             continue
@@ -6181,13 +6432,17 @@ def _get_display_param_suppressions() -> dict[str, set[str]]:
         "L90(60Hz)":{"线路侧波阻抗","SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
         "L75(60Hz)":{"线路侧波阻抗","SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
         "L60(60Hz)":{"线路侧波阻抗","SF6气体的最低功能压力(20℃表压)","外壳是否带电"},
-        "T100A(60Hz)":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电","故障类型"},
+        "T100A(60Hz)":{"SF6气体的最低功能压力(20℃表压)","外壳是否带电","故障类型",'结构特征','首开极系数','失败次数'},
         "CC1(60Hz)":{"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电"},
         "CC2(60Hz)":{"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电"},
+        "CC2(60Hz)#1":{"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电"},
+        "CC2(60Hz)#2":{"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电"},
         "BC1(60Hz)":{"关合涌流","关合涌流的频率","SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电"},
         "BC2(60Hz)":{"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电"},
         "LC1(60Hz)":{"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电"},
         "LC2(60Hz)":{"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电"},
+        "LC2(60Hz)#1":{"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电"},
+        "LC2(60Hz)#2":{"SF6气体的最低功能压力(20℃表压)","SF6气体的额定压力(20℃表压)","外壳是否带电"},
         "T100s(a)(60Hz)":{"外壳是否带电","SF6气体的最低功能压力(20℃表压)"},
         "T100s(b)(60Hz)": {"金短时间","外壳是否带电","SF6气体的最低功能压力(20℃表压)"},
         "短路开断试验(T10)": {"外壳是否带电", "失败次数","SF6气体的最低功能压力(20℃表压)"},
@@ -6256,8 +6511,12 @@ def _get_report_scope_test_whitelist(stand_type: str | None = None) -> dict[str,
             "BC2(60Hz)",
             "CC1(60Hz)",
             "CC2(60Hz)",
+            "CC2(60Hz)#1",
+            "CC2(60Hz)#2",
             "LC1(60Hz)",
             "LC2(60Hz)",
+            "LC2(60Hz)#1",
+            "LC2(60Hz)#2",
 
         }
     short_tests = {
@@ -6679,7 +6938,25 @@ def _postprocess_electrical_markdown_response(
         "容性电流开断试验(CC1)",
         "容性电流开断试验(CC2)",
     }
+    lc_cc_60hz_coverage_required_items = {
+        "LC1(60Hz)",
+        "LC2(60Hz)",
+        "CC1(60Hz)",
+        "CC2(60Hz)",
+    }
+    lc_cc_coverage_note = "LC1，LC2可被CC1、CC2覆盖"
+    lc_cc_coverage_note_ascii = "LC1,LC2可被CC1、CC2覆盖"
+    lc_cc_60hz_coverage_note = "LC1(60Hz),LC2(60Hz) 可以被CC1(60Hz) CC2(60Hz) 替代"
     op1_optional_required_item = "失步关合和开断试验(OP1)"
+
+    def _has_lc_cc_60hz_coverage_items() -> bool:
+        return all(
+            any(
+                item == required_item or item.startswith(f"{required_item}#")
+                for item in allowed_set
+            )
+            for required_item in lc_cc_60hz_coverage_required_items
+        ) or lc_cc_60hz_coverage_required_items.issubset(allowed_display_set)
 
     iec_el_reduction_notes = [
         {
@@ -6721,7 +6998,9 @@ def _postprocess_electrical_markdown_response(
         stripped = str(line or "").strip()
         if not stripped:
             return True
-        if "LC1，LC2可被CC1、CC2覆盖" in stripped or "LC1,LC2可被CC1、CC2覆盖" in stripped:
+        if lc_cc_60hz_coverage_note in stripped:
+            return _has_lc_cc_60hz_coverage_items()
+        if lc_cc_coverage_note in stripped or lc_cc_coverage_note_ascii in stripped:
             return lc_cc_coverage_required_items.issubset(allowed_display_set)
         if "失步关合和开断试验(OP1)试验可免做" in stripped:
             return (
@@ -6749,10 +7028,15 @@ def _postprocess_electrical_markdown_response(
         required_notes: list[str] = []
 
         if lc_cc_coverage_required_items.issubset(allowed_display_set) and (
-            "LC1，LC2可被CC1、CC2覆盖" not in existing_text
-            and "LC1,LC2可被CC1、CC2覆盖" not in existing_text
+            lc_cc_coverage_note not in existing_text
+            and lc_cc_coverage_note_ascii not in existing_text
         ):
-            required_notes.append("LC1，LC2可被CC1、CC2覆盖")
+            required_notes.append(lc_cc_coverage_note)
+
+        if _has_lc_cc_60hz_coverage_items() and (
+            lc_cc_60hz_coverage_note not in existing_text
+        ):
+            required_notes.append(lc_cc_60hz_coverage_note)
 
         if (
             op1_optional_required_item in allowed_display_set
@@ -7120,11 +7404,31 @@ def _build_electrical_a_section_note_patch(
         "容性电流开断试验(CC1)",
         "容性电流开断试验(CC2)",
     }
+    lc_cc_60hz_coverage_required_items = {
+        "LC1(60Hz)",
+        "LC2(60Hz)",
+        "CC1(60Hz)",
+        "CC2(60Hz)",
+    }
+    def _has_lc_cc_60hz_coverage_items() -> bool:
+        return all(
+            any(
+                item == required_item or item.startswith(f"{required_item}#")
+                for item in allowed_set
+            )
+            for required_item in lc_cc_60hz_coverage_required_items
+        ) or lc_cc_60hz_coverage_required_items.issubset(allowed_display_set)
+
     if lc_cc_coverage_required_items.issubset(allowed_display_set) and (
         "LC1，LC2可被CC1、CC2覆盖" not in existing_text
         and "LC1,LC2可被CC1、CC2覆盖" not in existing_text
     ):
         notes.append("LC1，LC2可被CC1、CC2覆盖\n")
+    lc_cc_60hz_coverage_note = "LC1(60Hz),LC2(60Hz) 可以被CC1(60Hz) CC2(60Hz) 替代"
+    if _has_lc_cc_60hz_coverage_items() and (
+        lc_cc_60hz_coverage_note not in existing_text
+    ):
+        notes.append(f"{lc_cc_60hz_coverage_note}\n")
 
     rule_query_text = str(metadata.get("rule_query_text", "") or "")
     rated_voltage_match = re.search(
@@ -12948,6 +13252,8 @@ async def kg_query(
     if not query:
         return QueryResult(content=PROMPTS["fail_response"])
 
+    cleaned_rule_query = re.sub(r"[\r\n]+", " ", query).strip()
+
     if query_param.model_func:
         use_model_func = query_param.model_func
     else:
@@ -13110,7 +13416,7 @@ async def kg_query(
     # Build query context (unified interface)
     context_result = await _build_query_context(
         retrieval_query,
-        query,
+        cleaned_rule_query,
         ll_keywords_str,
         hl_keywords_str,
         knowledge_graph_inst,
