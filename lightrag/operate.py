@@ -77,6 +77,7 @@ from lightrag.constants import (
 )
 from lightrag.standards import normalize_standard_type
 from lightrag.kg.shared_storage import get_storage_keyed_lock
+from lightrag.query_param_extractor import QueryParamExtractor
 
 # use the .env that is inside the current folder
 # allows to use different .env file for each lightrag instance
@@ -3161,10 +3162,13 @@ def _apply_domain_rule_decisions_to_project_context(
         return _preferred_capacitive_current_a_local(fallback_kind, rated_voltage_kv)
 
     query_text = str(rule_query_text or "").strip()
-    rated_voltage_match = re.search(
-        r"额定电压\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*kV\b", query_text, flags=re.IGNORECASE
-    )
-    rated_voltage_kv = float(rated_voltage_match.group(1)) if rated_voltage_match else None
+
+    # ---- 统一参数提取：通过 QueryParamExtractor 从 query 中提取可先行默认的参数 ----
+    _extracted_result = QueryParamExtractor().extract(query_text)
+    _extracted_params = _extracted_result["values"]
+    _extracted_descs = _extracted_result["descriptions"]
+
+    rated_voltage_kv = _extracted_params.get("rated_voltage_kv")
     rated_current_match = re.search(
         r"额定电流\s*(?:[:：=]\s*)?([0-9]+(?:\.[0-9]+)?)\s*A\b",
         query_text,
@@ -3184,23 +3188,11 @@ def _apply_domain_rule_decisions_to_project_context(
         query_text,
         ["额定短路关合电流", "短路关合电流", "关合电流"],
     )
-    explicit_first_pole_kpp = _extract_named_scalar_local(
-        query_text,
-        ["首开极系数kpp", "首开极系数"],
-    )
-    first_pole_kpp_from_user = explicit_first_pole_kpp is not None
-    if explicit_first_pole_kpp is not None:
-        first_pole_kpp = explicit_first_pole_kpp
-        first_pole_kpp_rule = "用户已明确提供首开极系数 kpp，问答阶段直接采用该值。"
-    elif rated_voltage_kv is not None and rated_voltage_kv <= 40.5:
-        first_pole_kpp = 1.5
-        first_pole_kpp_rule = f"额定电压 {rated_voltage_kv} kV 不高于 40.5 kV，首开极系数 kpp 默认取 1.5。"
-    elif rated_voltage_kv is not None and rated_voltage_kv >= 72.5:
-        first_pole_kpp = 1.3
-        first_pole_kpp_rule = f"额定电压 {rated_voltage_kv} kV 不低于 72.5 kV，首开极系数 kpp 默认取 1.3。"
-    else:
-        first_pole_kpp = None
-        first_pole_kpp_rule = "未明确提供首开极系数 kpp，且当前额定电压区间无默认值。"
+
+    # ---- 首开极系数：优先用 extractor 提取/计算的结果 ----
+    first_pole_kpp = _extracted_params.get("first_pole_kpp")
+    first_pole_kpp_from_user = _extracted_params.get("first_pole_kpp") is not None
+    first_pole_kpp_rule = _extracted_descs.get("first_pole_kpp", "")
     is_low_voltage = rated_voltage_kv is not None and rated_voltage_kv <= 40.5
     is_breaker_class_not_applicable = rated_voltage_kv is not None and rated_voltage_kv > 72.5
     pf_withstand_kv = _extract_named_voltage_kv_local(
@@ -3534,6 +3526,15 @@ def _apply_domain_rule_decisions_to_project_context(
 
         return resolved
 
+    def _resolve_op2_current_local(resolved: dict[str, tuple[str, str]]) -> None:
+        """OP2 试验电流 = 额定失步开断电流（100%）"""
+        out_of_step_ka = _extracted_params.get("rated_out_of_step_ka")
+        if out_of_step_ka is not None:
+            resolved["试验电流kA"] = (
+                f"{out_of_step_ka} kA",
+                f"失步关合和开断试验(OP2)试验电流取额定失步开断电流，即 {out_of_step_ka} kA。",
+            )
+
     def _resolve_op2_parameters_local() -> dict[str, tuple[str, str]]:
         resolved: dict[str, tuple[str, str]] = {}
         if rated_voltage_kv is None or capacitive_nonuniform_value is None:
@@ -3555,6 +3556,7 @@ def _apply_domain_rule_decisions_to_project_context(
                 _format_voltage_value(test_voltage),
                 f"额定电压 {rated_voltage_kv} kV 不高于 40.5 kV 时，失步关合和开断试验(OP2)试验电压按 2.5 × 额定电压 / √3 × 不均匀系数 计算，即 2.5 × {rated_voltage_kv} / √3 × {nonuniform_text} = {_format_voltage_value(test_voltage)}。",
             )
+            _resolve_op2_current_local(resolved)
             return resolved
 
         if rated_voltage_kv >= 72.5:
@@ -3563,6 +3565,7 @@ def _apply_domain_rule_decisions_to_project_context(
                 f"额定电压 {rated_voltage_kv} kV 不低于 72.5 kV，失步关合和开断试验(OP2)按单相。",
             )
             if first_pole_kpp is None:
+                _resolve_op2_current_local(resolved)
                 return resolved
             kpp_text = str(first_pole_kpp).rstrip("0").rstrip(".")
             if abs(first_pole_kpp - 1.3) < 1e-6:
@@ -3570,6 +3573,7 @@ def _apply_domain_rule_decisions_to_project_context(
             elif abs(first_pole_kpp - 1.5) < 1e-6:
                 numerator = 2.5
             else:
+                _resolve_op2_current_local(resolved)
                 return resolved
             numerator_text = str(numerator).rstrip("0").rstrip(".")
             test_voltage = round(
@@ -3582,6 +3586,7 @@ def _apply_domain_rule_decisions_to_project_context(
                 f"额定电压 {rated_voltage_kv} kV 不低于 72.5 kV 且首开极系数 kpp={kpp_text} 时，失步关合和开断试验(OP2)试验电压按 {numerator_text} × 额定电压 / √3 × 不均匀系数 计算，即 {numerator_text} × {rated_voltage_kv} / √3 × {nonuniform_text} = {_format_voltage_value(test_voltage)}。",
             )
 
+        _resolve_op2_current_local(resolved)
         return resolved
 
     def _resolve_op1_parameters_local() -> dict[str, tuple[str, str]]:
@@ -3594,6 +3599,15 @@ def _apply_domain_rule_decisions_to_project_context(
             _format_voltage_value(test_voltage),
             f"失步关合和开断试验(OP1)试验电压按 额定电压 × 2.5 / √3 计算，即 {rated_voltage_kv} × 2.5 / √3 = {_format_voltage_value(test_voltage)}。",
         )
+
+        # 试验电流 = 额定失步开断电流 × 30%
+        out_of_step_ka = _extracted_params.get("rated_out_of_step_ka")
+        if out_of_step_ka is not None:
+            op1_current_ka = round(out_of_step_ka * 0.3, 3)
+            resolved["试验电流kA"] = (
+                f"{op1_current_ka} kA",
+                f"失步关合和开断试验(OP1)试验电流取额定失步开断电流的30%，即 {out_of_step_ka} kA × 30% = {op1_current_ka} kA。",
+            )
         return resolved
 
     def _resolve_t100s_ab_parameters_local() -> dict[str, dict[str, tuple[str, str]]]:
@@ -3667,6 +3681,14 @@ def _apply_domain_rule_decisions_to_project_context(
             _format_voltage_value(test_voltage),
             f"OP2关合试验电压按 2 × 额定电压 / 断口数量 / √3 × 不均匀系数 计算；{break_count_rule} 即 2 × {rated_voltage_kv} / {break_count} / √3 × {nonuniform_text} = {_format_voltage_value(test_voltage)}。",
         )
+
+        # 试验电流 = 额定失步开断电流（OP2关合用 100%，不同于 OP1 的 30%）
+        out_of_step_ka = _extracted_params.get("rated_out_of_step_ka")
+        if out_of_step_ka is not None:
+            resolved["试验电流kA"] = (
+                f"{out_of_step_ka} kA",
+                f"OP2关合试验电流取额定失步开断电流，即 {out_of_step_ka} kA。",
+            )
         return resolved
 
     def _resolve_60hz_short_circuit_parameters_local() -> dict[str, dict[str, tuple[str, str]]]:
@@ -5095,7 +5117,7 @@ def _apply_domain_rule_decisions_to_project_context(
     )
 
     op2_parameters = _resolve_op2_parameters_local()
-    for param_name in ("试验相数", "试验电压"):
+    for param_name in ("试验相数", "试验电压", "试验电流kA"):
         resolved_value = op2_parameters.get(param_name)
         if not resolved_value:
             continue
@@ -5108,7 +5130,7 @@ def _apply_domain_rule_decisions_to_project_context(
         )
 
     op1_parameters = _resolve_op1_parameters_local()
-    for param_name in ("试验电压",):
+    for param_name in ("试验电压", "试验电流kA"):
         resolved_value = op1_parameters.get(param_name)
         if not resolved_value:
             continue
@@ -5140,7 +5162,7 @@ def _apply_domain_rule_decisions_to_project_context(
         )
 
     op2_making_parameters = _resolve_op2_making_parameters_local()
-    for param_name in ("试验电压",):
+    for param_name in ("试验电压", "试验电流kA"):
         resolved_value = op2_making_parameters.get(param_name)
         if not resolved_value:
             continue
@@ -5502,21 +5524,31 @@ def _apply_domain_rule_decisions_to_project_context(
           2. 用户未提供时，默认回填 1000m
 
         各试验项需要海拔参数时，统一调用此方法获取，避免相互复制依赖。
+
+        注：海拔值优先使用 _extracted_params（由 QueryParamExtractor 统一提取），
+            若不存在则回退到 _extract_named_scalar_local 直接提取。
+            描述文本优先使用 _extracted_descs（由 QueryParamExtractor 生成）。
         """
-        explicit_altitude = _extract_named_scalar_local(
-            query_text,
-            ["最大(适用)的海拔", "最大适用海拔"],
-        )
+        altitude_m = _extracted_params.get("altitude_m")
+        if altitude_m is None:
+            altitude_m = _extract_named_scalar_local(
+                query_text,
+                ["最大(适用)的海拔", "最大适用海拔"],
+            )
+        explicit_altitude = altitude_m
         altitude_value_text = (
             f"{str(explicit_altitude).rstrip('0').rstrip('.')}m"
             if explicit_altitude is not None
             else "1000m"
         )
-        altitude_calc_rule = (
-            f"用户已明确提供最大(适用)的海拔为 {altitude_value_text}，直接采用。"
-            if explicit_altitude is not None
-            else "当前未检测到用户提供的最大(适用)的海拔，默认按1000m回填。"
-        )
+        # 优先使用 extractor 生成的描述文本
+        altitude_calc_rule = _extracted_descs.get("altitude_m", "")
+        if not altitude_calc_rule:
+            altitude_calc_rule = (
+                f"用户已明确提供最大(适用)的海拔为 {altitude_value_text}，直接采用。"
+                if explicit_altitude is not None
+                else "当前未检测到用户提供的最大(适用)的海拔，默认按1000m回填。"
+            )
         return {
             "value_text": altitude_value_text,
             "value_source": "user_input" if explicit_altitude is not None else "default",
